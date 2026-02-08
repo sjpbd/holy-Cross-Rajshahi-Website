@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Clubs & Organizations - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Clubs & Organizations</div>
+        </nav>
+
+        <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">Clubs & Organizations</h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+        <p class="text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            Explore our vibrant student organizations and extracurricular activities
+        </p>
+    </div>
+</section>
+
+<!-- Clubs Grid -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for club in clubs %}
+            <div class="card card-hover-lift overflow-hidden" data-aos="fade-up"
+                data-aos-delay="{{ forloop.counter0|add:'00' }}" data-tilt>
+                <!-- Club Logo/Image -->
+                {% if club.logo %}
+                <div class="h-48 bg-gradient-to-br from-primary to-primary-light flex items-center justify-center p-8">
+                    <img src="{{ club.logo.url }}" alt="{{ club.name }}" class="max-h-full max-w-full object-contain">
+                </div>
+                {% else %}
+                <div
+                    class="h-48 bg-gradient-to-br from-primary via-primary-light to-accent flex items-center justify-center">
+                    <i class="fas fa-users text-6xl text-white"></i>
+                </div>
+                {% endif %}
+
+                <div class="p-6">
+                    <!-- Club Name -->
+                    <h3 class="text-2xl font-bold text-primary mb-3">{{ club.name }}</h3>
+
+                    <!-- Club Description -->
+                    <p class="text-gray-600 mb-4 line-clamp-3">
+                        {{ club.description|striptags|truncatewords:20 }}
+                    </p>
+
+                    <!-- Club Stats -->
+                    <div class="flex items-center gap-4 mb-4 text-sm text-gray-500">
+                        {% if club.member_count %}
+                        <div class="flex items-center">
+                            <i class="fas fa-users mr-1"></i>
+                            <span>{{ club.member_count }} Members</span>
+                        </div>
+                        {% endif %}
+                        {% if club.category %}
+                        <span class="badge badge-primary">{{ club.category }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- View Details Button -->
+                    <a href="{% url 'club_detail' club.slug %}" class="btn btn-primary btn-sm w-full">
+                        View Details <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-16" data-aos="fade-up">
+                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-users text-4xl text-gray-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-600 mb-2">No Clubs Available</h3>
+                <p class="text-gray-500">Check back later for updates</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-16 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+    <div class="container mx-auto px-4 text-center relative z-10" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Interested in Joining a Club?</h2>
+        <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+            Contact our student affairs office to learn more about club memberships and activities
+        </p>
+        <a href="{% url 'home' %}#contact" class="btn btn-accent">
+            <i class="fas fa-envelope mr-2"></i>Get in Touch
+        </a>
+    </div>
+</section>
+{% endblock %}

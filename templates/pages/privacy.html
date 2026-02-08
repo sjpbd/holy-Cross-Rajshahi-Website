@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Privacy Policy</div>
+        </nav>
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Privacy Policy</h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto prose prose-lg">
+            <p class="lead text-xl text-gray-600 mb-8">
+                At Holy Cross School and College, Rajshahi, we are committed to protecting your privacy and ensuring the
+                security of your personal information. This Privacy Policy outlines how we collect, use, and safeguard
+                your data.
+            </p>
+
+            <h3>1. Information We Collect</h3>
+            <p>We may collect personal information such as your name, email address, phone number, and student details
+                when you interact with our website, fill out forms, or contact us.</p>
+
+            <h3>2. How We Use Your Information</h3>
+            <p>The information we collect is used to:</p>
+            <ul>
+                <li>Provide educational services and support.</li>
+                <li>Communicate with students, parents, and staff.</li>
+                <li>Process admissions and inquiries.</li>
+                <li>Improve our website and services.</li>
+            </ul>
+
+            <h3>3. Data Security</h3>
+            <p>We implement appropriate technical and organizational measures to protect your personal data against
+                unauthorized access, alteration, disclosure, or destruction.</p>
+
+            <h3>4. Third-Party Sharing</h3>
+            <p>We do not sell, trade, or rent your personal identification information to others. We may share generic
+                aggregated demographic information not linked to any personal identification information regarding
+                visitors and users with our business partners and trusted affiliates.</p>
+
+            <h3>5. Changes to This Policy</h3>
+            <p>Holy Cross School and College has the discretion to update this privacy policy at any time. We encourage
+                users to frequently check this page for any changes.</p>
+
+            <h3>6. Contact Us</h3>
+            <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+            <p>
+                <strong>Holy Cross School and College, Rajshahi</strong><br>
+                Email: info@holycross-rajshahi.edu.bd<br>
+                Phone: +880 1234-567890
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

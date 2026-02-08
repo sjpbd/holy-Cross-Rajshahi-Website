@@ -1,0 +1,70 @@
+<!-- templates/home_slider_new.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Slider Section with Swiper.js -->
+<section class="relative pt-20">
+    <div class="swiper heroSwiper h-[600px] md:h-[700px]">
+        <div class="swiper-wrapper">
+            {% for slider in sliders %}
+            <div class="swiper-slide relative">
+                <!-- Background Image -->
+                {% if slider.image %}
+                <img src="{{ slider.image.url }}" alt="{{ slider.title }}"
+                    class="absolute inset-0 w-full h-full object-cover">
+                {% else %}
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-primary to-primary-dark"></div>
+                {% endif %}
+
+                <!-- Gradient Overlay for Text Readability -->
+                <div class="absolute inset-0 bg-gradient-to-r from-primary/60 to-transparent"></div>
+
+                <!-- Content -->
+                <div class="relative container mx-auto px-4 h-full flex items-center z-10">
+                    <div class="text-white max-w-3xl">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight"
+                            style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                            {{ slider.title }}
+                        </h1>
+                        {% if slider.subtitle %}
+                        <p class="text-xl md:text-2xl mb-8 text-gray-200"
+                            style="text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">
+                            {{ slider.subtitle }}
+                        </p>
+                        {% endif %}
+                        {% if slider.link %}
+                        <a href="{{ slider.link }}"
+                            class="inline-block bg-accent hover:bg-accent-dark text-white font-bold px-8 py-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            Learn More <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Default Slide if no sliders -->
+            <div class="swiper-slide relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark"></div>
+                <div class="relative container mx-auto px-4 h-full flex items-center z-10">
+                    <div class="text-white max-w-3xl">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4">Welcome to Holy Cross School & College</h1>
+                        <p class="text-xl md:text-2xl mb-8 text-gray-200">Excellence in Education Since Establishment
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Arrows -->
+        {% if sliders|length > 1 %}
+        <div class="swiper-button-next text-white"></div>
+        <div class="swiper-button-prev text-white"></div>
+
+        <!-- Pagination Dots -->
+        <div class="swiper-pagination"></div>
+        {% endif %}
+    </div>
+</section>

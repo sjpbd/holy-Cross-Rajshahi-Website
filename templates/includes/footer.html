@@ -1,0 +1,114 @@
+<!-- templates/includes/footer.html -->
+{% load static %}
+
+<footer class="bg-primary-dark text-white pt-12 pb-6">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <!-- About Section -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-footer-text">Holy Cross School & College</h3>
+                <p class="text-gray-300 text-sm leading-relaxed mb-4">
+                    A premier educational institution in Rajshahi, dedicated to providing excellence in education and
+                    character development since its establishment.
+                </p>
+                <!-- Social Media -->
+                <div class="flex space-x-3">
+                    {% if school_info.facebook_url %}
+                    <a href="{{ school_info.facebook_url }}" target="_blank"
+                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    {% endif %}
+                    {% if school_info.twitter_url %}
+                    <a href="{{ school_info.twitter_url }}" target="_blank"
+                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    {% endif %}
+                    {% if school_info.youtube_url %}
+                    <a href="{{ school_info.youtube_url }}" target="_blank"
+                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    {% endif %}
+                    {% if school_info.instagram_url %}
+                    <a href="{{ school_info.instagram_url }}" target="_blank"
+                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-footer-text">Quick Links</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{% url 'about_page' 'history' %}"
+                            class="text-gray-300 hover:text-white transition">About Us</a></li>
+                    <li><a href="{% url 'teachers' %}" class="text-gray-300 hover:text-white transition">Our
+                            Teachers</a></li>
+                    <li><a href="{% url 'administration' %}"
+                            class="text-gray-300 hover:text-white transition">Administration</a></li>
+                    <li><a href="{% url 'club_list' %}" class="text-gray-300 hover:text-white transition">Clubs &
+                            Organizations</a></li>
+                    <li><a href="{% url 'resources' %}" class="text-gray-300 hover:text-white transition">Resources</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Academics -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-footer-text">Academics</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="{% url 'notice_list' %}" class="text-gray-300 hover:text-white transition">Notices</a>
+                    </li>
+                    <li><a href="{% url 'news_list' %}" class="text-gray-300 hover:text-white transition">News &
+                            Events</a></li>
+                    <li><a href="{% url 'resources' %}" class="text-gray-300 hover:text-white transition">Download
+                            Resources</a></li>
+                    <li><a href="/admin/" class="text-gray-300 hover:text-white transition">Admin Login</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact Info -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-footer-text">Contact Us</h3>
+                <ul class="space-y-3 text-sm text-gray-300">
+                    {% if school_info.address %}
+                    <li class="flex items-start space-x-2">
+                        <i class="fas fa-map-marker-alt mt-1"></i>
+                        <span>{{ school_info.address|safe }}</span>
+                    </li>
+                    {% endif %}
+                    {% if school_info.phone %}
+                    <li class="flex items-center space-x-2">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ school_info.phone }}</span>
+                    </li>
+                    {% endif %}
+                    {% if school_info.email %}
+                    <li class="flex items-center space-x-2">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ school_info.email }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="border-t border-gray-700 pt-6 mt-6">
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                <p>&copy; {% now "Y" %} Holy Cross School and College, Rajshahi. All rights reserved.</p>
+                <div class="flex space-x-4 mt-2 md:mt-0">
+                    <a href="{% url 'privacy_policy' %}" class="hover:text-white transition">Privacy Policy</a>
+                    <span class="text-gray-600">|</span>
+                    <a href="{% url 'terms_of_service' %}" class="hover:text-white transition">Terms of Service</a>
+                    <span class="text-gray-600">|</span>
+                    <a href="{% url 'sitemap' %}" class="hover:text-white transition">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

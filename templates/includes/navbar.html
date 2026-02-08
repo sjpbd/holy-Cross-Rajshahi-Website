@@ -1,0 +1,295 @@
+<!-- templates/includes/navbar.html -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-primary transition-all duration-300">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-20">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <a href="{% url 'home' %}" class="flex items-center space-x-3">
+                    {% if school_info.logo %}
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="h-12 w-auto object-contain">
+                    </div>
+                    {% else %}
+                    <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                    </div>
+                    {% endif %}
+                    <div class="text-white">
+                        <div class="font-bold text-lg leading-tight">Holy Cross School & College</div>
+                        <div class="text-xs text-gray-300">Rajshahi</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center space-x-1">
+                <a href="{% url 'home' %}" class="nav-link">
+                    <i class="fas fa-home mr-1"></i>Home
+                </a>
+
+                <!-- About Dropdown -->
+                <div class="relative group">
+                    <button class="nav-link flex items-center">
+                        About Us <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'about_page' 'history' %}" class="dropdown-item">
+                            <i class="fas fa-history mr-2"></i>Our History
+                        </a>
+                        <a href="{% url 'about_page' 'mission' %}" class="dropdown-item">
+                            <i class="fas fa-bullseye mr-2"></i>Mission & Vision
+                        </a>
+                        <a href="{% url 'about_page' 'message' %}" class="dropdown-item">
+                            <i class="fas fa-comment-dots mr-2"></i>Messages
+                        </a>
+                    </div>
+                </div>
+
+                <!-- People Dropdown -->
+                <div class="relative group">
+                    <button class="nav-link flex items-center">
+                        People <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{% url 'administration' %}" class="dropdown-item">
+                            <i class="fas fa-user-tie mr-2"></i>Administration
+                        </a>
+                        <a href="{% url 'teachers' %}" class="dropdown-item">
+                            <i class="fas fa-chalkboard-teacher mr-2"></i>Teachers
+                        </a>
+                    </div>
+                </div>
+
+                <a href="{% url 'notice_list' %}" class="nav-link">
+                    <i class="fas fa-bell mr-1"></i>Notices
+                </a>
+                <a href="{% url 'news_list' %}" class="nav-link">
+                    <i class="fas fa-newspaper mr-1"></i>News
+                </a>
+                <a href="{% url 'club_list' %}" class="nav-link">
+                    <i class="fas fa-users mr-1"></i>Clubs
+                </a>
+                <a href="{% url 'resources' %}" class="nav-link">
+                    <i class="fas fa-book mr-1"></i>Resources
+                </a>
+                <a href="{% url 'contact' %}" class="nav-link">
+                    <i class="fas fa-envelope mr-1"></i>Contact
+                </a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuBtn" class="lg:hidden text-white p-2 hover:bg-primary-dark rounded-lg transition">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="lg:hidden bg-primary-dark overflow-hidden transition-all duration-300 max-h-0">
+        <div class="container mx-auto px-4 py-4 space-y-2">
+            <a href="{% url 'home' %}" class="mobile-nav-link">
+                <i class="fas fa-home mr-2"></i>Home
+            </a>
+
+            <!-- About Mobile Dropdown -->
+            <div>
+                <button class="mobile-nav-link w-full flex items-center justify-between"
+                    onclick="toggleMobileDropdown('aboutDropdown')">
+                    <span><i class="fas fa-info-circle mr-2"></i>About Us</span>
+                    <i class="fas fa-chevron-down transition-transform" id="aboutDropdownIcon"></i>
+                </button>
+                <div id="aboutDropdown" class="pl-8 space-y-2 max-h-0 overflow-hidden transition-all duration-300">
+                    <a href="{% url 'about_page' 'history' %}" class="mobile-nav-sublink">Our History</a>
+                    <a href="{% url 'about_page' 'mission' %}" class="mobile-nav-sublink">Mission & Vision</a>
+                    <a href="{% url 'about_page' 'message' %}" class="mobile-nav-sublink">Messages</a>
+                </div>
+            </div>
+
+            <!-- People Mobile Dropdown -->
+            <div>
+                <button class="mobile-nav-link w-full flex items-center justify-between"
+                    onclick="toggleMobileDropdown('peopleDropdown')">
+                    <span><i class="fas fa-users mr-2"></i>People</span>
+                    <i class="fas fa-chevron-down transition-transform" id="peopleDropdownIcon"></i>
+                </button>
+                <div id="peopleDropdown" class="pl-8 space-y-2 max-h-0 overflow-hidden transition-all duration-300">
+                    <a href="{% url 'administration' %}" class="mobile-nav-sublink">Administration</a>
+                    <a href="{% url 'teachers' %}" class="mobile-nav-sublink">Teachers</a>
+                </div>
+            </div>
+
+            <a href="{% url 'notice_list' %}" class="mobile-nav-link">
+                <i class="fas fa-bell mr-2"></i>Notices
+            </a>
+            <a href="{% url 'news_list' %}" class="mobile-nav-link">
+                <i class="fas fa-newspaper mr-2"></i>News
+            </a>
+            <a href="{% url 'club_list' %}" class="mobile-nav-link">
+                <i class="fas fa-users mr-2"></i>Clubs
+            </a>
+            <a href="{% url 'resources' %}" class="mobile-nav-link">
+                <i class="fas fa-book mr-2"></i>Resources
+            </a>
+            <a href="{% url 'contact' %}" class="mobile-nav-link">
+                <i class="fas fa-envelope mr-2"></i>Contact
+            </a>
+        </div>
+    </div>
+</nav>
+
+<style>
+    /* Navbar Styles */
+    #navbar {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-scrolled {
+        background: rgba(28, 42, 78, 0.98) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Desktop Navigation Links */
+    .nav-link {
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 215, 0, 0.2);
+        color: #FFEC8B;
+        transform: translateY(-2px);
+    }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: white;
+        min-width: 220px;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+
+    .group:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1.25rem;
+        color: #1e40af;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+
+    .dropdown-item:hover {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    .dropdown-item i {
+        color: #FFD700;
+        transition: transform 0.2s ease;
+    }
+
+    .dropdown-item:hover i {
+        transform: translateX(5px);
+    }
+
+    /* Mobile Navigation */
+    .mobile-nav-link {
+        display: block;
+        color: white;
+        padding: 0.875rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        text-align: left;
+    }
+
+    .mobile-nav-link:hover {
+        background: rgba(255, 215, 0, 0.2);
+        color: #FFEC8B;
+    }
+
+    .mobile-nav-sublink {
+        display: block;
+        color: #e5e7eb;
+        padding: 0.625rem 1rem;
+        border-radius: 0.375rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        text-align: left;
+    }
+
+    .mobile-nav-sublink:hover {
+        color: #FFEC8B;
+        background: rgba(255, 215, 0, 0.1);
+    }
+</style>
+
+<script>
+    // Mobile Menu Toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function () {
+        const menu = document.getElementById('mobileMenu');
+        const icon = this.querySelector('i');
+
+        if (menu.style.maxHeight === '0px' || !menu.style.maxHeight) {
+            menu.style.maxHeight = '600px';
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        } else {
+            menu.style.maxHeight = '0px';
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+
+    // Mobile Dropdown Toggle
+    function toggleMobileDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        const icon = document.getElementById(dropdownId + 'Icon');
+
+        if (dropdown.style.maxHeight === '0px' || !dropdown.style.maxHeight) {
+            dropdown.style.maxHeight = '200px';
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            dropdown.style.maxHeight = '0px';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function (event) {
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+
+        if (!mobileMenu.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+            mobileMenu.style.maxHeight = '0px';
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    });
+</script>

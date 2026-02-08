@@ -1,0 +1,166 @@
+<!-- templates/about.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section with Breadcrumb -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">
+                {% if page == 'history' %}Our History
+                {% elif page == 'mission' %}Mission & Vision
+                {% elif page == 'message' %}Messages
+                {% else %}About Us{% endif %}
+            </div>
+        </nav>
+
+        <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">
+            {% if page == 'history' %}Our History
+            {% elif page == 'mission' %}Mission & Vision
+            {% elif page == 'message' %}Messages from Leadership
+            {% else %}About Us{% endif %}
+        </h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+        <p class="text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            {% if page == 'history' %}Discover our rich heritage and journey of excellence
+            {% elif page == 'mission' %}Our guiding principles and aspirations
+            {% elif page == 'message' %}Words of wisdom from our esteemed leaders
+            {% else %}Learn more about our institution{% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- Content Section -->
+<div class="bg-gray-50 py-16">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            {% if page == 'history' %}
+            <!-- History Content -->
+            <div class="card p-8 md:p-12 prose prose-lg max-w-none" data-aos="fade-up">
+                {{ school_info.history|safe }}
+            </div>
+
+            {% elif page == 'mission' %}
+            <!-- Mission, Vision, Goals -->
+            <div class="space-y-8">
+                <div class="card card-hover-lift p-8 md:p-12" data-aos="fade-up">
+                    <div class="flex items-center mb-6">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-bullseye text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-primary">Our Mission</h2>
+                    </div>
+                    <div class="prose prose-lg max-w-none">
+                        {{ school_info.mission|safe }}
+                    </div>
+                </div>
+
+                <div class="card card-hover-lift p-8 md:p-12" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center mb-6">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-eye text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-primary">Our Vision</h2>
+                    </div>
+                    <div class="prose prose-lg max-w-none">
+                        {{ school_info.vision|safe }}
+                    </div>
+                </div>
+
+                {% if school_info.goal %}
+                <div class="card card-hover-lift p-8 md:p-12" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center mb-6">
+                        <div
+                            class="w-16 h-16 bg-gradient-to-br from-primary-light to-accent rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-flag-checkered text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-primary">Our Goals</h2>
+                    </div>
+                    <div class="prose prose-lg max-w-none">
+                        {{ school_info.goal|safe }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% elif page == 'message' %}
+            <!-- Leadership Messages -->
+            <div class="space-y-8">
+                {% if school_info.principal_message %}
+                <div class="card card-hover-lift overflow-hidden" data-aos="fade-up">
+                    <div class="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
+                        <div class="flex items-center">
+                            {% if school_info.principal_photo %}
+                            <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
+                                class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-accent shadow-lg">
+                            {% endif %}
+                            <div class="ml-6">
+                                <h2 class="text-3xl md:text-4xl font-bold">{{ school_info.principal_name }}</h2>
+                                <p class="text-xl text-accent-light">Principal</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 md:p-12 prose prose-lg max-w-none">
+                        {{ school_info.principal_message|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if school_info.vice_principal_message %}
+                <div class="card card-hover-lift overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-gradient-to-r from-primary-dark to-primary p-6 text-white">
+                        <div class="flex items-center">
+                            {% if school_info.vice_principal_photo %}
+                            <img src="{{ school_info.vice_principal_photo.url }}"
+                                alt="{{ school_info.vice_principal_name }}"
+                                class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-accent shadow-lg">
+                            {% endif %}
+                            <div class="ml-6">
+                                <h2 class="text-3xl md:text-4xl font-bold">{{ school_info.vice_principal_name }}</h2>
+                                <p class="text-xl text-accent-light">Vice Principal</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 md:p-12 prose prose-lg max-w-none">
+                        {{ school_info.vice_principal_message|safe }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<section class="py-16 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+    <div class="container mx-auto px-4 text-center relative z-10" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Want to Learn More?</h2>
+        <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+            Explore our website to discover more about our programs, faculty, and achievements.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="{% url 'teachers' %}" class="btn btn-accent">
+                <i class="fas fa-chalkboard-teacher mr-2"></i>Our Teachers
+            </a>
+            <a href="{% url 'club_list' %}" class="btn btn-glass">
+                <i class="fas fa-users mr-2"></i>Clubs & Activities
+            </a>
+            <a href="{% url 'notice_list' %}" class="btn btn-glass">
+                <i class="fas fa-bell mr-2"></i>Latest Notices
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

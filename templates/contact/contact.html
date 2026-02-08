@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Contact Us</div>
+        </nav>
+
+        <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">Contact Us</h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+        <p class="text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            We'd love to hear from you. Get in touch with us for any inquiries.
+        </p>
+    </div>
+</section>
+
+<!-- Contact Content -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Contact Info Cards -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Address Card -->
+                <div class="card card-hover-lift p-6" data-aos="fade-up">
+                    <div class="flex items-start">
+                        <div
+                            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 flex-shrink-0">
+                            <i class="fas fa-map-marker-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Our Location</h3>
+                            <p class="text-gray-600">{{ contact_info.address|linebreaksbr }}</p>
+                            {% if contact_info.city %}
+                            <p class="text-gray-600">{{ contact_info.city }}{% if contact_info.postal_code %}, {{
+                                contact_info.postal_code }}{% endif %}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone Card -->
+                <div class="card card-hover-lift p-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-start">
+                        <div
+                            class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent mr-4 flex-shrink-0">
+                            <i class="fas fa-phone text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Phone Number</h3>
+                            <p class="text-gray-600 mb-2">Call us during office hours</p>
+                            <a href="tel:{{ contact_info.phone }}"
+                                class="text-primary font-semibold hover:text-accent transition">
+                                {{ contact_info.phone }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Card -->
+                <div class="card card-hover-lift p-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-start">
+                        <div
+                            class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 flex-shrink-0">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Email Address</h3>
+                            <p class="text-gray-600 mb-2">Send us your query anytime</p>
+                            <a href="mailto:{{ contact_info.email }}"
+                                class="text-primary font-semibold hover:text-accent transition">
+                                {{ contact_info.email }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Office Hours -->
+                {% if contact_info.office_hours %}
+                <div class="card card-hover-lift p-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-start">
+                        <div
+                            class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4 flex-shrink-0">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Office Hours</h3>
+                            <p class="text-gray-600">{{ contact_info.office_hours|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Contact Form -->
+            <div class="lg:col-span-2">
+                <div class="card p-8" data-aos="fade-up" data-aos-delay="200">
+                    <h2 class="text-2xl font-bold text-primary mb-6">Send us a Message</h2>
+
+                    {% if messages %}
+                    <div class="mb-6">
+                        {% for message in messages %}
+                        <div
+                            class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200{% else %}bg-red-100 text-red-700 border border-red-200{% endif %}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Your Name</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Email Address</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Phone Number (Optional)</label>
+                                {{ form.phone }}
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Subject</label>
+                                {{ form.subject }}
+                                {% if form.subject.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.subject.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Message</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.message.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-full md:w-auto">
+                            <i class="fas fa-paper-plane mr-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+{% if contact_info.map_embed_url %}
+<section class="h-[400px] w-full relative">
+    <iframe src="{{ contact_info.map_embed_url }}" width="100%" height="100%" style="border:0;" allowfullscreen=""
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</section>
+{% endif %}
+{% endblock %}

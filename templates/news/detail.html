@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ news.title }} - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Featured Image -->
+<section class="pt-20 relative">
+    {% if news.featured_image %}
+    <div class="relative h-[500px] md:h-[600px]">
+        <img src="{{ news.featured_image.url }}" alt="{{ news.title }}" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+
+        <div class="absolute bottom-0 left-0 right-0 pb-12">
+            <div class="container mx-auto px-4">
+                <nav class="breadcrumb mb-6" data-aos="fade-down">
+                    <div class="breadcrumb-item"><a href="{% url 'home' %}"
+                            class="text-white hover:text-accent">Home</a></div>
+                    <div class="breadcrumb-item"><a href="{% url 'news_list' %}"
+                            class="text-white hover:text-accent">News</a></div>
+                    <div class="breadcrumb-item active text-accent">{{ news.title|truncatewords:5 }}</div>
+                </nav>
+
+                {% if news.is_featured %}
+                <div class="badge badge-accent mb-4" data-aos="fade-up">
+                    <i class="fas fa-star mr-2"></i>Featured Story
+                </div>
+                {% endif %}
+
+                <h1 class="text-4xl md:text-5xl font-bold text-white mb-6" data-aos="fade-up">{{ news.title }}</h1>
+
+                <div class="flex flex-wrap items-center gap-6 text-gray-200" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center">
+                        <i class="far fa-calendar-alt mr-2"></i>
+                        <span>{{ news.published_date|date:"F d, Y" }}</span>
+                    </div>
+                    {% if news.author %}
+                    <div class="flex items-center">
+                        <i class="far fa-user mr-2"></i>
+                        <span>{{ news.author }}</span>
+                    </div>
+                    {% endif %}
+                    {% if news.category %}
+                    <div class="badge badge-glass">{{ news.category }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gradient-to-br from-primary to-primary-dark text-white py-20">
+        <div class="container mx-auto px-4">
+            <nav class="breadcrumb mb-8" data-aos="fade-down">
+                <div class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white hover:text-accent">Home</a>
+                </div>
+                <div class="breadcrumb-item"><a href="{% url 'news_list' %}"
+                        class="text-white hover:text-accent">News</a></div>
+                <div class="breadcrumb-item active text-accent">{{ news.title|truncatewords:5 }}</div>
+            </nav>
+
+            <h1 class="text-4xl md:text-5xl font-bold mb-6" data-aos="fade-up">{{ news.title }}</h1>
+
+            <div class="flex flex-wrap items-center gap-6 text-gray-200" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-center">
+                    <i class="far fa-calendar-alt mr-2"></i>
+                    <span>{{ news.published_date|date:"F d, Y" }}</span>
+                </div>
+                {% if news.author %}
+                <div class="flex items-center">
+                    <i class="far fa-user mr-2"></i>
+                    <span>{{ news.author }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- News Content -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Main Content -->
+            <div class="card p-8 md:p-12 mb-8" data-aos="fade-up">
+                <div class="prose prose-lg max-w-none">
+                    {{ news.content|safe }}
+                </div>
+
+                <!-- Tags -->
+                {% if news.tags.all %}
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-lg font-bold text-primary mb-3 flex items-center">
+                        <i class="fas fa-tags mr-2"></i>Tags
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in news.tags.all %}
+                        <span class="badge badge-primary">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Share Buttons -->
+            <div class="flex flex-wrap gap-4 mb-8" data-aos="fade-up">
+                <button onclick="shareNews()" class="btn btn-accent">
+                    <i class="fas fa-share-alt mr-2"></i>Share This Story
+                </button>
+                <button onclick="window.print()" class="btn btn-outline">
+                    <i class="fas fa-print mr-2"></i>Print
+                </button>
+                <a href="{% url 'news_list' %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to News
+                </a>
+            </div>
+
+            <!-- Related News -->
+            {% if related_news %}
+            <div class="mt-12" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-primary mb-6">Related Stories</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {% for related in related_news %}
+                    <div class="card card-hover-lift image-zoom-container relative">
+                        {% if related.featured_image %}
+                        <img src="{{ related.featured_image.url }}" alt="{{ related.title }}"
+                            class="w-full h-48 object-cover image-zoom">
+                        <div class="image-overlay"></div>
+                        {% else %}
+                        <div class="w-full h-48 bg-gradient-to-br from-primary to-accent"></div>
+                        {% endif %}
+
+                        <div class="p-4">
+                            <div class="text-sm text-gray-500 mb-2">
+                                {{ related.published_date|date:"M d, Y" }}
+                            </div>
+                            <h3 class="text-lg font-bold text-primary mb-2 hover:text-accent transition line-clamp-2">
+                                {{ related.title }}
+                            </h3>
+                            <a href="{% url 'news_detail' related.slug %}"
+                                class="text-accent hover:text-accent-dark font-semibold text-sm">
+                                Read More <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function shareNews() {
+        if (navigator.share) {
+            navigator.share({
+                title: '{{ news.title|escapejs }}',
+                text: '{{ news.get_excerpt|escapejs }}',
+                url: window.location.href
+            }).catch(err => console.log('Error sharing:', err));
+        } else {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Service - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Terms of Service</div>
+        </nav>
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Terms of Service</h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+    </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto prose prose-lg">
+            <p class="lead text-xl text-gray-600 mb-8">
+                Welcome to the Holy Cross School and College, Rajshahi website. By accessing or using our website, you
+                agree to comply with and be bound by the following terms and conditions.
+            </p>
+
+            <h3>1. Acceptance of Terms</h3>
+            <p>By accessing this website, you acknowledge that you have read, understood, and agree to be bound by these
+                Terms of Service. If you do not agree with any part of these terms, please do not use our website.</p>
+
+            <h3>2. Use of Content</h3>
+            <p>All content provided on this website is for informational purposes only. The materials contained in this
+                website are protected by applicable copyright and trademark law.</p>
+
+            <h3>3. User Conduct</h3>
+            <p>You agree to use our website only for lawful purposes. You are prohibited from posting or transmitting
+                any unlawful, threatening, libelous, defamatory, obscene, or profane material.</p>
+
+            <h3>4. Disclaimer</h3>
+            <p>The materials on Holy Cross School and College's website are provided on an 'as is' basis. We make no
+                warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without
+                limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or
+                non-infringement of intellectual property or other violation of rights.</p>
+
+            <h3>5. Limitation of Liability</h3>
+            <p>In no event shall Holy Cross School and College or its suppliers be liable for any damages (including,
+                without limitation, damages for loss of data or profit, or due to business interruption) arising out of
+                the use or inability to use the materials on our website.</p>
+
+            <h3>6. Governing Law</h3>
+            <p>These terms and conditions are governed by and construed in accordance with the laws of Bangladesh and
+                you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

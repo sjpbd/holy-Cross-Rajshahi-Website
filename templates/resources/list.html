@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Resources - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Resources</div>
+        </nav>
+
+        <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">Resources</h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+        <p class="text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            Download important documents, forms, and educational materials
+        </p>
+    </div>
+</section>
+
+<!-- Resources Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <!-- Category Filter -->
+        {% if categories %}
+        <div class="flex flex-wrap gap-3 mb-8" data-aos="fade-up">
+            <button data-filter="all" class="btn btn-primary active">All Resources</button>
+            {% for category in categories %}
+            <button data-filter="{{ category.slug }}" class="btn btn-outline">
+                <i class="fas {{ category.icon|default:'fa-folder' }} mr-2"></i>{{ category.name }}
+            </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Resources Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for resource in resources %}
+            <div class="card card-hover-lift" data-category="{{ resource.category.slug|default:'general' }}"
+                data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
+                <div class="p-6">
+                    <!-- File Icon -->
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center mb-4">
+                        {% if resource.file_type == 'pdf' %}
+                        <i class="fas fa-file-pdf text-3xl text-white"></i>
+                        {% elif resource.file_type == 'doc' or resource.file_type == 'docx' %}
+                        <i class="fas fa-file-word text-3xl text-white"></i>
+                        {% elif resource.file_type == 'xls' or resource.file_type == 'xlsx' %}
+                        <i class="fas fa-file-excel text-3xl text-white"></i>
+                        {% elif resource.file_type == 'ppt' or resource.file_type == 'pptx' %}
+                        <i class="fas fa-file-powerpoint text-3xl text-white"></i>
+                        {% elif resource.file_type == 'zip' or resource.file_type == 'rar' %}
+                        <i class="fas fa-file-archive text-3xl text-white"></i>
+                        {% else %}
+                        <i class="fas fa-file text-3xl text-white"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- Resource Info -->
+                    <div class="flex items-center justify-between mb-3">
+                        {% if resource.category %}
+                        <span class="badge badge-primary">{{ resource.category }}</span>
+                        {% endif %}
+                        {% if resource.file_type %}
+                        <span class="text-xs text-gray-500 uppercase font-bold">{{ resource.file_type }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="text-xl font-bold text-primary mb-2 line-clamp-2">{{ resource.title }}</h3>
+
+                    <!-- Description -->
+                    {% if resource.description %}
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ resource.description }}</p>
+                    {% endif %}
+
+                    <!-- Meta Info -->
+                    <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+                        <span><i class="far fa-calendar-alt mr-1"></i>{{ resource.uploaded_at|date:"M d, Y" }}</span>
+                        {% if resource.file_size %}
+                        <span><i class="fas fa-database mr-1"></i>{{ resource.file_size }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Download Button -->
+                    <a href="{{ resource.file.url }}" download class="btn btn-accent btn-sm w-full">
+                        <i class="fas fa-download mr-2"></i>Download
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-16" data-aos="fade-up">
+                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-folder-open text-4xl text-gray-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-600 mb-2">No Resources Available</h3>
+                <p class="text-gray-500">Check back later for updates</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Help Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center" data-aos="fade-up">
+            <div
+                class="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-question-circle text-3xl text-white"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold text-primary mb-4">Need Help?</h2>
+            <p class="text-gray-600 mb-8">
+                If you're having trouble downloading resources or need a specific document, please contact our office
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                {% if school_info.email %}
+                <a href="mailto:{{ school_info.email }}" class="btn btn-primary">
+                    <i class="fas fa-envelope mr-2"></i>Email Us
+                </a>
+                {% endif %}
+                {% if school_info.phone %}
+                <a href="tel:{{ school_info.phone }}" class="btn btn-outline">
+                    <i class="fas fa-phone mr-2"></i>Call Us
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

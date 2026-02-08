@@ -1,0 +1,1096 @@
+<!-- templates/notices/detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ notice.title }} - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary via-primary-dark to-primary text-white relative overflow-hidden">
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'notice_list' %}"
+                    style="color: white !important;">Notices</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">{{ notice.title|truncatewords:5 }}
+            </div>
+        </nav>
+
+        {% if notice.is_important %}
+        <div class="inline-flex items-center bg-red-600 text-white px-4 py-2 rounded-full mb-4 animate-pulse"
+            data-aos="fade-up">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span class="font-bold text-sm uppercase tracking-wide">Important Notice</span>
+        </div>
+        {% endif %}
+
+        <h1 class="text-3xl md:text-5xl font-bold mb-6 leading-tight" data-aos="fade-up">{{ notice.title }}</h1>
+
+        <div class="flex flex-wrap items-center gap-6 text-gray-200" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex items-center bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                <i class="far fa-calendar-alt mr-2"></i>
+                <span>{{ notice.created_at|date:"F d, Y" }}</span>
+            </div>
+            <div class="flex items-center bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                <i class="far fa-clock mr-2"></i>
+                <span>{{ notice.created_at|date:"g:i A" }}</span>
+            </div>
+            <div class="flex items-center bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                <i class="far fa-eye mr-2"></i>
+                <span id="viewCount">{{ notice.view_count }}</span> views
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Notice Content -->
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Main Content Card -->
+            <div class="notice-detail-card" data-aos="fade-up">
+                <div class="prose prose-lg max-w-none notice-content">
+                    {{ notice.description|safe }}
+                </div>
+
+                {% if notice.attachment %}
+                <div class="attachment-section">
+                    <div class="attachment-header">
+                        <div class="flex items-center gap-3">
+                            <div class="attachment-icon">
+                                <i class="fas fa-paperclip"></i>
+                            </div>
+                            <div>
+                                <h3 class="attachment-title">Attachment</h3>
+                                <p class="attachment-filename">{{ notice.attachment.name }}</p>
+                            </div>
+                        </div>
+                        <div class="attachment-meta">
+                            {% if notice.attachment_is_pdf %}
+                            <span class="file-type-badge pdf">
+                                <i class="fas fa-file-pdf mr-1"></i> PDF
+                            </span>
+                            {% elif notice.attachment_is_image %}
+                            <span class="file-type-badge image">
+                                <i class="fas fa-file-image mr-1"></i> Image
+                            </span>
+                            {% else %}
+                            <span class="file-type-badge document">
+                                <i class="fas fa-file-alt mr-1"></i> {{ notice.attachment.name|slice:"-4"|upper }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- File Viewer -->
+                    <div class="attachment-viewer-container">
+                        {% if notice.attachment_is_pdf %}
+                        <!-- PDF Viewer with Controls -->
+                        <div class="pdf-viewer-wrapper">
+                            <div class="pdf-controls">
+                                <div class="pdf-controls-left">
+                                    <button id="prevPage" class="pdf-control-btn" title="Previous Page">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <span class="pdf-page-info">
+                                        Page <span id="pageNum">1</span> of <span id="pageCount">--</span>
+                                    </span>
+                                    <button id="nextPage" class="pdf-control-btn" title="Next Page">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                                <div class="pdf-controls-right">
+                                    <button id="zoomOut" class="pdf-control-btn" title="Zoom Out">
+                                        <i class="fas fa-search-minus"></i>
+                                    </button>
+                                    <span class="pdf-zoom-level" id="zoomLevel">100%</span>
+                                    <button id="zoomIn" class="pdf-control-btn" title="Zoom In">
+                                        <i class="fas fa-search-plus"></i>
+                                    </button>
+                                    <button id="fitWidth" class="pdf-control-btn" title="Fit Width">
+                                        <i class="fas fa-arrows-alt-h"></i>
+                                    </button>
+                                    <button id="fullscreen" class="pdf-control-btn" title="Fullscreen">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="pdf-canvas-container">
+                                <div class="pdf-loading" id="pdfLoading">
+                                    <div class="spinner"></div>
+                                    <p>Loading PDF...</p>
+                                </div>
+                                <canvas id="pdfCanvas"></canvas>
+                            </div>
+                        </div>
+                        {% elif notice.attachment_is_image %}
+                        <!-- Enhanced Image Viewer -->
+                        <div class="image-viewer-wrapper">
+                            <a href="{{ notice.attachment.url }}" class="glightbox" data-gallery="attachment">
+                                <img src="{{ notice.attachment.url }}" alt="{{ notice.title }}" class="attachment-image"
+                                    loading="lazy">
+                                <div class="image-overlay">
+                                    <div class="image-overlay-content">
+                                        <i class="fas fa-search-plus text-3xl mb-2"></i>
+                                        <p class="font-semibold">Click to zoom</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% else %}
+                        <!-- Unsupported File Type -->
+                        <div class="unsupported-file">
+                            <div class="unsupported-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h4>Preview Not Available</h4>
+                            <p>This file type cannot be previewed in the browser.</p>
+                            <p class="text-sm text-gray-500 mt-2">Please download the file to view its contents.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Download Button -->
+                    <div class="attachment-actions">
+                        <a href="{{ notice.attachment.url }}" download class="attachment-download-btn">
+                            <i class="fas fa-download mr-2"></i>
+                            Download Attachment
+                        </a>
+                        {% if notice.attachment_is_pdf %}
+                        <button onclick="printPDF()" class="attachment-print-btn">
+                            <i class="fas fa-print mr-2"></i>
+                            Print PDF
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons" data-aos="fade-up" data-aos-delay="100">
+                <button onclick="window.print()" class="action-btn print-btn">
+                    <i class="fas fa-print mr-2"></i>Print Notice
+                </button>
+                <button onclick="shareNotice()" class="action-btn share-btn">
+                    <i class="fas fa-share-alt mr-2"></i>Share
+                </button>
+                <a href="{% url 'notice_list' %}" class="action-btn back-btn">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Notices
+                </a>
+            </div>
+
+            <!-- Related Notices -->
+            {% if related_notices %}
+            <div class="related-section" data-aos="fade-up" data-aos-delay="200">
+                <h2 class="related-title">
+                    <i class="fas fa-bell mr-3"></i>
+                    Related Notices
+                </h2>
+                <div class="related-grid">
+                    {% for related in related_notices %}
+                    <div class="related-card">
+                        <div class="related-card-header">
+                            {% if related.is_important %}
+                            <span class="related-badge important">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </span>
+                            {% else %}
+                            <span class="related-badge normal">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                            {% endif %}
+                            <span class="related-date">
+                                {{ related.created_at|date:"M d, Y" }}
+                            </span>
+                        </div>
+                        <h3 class="related-card-title">
+                            {{ related.title }}
+                        </h3>
+                        <p class="related-card-excerpt">
+                            {{ related.description|striptags|truncatewords:15 }}
+                        </p>
+                        <a href="{% url 'notice_detail' related.pk %}" class="related-card-link">
+                            Read Notice
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Notice Detail Card */
+    .notice-detail-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .notice-content {
+        color: #374151;
+        line-height: 1.8;
+    }
+
+    .notice-content h1,
+    .notice-content h2,
+    .notice-content h3 {
+        color: #1e3a8a;
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .notice-content p {
+        margin-bottom: 1.25rem;
+    }
+
+    .notice-content ul,
+    .notice-content ol {
+        margin-left: 2rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .notice-content a {
+        color: #f59e0b;
+        text-decoration: underline;
+    }
+
+    .notice-content a:hover {
+        color: #d97706;
+    }
+
+    /* Attachment Section */
+    .attachment-section {
+        margin-top: 3rem;
+        padding: 2.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 1.5rem;
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .attachment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .attachment-icon {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    .attachment-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin: 0;
+    }
+
+    .attachment-filename {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0.25rem 0 0 0;
+        font-weight: 500;
+    }
+
+    .attachment-meta {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .file-type-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .file-type-badge.pdf {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .file-type-badge.image {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .file-type-badge.document {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* PDF Viewer Styles */
+    .attachment-viewer-container {
+        margin-bottom: 2rem;
+    }
+
+    .pdf-viewer-wrapper {
+        background: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .pdf-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        border-bottom: 2px solid #1e40af;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .pdf-controls-left,
+    .pdf-controls-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .pdf-control-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.5rem 0.875rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9375rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .pdf-control-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .pdf-control-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .pdf-page-info,
+    .pdf-zoom-level {
+        color: white;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        padding: 0.5rem 0.875rem;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 0.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .pdf-canvas-container {
+        position: relative;
+        background: #f3f4f6;
+        min-height: 600px;
+        max-height: 800px;
+        overflow: auto;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2rem;
+    }
+
+    #pdfCanvas {
+        background: white;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        border-radius: 0.5rem;
+        max-width: 100%;
+    }
+
+    .pdf-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #1e3a8a;
+    }
+
+    .pdf-loading.hidden {
+        display: none;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e2e8f0;
+        border-top-color: #1e3a8a;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Image Viewer Styles */
+    .image-viewer-wrapper {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .image-viewer-wrapper a {
+        display: block;
+        position: relative;
+        cursor: zoom-in;
+    }
+
+    .attachment-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(30, 58, 138, 0.0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .image-viewer-wrapper:hover .image-overlay {
+        background: rgba(30, 58, 138, 0.8);
+        opacity: 1;
+    }
+
+    .image-viewer-wrapper:hover .attachment-image {
+        transform: scale(1.02);
+    }
+
+    .image-overlay-content {
+        text-align: center;
+        color: white;
+    }
+
+    /* Unsupported File Styles */
+    .unsupported-file {
+        background: white;
+        padding: 4rem 2rem;
+        border-radius: 1rem;
+        text-align: center;
+        border: 2px dashed #d1d5db;
+    }
+
+    .unsupported-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+    }
+
+    .unsupported-file h4 {
+        color: #1e3a8a;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .unsupported-file p {
+        color: #6b7280;
+        font-size: 1rem;
+        margin: 0.5rem 0;
+    }
+
+    /* Attachment Actions */
+    .attachment-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .attachment-download-btn,
+    .attachment-print-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 1rem 2.5rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .attachment-download-btn {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+    }
+
+    .attachment-download-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
+    }
+
+    .attachment-print-btn {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+
+    .attachment-print-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 1.75rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .print-btn {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+    }
+
+    .print-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .share-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .share-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .back-btn {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    .back-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    /* Related Section */
+    .related-section {
+        margin-top: 4rem;
+    }
+
+    .related-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .related-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        border-color: #f59e0b;
+    }
+
+    .related-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .related-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 0.875rem;
+    }
+
+    .related-badge.important {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+    }
+
+    .related-badge.normal {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    .related-date {
+        font-size: 0.8125rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .related-card-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .related-card-excerpt {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .related-card-link {
+        display: inline-flex;
+        align-items: center;
+        color: #f59e0b;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .related-card-link:hover {
+        color: #d97706;
+        transform: translateX(5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .notice-detail-card {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .attachment-section {
+            padding: 1.5rem;
+        }
+
+        .attachment-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .pdf-controls {
+            padding: 0.75rem;
+        }
+
+        .pdf-controls-left,
+        .pdf-controls-right {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pdf-control-btn {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .pdf-canvas-container {
+            padding: 1rem;
+            min-height: 400px;
+        }
+
+        .attachment-actions {
+            flex-direction: column;
+        }
+
+        .attachment-download-btn,
+        .attachment-print-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+
+        .action-buttons,
+        .related-section,
+        nav,
+        footer {
+            display: none !important;
+        }
+
+        .notice-detail-card {
+            box-shadow: none;
+            border: none;
+        }
+    }
+</style>
+
+
+<!-- GLightbox CSS for Image Lightbox -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/css/glightbox.min.css">
+
+<!-- PDF.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- GLightbox JS -->
+<script src="https://cdn.jsdelivr.net/npm/glightbox@3.2.0/dist/js/glightbox.min.js"></script>
+
+<script>
+    // ============================================
+    // PDF.js Viewer Implementation
+    // ============================================
+    {% if notice.attachment_is_pdf %}
+    // Configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let pdfDoc = null;
+    let pageNum = 1;
+    let pageRendering = false;
+    let pageNumPending = null;
+    let scale = 1.5;
+    const canvas = document.getElementById('pdfCanvas');
+    const ctx = canvas.getContext('2d');
+    const pdfUrl = '{{ notice.attachment.url }}';
+
+    /**
+     * Render the page
+     */
+    function renderPage(num) {
+        pageRendering = true;
+        const loadingEl = document.getElementById('pdfLoading');
+        loadingEl.classList.remove('hidden');
+
+        pdfDoc.getPage(num).then(function (page) {
+            const viewport = page.getViewport({ scale: scale });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+
+            const renderTask = page.render(renderContext);
+
+            renderTask.promise.then(function () {
+                pageRendering = false;
+                loadingEl.classList.add('hidden');
+
+                if (pageNumPending !== null) {
+                    renderPage(pageNumPending);
+                    pageNumPending = null;
+                }
+            });
+        });
+
+        // Update page counter
+        document.getElementById('pageNum').textContent = num;
+    }
+
+    /**
+     * Queue page rendering if another page is being rendered
+     */
+    function queueRenderPage(num) {
+        if (pageRendering) {
+            pageNumPending = num;
+        } else {
+            renderPage(num);
+        }
+    }
+
+    /**
+     * Navigate to previous page
+     */
+    function onPrevPage() {
+        if (pageNum <= 1) {
+            return;
+        }
+        pageNum--;
+        queueRenderPage(pageNum);
+        updateNavigationButtons();
+    }
+
+    /**
+     * Navigate to next page
+     */
+    function onNextPage() {
+        if (pageNum >= pdfDoc.numPages) {
+            return;
+        }
+        pageNum++;
+        queueRenderPage(pageNum);
+        updateNavigationButtons();
+    }
+
+    /**
+     * Zoom in
+     */
+    function onZoomIn() {
+        scale += 0.25;
+        updateZoomLevel();
+        queueRenderPage(pageNum);
+    }
+
+    /**
+     * Zoom out
+     */
+    function onZoomOut() {
+        if (scale <= 0.5) return;
+        scale -= 0.25;
+        updateZoomLevel();
+        queueRenderPage(pageNum);
+    }
+
+    /**
+     * Fit to width
+     */
+    function onFitWidth() {
+        const container = document.querySelector('.pdf-canvas-container');
+        const containerWidth = container.clientWidth - 80; // Account for padding
+
+        pdfDoc.getPage(pageNum).then(function (page) {
+            const viewport = page.getViewport({ scale: 1 });
+            scale = containerWidth / viewport.width;
+            updateZoomLevel();
+            queueRenderPage(pageNum);
+        });
+    }
+
+    /**
+     * Toggle fullscreen
+     */
+    function onFullscreen() {
+        const wrapper = document.querySelector('.pdf-viewer-wrapper');
+
+        if (!document.fullscreenElement) {
+            wrapper.requestFullscreen().catch(err => {
+                console.error('Error attempting to enable fullscreen:', err);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    /**
+     * Update zoom level display
+     */
+    function updateZoomLevel() {
+        const percentage = Math.round(scale * 100);
+        document.getElementById('zoomLevel').textContent = percentage + '%';
+    }
+
+    /**
+     * Update navigation button states
+     */
+    function updateNavigationButtons() {
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+
+        prevBtn.disabled = pageNum <= 1;
+        nextBtn.disabled = pageNum >= pdfDoc.numPages;
+    }
+
+    /**
+     * Print PDF
+     */
+    function printPDF() {
+        window.open(pdfUrl, '_blank');
+    }
+
+    // Load the PDF document
+    pdfjsLib.getDocument(pdfUrl).promise.then(function (pdfDoc_) {
+        pdfDoc = pdfDoc_;
+        document.getElementById('pageCount').textContent = pdfDoc.numPages;
+
+        // Initial render
+        renderPage(pageNum);
+        updateNavigationButtons();
+        updateZoomLevel();
+    }).catch(function (error) {
+        console.error('Error loading PDF:', error);
+        const loadingEl = document.getElementById('pdfLoading');
+        loadingEl.innerHTML = '<div class="text-red-600"><i class="fas fa-exclamation-triangle text-3xl mb-2"></i><p>Error loading PDF. Please try downloading instead.</p></div>';
+    });
+
+    // Attach event listeners
+    document.getElementById('prevPage').addEventListener('click', onPrevPage);
+    document.getElementById('nextPage').addEventListener('click', onNextPage);
+    document.getElementById('zoomIn').addEventListener('click', onZoomIn);
+    document.getElementById('zoomOut').addEventListener('click', onZoomOut);
+    document.getElementById('fitWidth').addEventListener('click', onFitWidth);
+    document.getElementById('fullscreen').addEventListener('click', onFullscreen);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') onPrevPage();
+        if (e.key === 'ArrowRight') onNextPage();
+        if (e.key === '+' || e.key === '=') onZoomIn();
+        if (e.key === '-') onZoomOut();
+    });
+    {% endif %}
+
+    // ============================================
+    // GLightbox Image Lightbox
+    // ============================================
+    {% if notice.attachment_is_image %}
+    const lightbox = GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: false,
+        autoplayVideos: false,
+        zoomable: true,
+        draggable: true,
+        closeOnOutsideClick: true,
+    });
+    {% endif %}
+
+    // ============================================
+    // Share Notice Function
+    // ============================================
+    function shareNotice() {
+        const title = '{{ notice.title|escapejs }}';
+        const text = '{{ notice.description|striptags|truncatewords:20|escapejs }}';
+        const url = window.location.href;
+
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: text,
+                url: url
+            }).catch(err => console.log('Error sharing:', err));
+        } else {
+            // Fallback: Copy link to clipboard
+            navigator.clipboard.writeText(url).then(() => {
+                // Show notification
+                showNotification('Link copied to clipboard!');
+            }).catch(err => {
+                console.error('Could not copy text:', err);
+            });
+        }
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideInUp 0.3s ease;
+    `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOutDown 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+</script>
+{% endblock %}

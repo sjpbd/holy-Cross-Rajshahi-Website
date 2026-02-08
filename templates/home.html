@@ -1,0 +1,601 @@
+<!-- templates/home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+
+<!-- Notice Ticker - Clickable Scrolling Notices -->
+{% if ticker_notices %}
+<div id="noticeTicker" class="notice-ticker" style="margin-top: 80px;">
+    <div class="container mx-auto px-4 flex items-center relative">
+        <div class="ticker-label">
+            <i class="fas fa-bell mr-2 animate-bounce"></i>
+            <span class="hidden sm:inline">Latest Notices:</span>
+            <span class="sm:hidden">Notices:</span>
+        </div>
+        <div class="ticker-wrapper">
+            <div class="ticker-content">
+                {% for notice in ticker_notices %}
+                <a href="{% url 'notice_detail' notice.pk %}" class="ticker-item">
+                    <i class="fas fa-circle text-xs"></i>
+                    <span>{{ notice.title }}</span>
+                </a>
+                {% endfor %}
+                <!-- Duplicate for seamless loop -->
+                {% for notice in ticker_notices %}
+                <a href="{% url 'notice_detail' notice.pk %}" class="ticker-item">
+                    <i class="fas fa-circle text-xs"></i>
+                    <span>{{ notice.title }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Close Button -->
+        <button onclick="closeTicker()" class="ticker-close-btn" title="Close notice ticker">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    function closeTicker() {
+        const ticker = document.getElementById('noticeTicker');
+        ticker.style.opacity = '0';
+        ticker.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            ticker.style.display = 'none';
+        }, 300);
+    }
+</script>
+{% endif %}
+
+<!-- Hero Slider Section with Enhanced Swiper.js -->
+<section class="relative">
+    <div class="swiper heroSwiper h-[600px] md:h-[700px]">
+        <div class="swiper-wrapper">
+            {% for slider in sliders %}
+            <div class="swiper-slide relative overflow-hidden">
+                <!-- Background Image with Zoom Effect -->
+                {% if slider.image %}
+                <div class="slide-image-wrapper">
+                    <img src="{{ slider.image.url }}" alt="{{ slider.title }}" class="slide-image">
+                </div>
+                {% else %}
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-primary to-primary-dark"></div>
+                {% endif %}
+
+                <!-- Gradient Overlay for Text Readability -->
+                <div class="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-transparent"></div>
+
+                <!-- Content -->
+                <div class="relative container mx-auto px-4 h-full flex items-center z-10">
+                    <div class="text-white max-w-3xl slide-content">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight"
+                            style="text-shadow: 2px 2px 8px rgba(0,0,0,0.6);">
+                            {{ slider.title }}
+                        </h1>
+                        {% if slider.subtitle %}
+                        <p class="text-xl md:text-2xl mb-8 text-gray-200"
+                            style="text-shadow: 1px 1px 4px rgba(0,0,0,0.6);">
+                            {{ slider.subtitle }}
+                        </p>
+                        {% endif %}
+                        {% if slider.link %}
+                        <a href="{{ slider.link }}"
+                            class="inline-block bg-accent hover:bg-accent-dark text-white font-bold px-8 py-4 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                            Learn More <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Default Slide if no sliders -->
+            <div class="swiper-slide relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark"></div>
+                <div class="relative container mx-auto px-4 h-full flex items-center z-10">
+                    <div class="text-white max-w-3xl">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4">Welcome to Holy Cross School & College</h1>
+                        <p class="text-xl md:text-2xl mb-8 text-gray-200">Excellence in Education Since Establishment
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Navigation Arrows -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+
+        <!-- Pagination Dots -->
+        <div class="swiper-pagination"></div>
+    </div>
+</section>
+
+
+<!-- Welcome Section -->
+<section class="py-16 bg-white relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="decorative-shape decorative-circle-2"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="text-center mb-12" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-bold text-primary mb-4">Welcome to Holy Cross</h2>
+            <div class="section-divider"></div>
+            <p class="text-gray-600 text-lg max-w-3xl mx-auto">
+                A premier educational institution dedicated to excellence, character development, and holistic growth of
+                our students.
+            </p>
+        </div>
+
+        <!-- Principal & VP Messages -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+            {% if school_info.principal_name %}
+            <div class="card card-hover-lift p-8" data-aos="fade-right">
+                <div class="flex items-center mb-6">
+                    {% if school_info.principal_photo %}
+                    <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
+                        class="w-24 h-24 rounded-full object-cover border-4 border-accent">
+                    {% endif %}
+                    <div class="ml-6">
+                        <h3 class="text-2xl font-bold text-primary">{{ school_info.principal_name }}</h3>
+                        <p class="text-gray-600">Principal</p>
+                    </div>
+                </div>
+                <div class="text-gray-700 leading-relaxed">
+                    {{ school_info.principal_message|safe|truncatewords_html:50 }}
+                </div>
+                <a href="{% url 'about_page' 'message' %}"
+                    class="inline-block mt-4 text-accent hover:text-accent-dark font-semibold">
+                    Read Full Message <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            {% endif %}
+
+            {% if school_info.vice_principal_name %}
+            <div class="card card-hover-lift p-8" data-aos="fade-left">
+                <div class="flex items-center mb-6">
+                    {% if school_info.vice_principal_photo %}
+                    <img src="{{ school_info.vice_principal_photo.url }}" alt="{{ school_info.vice_principal_name }}"
+                        class="w-24 h-24 rounded-full object-cover border-4 border-accent">
+                    {% endif %}
+                    <div class="ml-6">
+                        <h3 class="text-2xl font-bold text-primary">{{ school_info.vice_principal_name }}</h3>
+                        <p class="text-gray-600">Vice Principal</p>
+                    </div>
+                </div>
+                <div class="text-gray-700 leading-relaxed">
+                    {{ school_info.vice_principal_message|safe|truncatewords_html:50 }}
+                </div>
+                <a href="{% url 'about_page' 'message' %}"
+                    class="inline-block mt-4 text-accent hover:text-accent-dark font-semibold">
+                    Read Full Message <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Facts & Figures -->
+{% if facts %}
+<section class="py-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <!-- Decorative Background Pattern -->
+    <div class="absolute inset-0 decorative-dots opacity-10"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4" data-aos="fade-down">Our Achievements</h2>
+        <div class="section-divider bg-gradient-to-r from-accent to-accent-light"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
+            {% for fact in facts %}
+            <div class="text-center" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:'00' }}">
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
+                    <i class="fas {{ fact.icon|default:'fa-star' }} text-4xl"></i>
+                </div>
+                <div class="text-5xl md:text-6xl font-bold mb-2" data-count="{{ fact.number|cut:'+' }}">{{ fact.number
+                    }}</div>
+                <div class="text-xl text-gray-200">{{ fact.title }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Notice Board -->
+<section class="py-16 bg-gradient-to-b from-gray-50 to-white relative">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center mb-8" data-aos="fade-up">
+            <div>
+                <h2 class="text-4xl md:text-5xl font-bold text-primary">Notice Board</h2>
+                <div class="section-divider ml-0"></div>
+            </div>
+            <a href="{% url 'notice_list' %}" class="btn btn-outline">
+                View All <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for notice in notices %}
+            <div class="card card-hover-lift" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        {% if notice.is_important %}
+                        <span class="badge badge-important">
+                            <i class="fas fa-exclamation-circle mr-1"></i>Important
+                        </span>
+                        {% else %}
+                        <span class="text-sm text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>{{ notice.created_at|date:"M d, Y" }}
+                        </span>
+                        {% endif %}
+                        <span class="text-sm text-gray-500">
+                            <i class="far fa-eye mr-1"></i>{{ notice.view_count }} views
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3 hover:text-accent transition">{{ notice.title }}</h3>
+                    <div class="text-gray-600 mb-4 line-clamp-3">
+                        {{ notice.description|striptags|truncatewords:20 }}
+                    </div>
+                    <a href="{% url 'notice_detail' notice.pk %}"
+                        class="btn btn-outline btn-sm inline-flex items-center">
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center text-gray-500 py-8">
+                No notices available at the moment.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Latest News -->
+{% if latest_news %}
+<section class="py-16 bg-white relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="decorative-shape decorative-circle-1" style="top: auto; bottom: -100px; right: auto; left: -100px;">
+    </div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="flex justify-between items-center mb-8" data-aos="fade-up">
+            <div>
+                <h2 class="text-4xl md:text-5xl font-bold text-primary">Latest News & Events</h2>
+                <div class="section-divider ml-0"></div>
+            </div>
+            <a href="{% url 'news_list' %}" class="btn btn-accent">
+                View All <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for news in latest_news %}
+            <div class="card card-hover-lift image-zoom-container relative" data-aos="fade-up"
+                data-aos-delay="{{ forloop.counter0|add:'00' }}">
+                {% if news.featured_image %}
+                <img src="{{ news.featured_image.url }}" alt="{{ news.title }}"
+                    class="w-full h-56 object-cover image-zoom">
+                <div class="image-overlay"></div>
+                {% else %}
+                <div class="w-full h-56 bg-gradient-to-br from-primary via-primary-light to-accent"></div>
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>{{ news.published_date|date:"M d, Y" }}
+                        </span>
+                        {% if news.is_featured %}
+                        <span class="badge badge-accent">Featured</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-xl font-bold text-primary mb-3 hover:text-accent transition">{{ news.title }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-3">{{ news.get_excerpt|truncatewords:15 }}</p>
+                    <a href="{% url 'news_detail' news.slug %}" class="btn btn-primary btn-sm inline-flex items-center">
+                        Read More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+    /* ============================================
+   Hero Slider Styles with Zoom Effect
+   ============================================ */
+
+    /* Slider Image Wrapper */
+    .slide-image-wrapper {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    /* Slide Image with Zoom Animation */
+    .slide-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1);
+        transition: transform 7s ease-out;
+    }
+
+    .swiper-slide-active .slide-image {
+        transform: scale(1.1);
+    }
+
+    /* Slide Content Animation */
+    .slide-content {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+    }
+
+    .swiper-slide-active .slide-content {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ============================================
+   Enhanced Swiper Navigation - FIXED Z-INDEX
+   ============================================ */
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: white !important;
+        background: transparent !important;
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 0 !important;
+        backdrop-filter: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        transition: all 0.3s ease !important;
+        z-index: 50 !important;
+        opacity: 0.7;
+    }
+
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 2rem !important;
+        font-weight: 300 !important;
+        /* Thinner, more elegant arrow */
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        /* Subtle shadow for visibility */
+    }
+
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+        background: transparent !important;
+        transform: scale(1.2) !important;
+        opacity: 1;
+        color: #f59e0b !important;
+        /* Accent color on hover */
+    }
+
+    /* ============================================
+   Pagination Bullets - FIXED Z-INDEX
+   ============================================ */
+
+    .swiper-pagination {
+        bottom: 30px !important;
+        z-index: 50 !important;
+        /* FIXED: Increased z-index */
+    }
+
+    .swiper-pagination-bullet {
+        width: 14px !important;
+        height: 14px !important;
+        background: white !important;
+        opacity: 0.6 !important;
+        transition: all 0.3s ease !important;
+        border: 2px solid transparent !important;
+    }
+
+    .swiper-pagination-bullet-active {
+        opacity: 1 !important;
+        background: #f59e0b !important;
+        width: 40px !important;
+        border-radius: 8px !important;
+        border-color: white !important;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5) !important;
+    }
+
+    /* ============================================
+   Notice Ticker Styles - Enhanced UX
+   ============================================ */
+
+    .notice-ticker {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        padding: 0.75rem 0;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 15px rgba(30, 58, 138, 0.2);
+        transition: all 0.3s ease;
+        border-bottom: 3px solid #f59e0b;
+    }
+
+    .ticker-label {
+        font-weight: bold;
+        color: white;
+        margin-right: 1.5rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+        z-index: 10;
+        position: relative;
+        background: rgba(245, 158, 11, 0.15);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .ticker-wrapper {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    }
+
+    .ticker-content {
+        display: flex;
+        animation: scroll-ticker 30s linear infinite;
+        white-space: nowrap;
+    }
+
+    .ticker-content:hover {
+        animation-play-state: paused;
+    }
+
+    .ticker-item {
+        display: inline-flex;
+        align-items: center;
+        margin: 0 3rem;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.95rem;
+        padding: 0.25rem 0;
+    }
+
+    .ticker-item:hover {
+        transform: scale(1.05);
+        color: #fbbf24;
+        text-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    }
+
+    .ticker-item i {
+        margin-right: 0.5rem;
+        font-size: 0.5rem;
+        color: #fbbf24;
+    }
+
+    .ticker-close-btn {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        z-index: 20;
+    }
+
+    .ticker-close-btn:hover {
+        background: rgba(239, 68, 68, 0.8);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    @keyframes scroll-ticker {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    /* ============================================
+   Responsive Adjustments
+   ============================================ */
+
+    @media (max-width: 768px) {
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            width: 45px !important;
+            height: 45px !important;
+        }
+
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
+            font-size: 18px !important;
+        }
+
+        .ticker-label {
+            font-size: 0.875rem;
+            margin-right: 1rem;
+        }
+
+        .ticker-item {
+            margin: 0 2rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    /* ============================================
+   Additional Utility Classes
+   ============================================ */
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize Swiper with enhanced settings
+        var swiper = new Swiper(".heroSwiper", {
+            spaceBetween: 0,
+            effect: "fade",
+            loop: true,
+            speed: 1200,
+            fadeEffect: {
+                crossFade: true
+            },
+            autoplay: {
+                delay: 6000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                dynamicBullets: false,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            on: {
+                init: function () {
+                    console.log('Hero Swiper initialized successfully');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

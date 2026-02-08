@@ -1,0 +1,506 @@
+<!-- templates/notices/list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notices - Holy Cross School and College{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary via-primary-dark to-primary text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-8 md:py-16 relative z-10">
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
+                    style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Notices</div>
+        </nav>
+
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4" data-aos="fade-up">
+            <i class="fas fa-bell mr-2 md:mr-4"></i>Notice Board
+        </h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
+            data-aos-delay="100"></div>
+        <p class="text-base sm:text-lg md:text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            Stay updated with the latest announcements and important information
+        </p>
+    </div>
+</section>
+
+<!-- Notices List -->
+<section class="py-8 md:py-16 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-4">
+        <!-- Filter Buttons -->
+        <div class="flex flex-wrap gap-2 sm:gap-3 mb-6 md:mb-10" data-aos="fade-up">
+            <a href="{% url 'notice_list' %}" class="filter-btn {% if not request.GET.filter %}active{% endif %}">
+                <i class="fas fa-th mr-2"></i>All Notices
+                <span class="ml-2 badge-count">{{ notices|length }}</span>
+            </a>
+            <a href="{% url 'notice_list' %}?filter=important"
+                class="filter-btn {% if request.GET.filter == 'important' %}active{% endif %}">
+                <i class="fas fa-exclamation-circle mr-2"></i>Important
+            </a>
+            <a href="{% url 'notice_list' %}?filter=academic"
+                class="filter-btn {% if request.GET.filter == 'academic' %}active{% endif %}">
+                <i class="fas fa-graduation-cap mr-2"></i>Academic
+            </a>
+            <a href="{% url 'notice_list' %}?filter=event"
+                class="filter-btn {% if request.GET.filter == 'event' %}active{% endif %}">
+                <i class="fas fa-calendar-alt mr-2"></i>Events
+            </a>
+        </div>
+
+        <!-- Notices Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for notice in notices %}
+            <div class="notice-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
+                <!-- Card Header -->
+                <div class="notice-card-header">
+                    {% if notice.is_important %}
+                    <span class="notice-badge important">
+                        <i class="fas fa-exclamation-circle mr-1"></i>Important
+                    </span>
+                    {% else %}
+                    <span class="notice-badge normal">
+                        <i class="fas fa-info-circle mr-1"></i>Notice
+                    </span>
+                    {% endif %}
+                    <span class="notice-views">
+                        <i class="far fa-eye mr-1"></i>{{ notice.view_count }}
+                    </span>
+                </div>
+
+                <!-- Date Badge -->
+                <div class="notice-date">
+                    <div class="date-day">{{ notice.created_at|date:"d" }}</div>
+                    <div class="date-month">{{ notice.created_at|date:"M" }}</div>
+                    <div class="date-year">{{ notice.created_at|date:"Y" }}</div>
+                </div>
+
+                <!-- Card Content -->
+                <div class="notice-card-body">
+                    <h3 class="notice-title">
+                        {{ notice.title }}
+                    </h3>
+
+                    <div class="notice-excerpt">
+                        {{ notice.description|striptags|truncatewords:20 }}
+                    </div>
+
+                    {% if notice.attachment %}
+                    <div class="notice-attachment-indicator">
+                        <i class="fas fa-paperclip mr-2"></i>
+                        <span>Has Attachment</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Card Footer -->
+                <div class="notice-card-footer">
+                    <a href="{% url 'notice_detail' notice.pk %}" class="notice-read-btn">
+                        Read Full Notice
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-20" data-aos="fade-up">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <h3 class="empty-title">No Notices Available</h3>
+                    <p class="empty-message">Check back later for updates</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex justify-center mt-12" data-aos="fade-up">
+            <nav class="pagination-nav">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="pagination-btn active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} <a href="?page={{ num }}"
+                    class="pagination-btn">{{ num }}</a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    /* Filter Buttons */
+    .filter-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.625rem 1rem;
+        background: white;
+        color: #1e3a8a;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    @media (min-width: 640px) {
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    .filter-btn:hover {
+        background: #1e3a8a;
+        color: white;
+        border-color: #1e3a8a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+    }
+
+    .filter-btn.active {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        border-color: #1e3a8a;
+        box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    }
+
+    .badge-count {
+        background: rgba(245, 158, 11, 0.2);
+        color: #d97706;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+
+    .filter-btn.active .badge-count {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    /* Notice Card */
+    .notice-card {
+        background: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        position: relative;
+        border: 1px solid #e5e7eb;
+    }
+
+    .notice-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        border-color: #f59e0b;
+    }
+
+    .notice-card-header {
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .notice-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.875rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .notice-badge.important {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: white;
+        animation: pulse-glow 2s infinite;
+    }
+
+    .notice-badge.normal {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+        }
+
+        50% {
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.8);
+        }
+    }
+
+    .notice-views {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    /* Date Badge */
+    .notice-date {
+        position: absolute;
+        top: 4.5rem;
+        right: 1.25rem;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        z-index: 10;
+    }
+
+    .date-day {
+        font-size: 1.5rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .date-month {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-top: 0.125rem;
+    }
+
+    .date-year {
+        font-size: 0.7rem;
+        opacity: 0.9;
+        margin-top: 0.125rem;
+    }
+
+    /* Card Body */
+    .notice-card-body {
+        padding: 1.25rem 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .notice-card-body {
+            padding: 1.5rem 1.25rem;
+            padding-right: 5rem;
+        }
+    }
+
+    .notice-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.3s ease;
+    }
+
+    @media (min-width: 640px) {
+        .notice-title {
+            font-size: 1.25rem;
+        }
+    }
+
+    .notice-card:hover .notice-title {
+        color: #f59e0b;
+    }
+
+    .notice-excerpt {
+        color: #6b7280;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @media (min-width: 640px) {
+        .notice-excerpt {
+            font-size: 0.9375rem;
+        }
+    }
+
+    .notice-attachment-indicator {
+        display: inline-flex;
+        align-items: center;
+        background: #fef3c7;
+        color: #d97706;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+    }
+
+    /* Card Footer */
+    .notice-card-footer {
+        padding: 0 1rem 1rem 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .notice-card-footer {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+        }
+    }
+
+    .notice-read-btn {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(30, 58, 138, 0.2);
+    }
+
+    @media (min-width: 640px) {
+        .notice-read-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9375rem;
+        }
+    }
+
+    .notice-read-btn:hover {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 3rem;
+    }
+
+    .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-icon i {
+        font-size: 3.5rem;
+        color: #9ca3af;
+    }
+
+    .empty-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-message {
+        color: #6b7280;
+        font-size: 1.125rem;
+    }
+
+    /* Pagination */
+    .pagination-nav {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .pagination-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: white;
+        color: #1e3a8a;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .pagination-btn:hover {
+        background: #1e3a8a;
+        color: white;
+        border-color: #1e3a8a;
+        transform: translateY(-2px);
+    }
+
+    .pagination-btn.active {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        border-color: #f59e0b;
+    }
+
+    /* Responsive */
+    @media (max-width: 767px) {
+        .notice-date {
+            position: static;
+            display: inline-block;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .date-day {
+            font-size: 1.25rem;
+        }
+
+        .date-month {
+            font-size: 0.625rem;
+        }
+
+        .date-year {
+            font-size: 0.625rem;
+        }
+
+        .notice-card-header {
+            padding: 0.875rem 1rem;
+        }
+
+        .notice-badge {
+            padding: 0.25rem 0.625rem;
+            font-size: 0.625rem;
+        }
+
+        .notice-views {
+            font-size: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
