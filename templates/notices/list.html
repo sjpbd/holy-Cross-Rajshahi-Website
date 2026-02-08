@@ -14,7 +14,7 @@
         <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
             <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
                     style="color: white !important;">Home</a></div>
-            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">Notices</div>
+            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Notices</div>
         </nav>
 
         <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4" data-aos="fade-up">
@@ -186,8 +186,8 @@
     }
 
     .badge-count {
-        background: rgba(245, 158, 11, 0.2);
-        color: #d97706;
+        background: rgba(212, 175, 55, 0.2);
+        color: #b8941e;
         padding: 0.125rem 0.5rem;
         border-radius: 9999px;
         font-size: 0.75rem;
@@ -213,7 +213,7 @@
     .notice-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-        border-color: #f59e0b;
+        border-color: #d4af37;
     }
 
     .notice-card-header {
@@ -270,12 +270,12 @@
         position: absolute;
         top: 4.5rem;
         right: 1.25rem;
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
         color: white;
         padding: 0.75rem;
         border-radius: 0.75rem;
         text-align: center;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         z-index: 10;
     }
 
@@ -330,7 +330,7 @@
     }
 
     .notice-card:hover .notice-title {
-        color: #f59e0b;
+        color: #d4af37;
     }
 
     .notice-excerpt {
@@ -354,7 +354,7 @@
         display: inline-flex;
         align-items: center;
         background: #fef3c7;
-        color: #d97706;
+        color: #b8941e;
         padding: 0.375rem 0.75rem;
         border-radius: 0.5rem;
         font-size: 0.8125rem;
@@ -394,9 +394,9 @@
     }
 
     .notice-read-btn:hover {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
         transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
     }
 
     /* Empty State */
@@ -462,9 +462,9 @@
     }
 
     .pagination-btn.active {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
         color: white;
-        border-color: #f59e0b;
+        border-color: #d4af37;
     }
 
     /* Responsive */
@@ -472,7 +472,7 @@
         .notice-date {
             position: static;
             display: inline-block;
-            margin-bottom: 1rem;
+            margin: 0 1rem 1rem 1rem;
             font-size: 0.875rem;
             padding: 0.5rem 0.75rem;
         }
@@ -499,7 +499,15 @@
         }
 
         .notice-views {
-            font-size: 0.75rem;
+            font-size: 0.625rem;
+        }
+
+        .notice-card-body {
+            padding: 0.5rem 1rem 1rem 1rem;
+        }
+
+        .notice-card-footer {
+            padding: 0 1rem 1rem 1rem;
         }
     }
 </style>

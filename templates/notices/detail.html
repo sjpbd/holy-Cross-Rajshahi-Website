@@ -15,7 +15,7 @@
                     style="color: white !important;">Home</a></div>
             <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'notice_list' %}"
                     style="color: white !important;">Notices</a></div>
-            <div class="breadcrumb-item active" style="color: #fbbf24 !important;">{{ notice.title|truncatewords:5 }}
+            <div class="breadcrumb-item active" style="color: #f4d03f !important;">{{ notice.title|truncatewords:5 }}
             </div>
         </nav>
 
@@ -262,12 +262,12 @@
     }
 
     .notice-content a {
-        color: #f59e0b;
+        color: #d4af37;
         text-decoration: underline;
     }
 
     .notice-content a:hover {
-        color: #d97706;
+        color: #b8941e;
     }
 
     /* Attachment Section */
@@ -287,6 +287,8 @@
         margin-bottom: 2rem;
         padding-bottom: 1.5rem;
         border-bottom: 2px solid #e2e8f0;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .attachment-icon {
@@ -314,6 +316,9 @@
         color: #6b7280;
         margin: 0.25rem 0 0 0;
         font-weight: 500;
+        word-break: break-all;
+        overflow-wrap: break-word;
+        max-width: 100%;
     }
 
     .attachment-meta {
@@ -570,14 +575,14 @@
     }
 
     .attachment-download-btn {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        background: linear-gradient(135deg, #d4af37 0%, #b8941e 100%);
         color: white;
-        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+        box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
     }
 
     .attachment-download-btn:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.5);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5);
     }
 
     .attachment-print-btn {
@@ -675,7 +680,7 @@
     .related-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-        border-color: #f59e0b;
+        border-color: #d4af37;
     }
 
     .related-card-header {
@@ -739,7 +744,7 @@
     .related-card-link {
         display: inline-flex;
         align-items: center;
-        color: #f59e0b;
+        color: #d4af37;
         font-weight: 600;
         font-size: 0.9375rem;
         text-decoration: none;
@@ -747,7 +752,7 @@
     }
 
     .related-card-link:hover {
-        color: #d97706;
+        color: #b8941e;
         transform: translateX(5px);
     }
 

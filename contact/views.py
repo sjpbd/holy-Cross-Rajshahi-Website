@@ -21,7 +21,44 @@ class ContactView(FormView):
 
     def form_valid(self, form):
         # Save the submission
-        form.save()
+        submission = form.save()
+        
+        # Get school contact info for the recipient email
+        contact_info = ContactInfo.load()
+        recipient_email = contact_info.email
+        
+        if recipient_email:
+            try:
+                from django.core.mail import send_mail
+                from django.conf import settings
+                
+                subject = f"New Contact Formula Submission: {submission.subject}"
+                email_message = f"""
+                You have received a new contact form submission.
+                
+                Name: {submission.name}
+                Email: {submission.email}
+                Phone: {submission.phone or 'Not provided'}
+                Subject: {submission.subject}
+                
+                Message:
+                {submission.message}
+                
+                ---
+                This message was sent from the Holy Cross School website contact form.
+                """
+                
+                send_mail(
+                    subject,
+                    email_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [recipient_email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                # Log error or handle it as needed
+                print(f"Error sending contact email: {e}")
+
         messages.success(self.request, 'Thank you for contacting us! We will get back to you soon.')
         return super().form_valid(form)
 

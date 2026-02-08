@@ -10,13 +10,13 @@
     --primary: #1e3a8a;
     --primary-dark: #1c2a4e;
     --primary-light: #3b82f6;
-    --accent: #FFD700;
-    --accent-dark: #B8860B;
-    --accent-light: #FFEC8B;
+    --accent: #d4af37;
+    --accent-dark: #b8941e;
+    --accent-light: #f4d03f;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-    --gradient-accent: linear-gradient(135deg, #FFD700 0%, #FFEC8B 100%);
+    --gradient-accent: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
     --gradient-hero: linear-gradient(135deg, rgba(30, 58, 138, 0.95) 0%, rgba(28, 42, 78, 0.9) 100%);
     --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
 

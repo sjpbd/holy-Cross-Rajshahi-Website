@@ -1,39 +1,65 @@
 <!-- templates/includes/footer.html -->
 {% load static %}
 
-<footer class="bg-primary-dark text-white pt-12 pb-6">
-    <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+<footer class="footer-modern">
+    <!-- Decorative Wave -->
+    <div class="footer-wave">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path
+                d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
+                opacity=".25" class="footer-wave-path"></path>
+            <path
+                d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z"
+                opacity=".5" class="footer-wave-path"></path>
+            <path
+                d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"
+                class="footer-wave-path"></path>
+        </svg>
+    </div>
+
+    <div class="container mx-auto px-4 pt-16 pb-8">
+        <!-- Main Footer Content -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             <!-- About Section -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 text-footer-text">Holy Cross School & College</h3>
-                <p class="text-gray-300 text-sm leading-relaxed mb-4">
+            <div class="footer-section" data-aos="fade-up">
+                <div class="flex items-center mb-4">
+                    {% if school_info.logo %}
+                    <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="h-12 w-auto mr-3">
+                    {% else %}
+                    <div
+                        class="w-12 h-12 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <h3 class="footer-heading">Holy Cross</h3>
+                        <p class="text-accent text-xs font-semibold">School & College</p>
+                    </div>
+                </div>
+                <p class="footer-text mb-6">
                     A premier educational institution in Rajshahi, dedicated to providing excellence in education and
                     character development since its establishment.
                 </p>
                 <!-- Social Media -->
                 <div class="flex space-x-3">
                     {% if school_info.facebook_url %}
-                    <a href="{{ school_info.facebook_url }}" target="_blank"
-                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                    <a href="{{ school_info.facebook_url }}" target="_blank" class="social-icon" aria-label="Facebook">
                         <i class="fab fa-facebook-f"></i>
                     </a>
                     {% endif %}
                     {% if school_info.twitter_url %}
-                    <a href="{{ school_info.twitter_url }}" target="_blank"
-                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                    <a href="{{ school_info.twitter_url }}" target="_blank" class="social-icon" aria-label="Twitter">
                         <i class="fab fa-twitter"></i>
                     </a>
                     {% endif %}
                     {% if school_info.youtube_url %}
-                    <a href="{{ school_info.youtube_url }}" target="_blank"
-                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                    <a href="{{ school_info.youtube_url }}" target="_blank" class="social-icon" aria-label="YouTube">
                         <i class="fab fa-youtube"></i>
                     </a>
                     {% endif %}
                     {% if school_info.instagram_url %}
-                    <a href="{{ school_info.instagram_url }}" target="_blank"
-                        class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition">
+                    <a href="{{ school_info.instagram_url }}" target="_blank" class="social-icon"
+                        aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
                     {% endif %}
@@ -41,54 +67,49 @@
             </div>
 
             <!-- Quick Links -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 text-footer-text">Quick Links</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="{% url 'about_page' 'history' %}"
-                            class="text-gray-300 hover:text-white transition">About Us</a></li>
-                    <li><a href="{% url 'teachers' %}" class="text-gray-300 hover:text-white transition">Our
-                            Teachers</a></li>
-                    <li><a href="{% url 'administration' %}"
-                            class="text-gray-300 hover:text-white transition">Administration</a></li>
-                    <li><a href="{% url 'club_list' %}" class="text-gray-300 hover:text-white transition">Clubs &
-                            Organizations</a></li>
-                    <li><a href="{% url 'resources' %}" class="text-gray-300 hover:text-white transition">Resources</a>
+            <div class="footer-section" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="footer-heading">Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="{% url 'about_page' 'history' %}"><i class="fas fa-chevron-right"></i> About Us</a>
                     </li>
+                    <li><a href="{% url 'teachers' %}"><i class="fas fa-chevron-right"></i> Our Teachers</a></li>
+                    <li><a href="{% url 'administration' %}"><i class="fas fa-chevron-right"></i> Administration</a>
+                    </li>
+                    <li><a href="{% url 'club_list' %}"><i class="fas fa-chevron-right"></i> Clubs & Organizations</a>
+                    </li>
+                    <li><a href="{% url 'resources' %}"><i class="fas fa-chevron-right"></i> Resources</a></li>
                 </ul>
             </div>
 
             <!-- Academics -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 text-footer-text">Academics</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="{% url 'notice_list' %}" class="text-gray-300 hover:text-white transition">Notices</a>
-                    </li>
-                    <li><a href="{% url 'news_list' %}" class="text-gray-300 hover:text-white transition">News &
-                            Events</a></li>
-                    <li><a href="{% url 'resources' %}" class="text-gray-300 hover:text-white transition">Download
-                            Resources</a></li>
-                    <li><a href="/admin/" class="text-gray-300 hover:text-white transition">Admin Login</a></li>
+            <div class="footer-section" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="footer-heading">Academics</h3>
+                <ul class="footer-links">
+                    <li><a href="{% url 'notice_list' %}"><i class="fas fa-chevron-right"></i> Notices</a></li>
+                    <li><a href="{% url 'news_list' %}"><i class="fas fa-chevron-right"></i> News & Events</a></li>
+                    <li><a href="{% url 'resources' %}"><i class="fas fa-chevron-right"></i> Download Resources</a></li>
+
                 </ul>
             </div>
 
             <!-- Contact Info -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 text-footer-text">Contact Us</h3>
-                <ul class="space-y-3 text-sm text-gray-300">
+            <div class="footer-section" data-aos="fade-up" data-aos-delay="300">
+                <h3 class="footer-heading">Contact Us</h3>
+                <ul class="footer-contact">
                     {% if school_info.address %}
-                    <li class="flex items-start space-x-2">
-                        <i class="fas fa-map-marker-alt mt-1"></i>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
                         <span>{{ school_info.address|safe }}</span>
                     </li>
                     {% endif %}
                     {% if school_info.phone %}
-                    <li class="flex items-center space-x-2">
+                    <li>
                         <i class="fas fa-phone"></i>
                         <span>{{ school_info.phone }}</span>
                     </li>
                     {% endif %}
                     {% if school_info.email %}
-                    <li class="flex items-center space-x-2">
+                    <li>
                         <i class="fas fa-envelope"></i>
                         <span>{{ school_info.email }}</span>
                     </li>
@@ -97,18 +118,252 @@
             </div>
         </div>
 
-        <!-- Copyright -->
-        <div class="border-t border-gray-700 pt-6 mt-6">
-            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-                <p>&copy; {% now "Y" %} Holy Cross School and College, Rajshahi. All rights reserved.</p>
-                <div class="flex space-x-4 mt-2 md:mt-0">
-                    <a href="{% url 'privacy_policy' %}" class="hover:text-white transition">Privacy Policy</a>
-                    <span class="text-gray-600">|</span>
-                    <a href="{% url 'terms_of_service' %}" class="hover:text-white transition">Terms of Service</a>
-                    <span class="text-gray-600">|</span>
-                    <a href="{% url 'sitemap' %}" class="hover:text-white transition">Sitemap</a>
+        <!-- Bottom Bar -->
+        <div class="footer-bottom">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="footer-copyright">
+                    &copy; {% now "Y" %} <span class="text-accent font-semibold">Holy Cross School and College</span>,
+                    Rajshahi. All rights reserved.
+                </p>
+                <div class="footer-legal">
+                    <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+                    <span class="separator">•</span>
+                    <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+                    <span class="separator">•</span>
+                    <a href="{% url 'sitemap' %}">Sitemap</a>
                 </div>
             </div>
         </div>
     </div>
 </footer>
+
+<style>
+    /* ============================================
+       Modern Footer Design
+       ============================================ */
+
+    .footer-modern {
+        background: linear-gradient(180deg, #1c2a4e 0%, #0f172a 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .footer-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    /* Decorative Wave */
+    .footer-wave {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+        transform: translateY(-99%);
+    }
+
+    .footer-wave svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 80px;
+    }
+
+    .footer-wave-path {
+        fill: #1c2a4e;
+    }
+
+    /* Footer Sections */
+    .footer-section {
+        position: relative;
+        z-index: 1;
+    }
+
+    .footer-heading {
+        color: white;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .footer-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #d4af37, #f4d03f);
+        border-radius: 2px;
+    }
+
+    .footer-text {
+        color: rgba(229, 231, 235, 0.8);
+        font-size: 0.9375rem;
+        line-height: 1.7;
+    }
+
+    /* Social Icons */
+    .social-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 1.125rem;
+    }
+
+    .social-icon:hover {
+        background: linear-gradient(135deg, #d4af37, #f4d03f);
+        border-color: #d4af37;
+        color: white;
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Footer Links */
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        space-y: 0.75rem;
+    }
+
+    .footer-links li {
+        margin-bottom: 0.75rem;
+    }
+
+    .footer-links a {
+        color: rgba(229, 231, 235, 0.8);
+        text-decoration: none;
+        font-size: 0.9375rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        position: relative;
+        padding-left: 0;
+    }
+
+    .footer-links a i {
+        color: #d4af37;
+        font-size: 0.625rem;
+        margin-right: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+
+    .footer-links a:hover {
+        color: #f4d03f;
+        padding-left: 0.5rem;
+    }
+
+    .footer-links a:hover i {
+        transform: translateX(4px);
+    }
+
+    /* Contact Info */
+    .footer-contact {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-contact li {
+        display: flex;
+        align-items: flex-start;
+        color: rgba(229, 231, 235, 0.8);
+        font-size: 0.9375rem;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .footer-contact i {
+        color: #d4af37;
+        margin-right: 0.875rem;
+        margin-top: 0.25rem;
+        font-size: 1rem;
+        min-width: 20px;
+    }
+
+    /* Bottom Bar */
+    .footer-bottom {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .footer-copyright {
+        color: rgba(229, 231, 235, 0.7);
+        font-size: 0.9375rem;
+        text-align: center;
+    }
+
+    .footer-legal {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .footer-legal a {
+        color: rgba(229, 231, 235, 0.7);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    .footer-legal a:hover {
+        color: #f4d03f;
+    }
+
+    .footer-legal .separator {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .footer-wave svg {
+            height: 60px;
+        }
+
+        .footer-heading {
+            font-size: 1.125rem;
+        }
+
+        .footer-text,
+        .footer-links a,
+        .footer-contact li {
+            font-size: 0.875rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .footer-copyright {
+            font-size: 0.875rem;
+        }
+    }
+</style>
