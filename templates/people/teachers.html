@@ -64,14 +64,6 @@
                     </div>
 
                     <!-- Quick Actions -->
-                    {% if teacher.email %}
-                    <div
-                        class="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                        <a href="mailto:{{ teacher.email }}" class="btn btn-primary btn-sm rounded-full px-6 shadow-lg">
-                            <i class="fas fa-envelope mr-2"></i>Email Me
-                        </a>
-                    </div>
-                    {% endif %}
                 </div>
 
                 <div class="p-6 text-center relative">
@@ -86,8 +78,7 @@
                     {% endif %}
 
                     <!-- Name -->
-                    <h3 class="text-xl font-bold text-gray-800 mb-1 mt-2 group-hover:text-primary transition-colors">{{
-                        teacher.name }}</h3>
+                    <h3 class="text-xl font-bold text-gray-800 mb-1 mt-2 group-hover:text-primary transition-colors">{{ teacher.name }}</h3>
 
                     <!-- Designation -->
                     <p class="text-accent font-medium text-sm mb-4">{{ teacher.designation }}</p>

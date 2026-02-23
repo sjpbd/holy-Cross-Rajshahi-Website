@@ -38,6 +38,12 @@ class SchoolInfo(models.Model):
         null=True,
         help_text="School logo (Recommended size: 200x200px, transparent background)"
     )
+    favicon = models.ImageField(
+        upload_to='branding/',
+        blank=True,
+        null=True,
+        help_text="Website favicon (Recommended size: 32x32px or 16x16px, .ico or .png)"
+    )
     
     # Messages
     principal_name = models.CharField(max_length=200, blank=True)

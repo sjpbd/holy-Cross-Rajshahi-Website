@@ -63,21 +63,21 @@
                     <img src="{{ slider.image.url }}" alt="{{ slider.title }}" class="slide-image">
                 </div>
                 {% else %}
-                <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-primary to-primary-dark"></div>
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-900 to-black"></div>
                 {% endif %}
 
-                <!-- Gradient Overlay for Text Readability -->
-                <div class="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40"></div>
+                <!-- Gradient Overlay for Text Readability - Neutrally Balanced -->
+                <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
 
                 <!-- Content -->
                 <div class="relative container mx-auto px-4 h-full flex items-center z-10">
                     <div class="text-white max-w-4xl slide-content">
-                        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+                        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight line-clamp-2"
                             style="text-shadow: 2px 4px 12px rgba(0,0,0,0.7);">
                             {{ slider.title }}
                         </h1>
                         {% if slider.subtitle %}
-                        <p class="text-xl md:text-3xl lg:text-4xl mb-10 text-gray-100 font-light"
+                        <p class="text-xl md:text-3xl lg:text-4xl mb-10 text-gray-100 font-light line-clamp-2"
                             style="text-shadow: 1px 2px 6px rgba(0,0,0,0.6);">
                             {{ slider.subtitle }}
                         </p>
@@ -226,7 +226,8 @@
                             </div>
                             <div class="flex-grow text-center md:text-left">
                                 <div class="mb-4">
-                                    <h3 class="text-2xl font-bold text-primary mb-1">{{ school_info.vice_principal_name }}</h3>
+                                    <h3 class="text-2xl font-bold text-primary mb-1">{{ school_info.vice_principal_name
+                                        }}</h3>
                                     <p class="text-accent font-semibold tracking-wide text-sm uppercase">Vice Principal
                                     </p>
                                 </div>
@@ -460,7 +461,7 @@
    ============================================ */
 
     .swiper-pagination {
-        bottom: 100px !important;
+        bottom: 110px !important;
         z-index: 50 !important;
     }
 
@@ -488,10 +489,10 @@
 
     .scroll-indicator {
         position: absolute;
-        bottom: 40px;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 50;
+        z-index: 40;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -963,6 +964,15 @@
     .line-clamp-3 {
         display: -webkit-box;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
@@ -991,7 +1001,7 @@
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true,
-                dynamicBullets: false,
+                dynamicBullets: true,
             },
             navigation: {
                 nextEl: ".swiper-button-next",

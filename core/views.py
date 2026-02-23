@@ -14,7 +14,7 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         
         # Hero Slider
-        context['sliders'] = Slider.objects.filter(is_active=True)[:5]
+        context['sliders'] = Slider.objects.filter(is_active=True)[:15]
         
         # Latest Notices for Ticker (important ones)
         context['ticker_notices'] = Notice.objects.filter(
@@ -48,7 +48,19 @@ class AboutView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['page'] = self.kwargs.get('page', 'history')
+        page_type = self.kwargs.get('page', 'history')
+        context['page'] = page_type
+        
+        # Meta information
+        titles = {
+            'history': 'Our History',
+            'mission': 'Mission & Vision',
+            'message': 'Leadership Messages',
+            'governing': 'Governing Body'
+        }
+        context['page_title'] = titles.get(page_type, 'About Us')
+        context['page_description'] = f"Learn more about Holy Cross School and College, Rajshahi - {context['page_title']}."
+        
         return context
 
 

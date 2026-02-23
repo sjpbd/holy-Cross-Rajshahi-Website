@@ -17,13 +17,12 @@ class ResourceListView(ListView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = "Resources - Holy Cross School"
         
-        # Group resources by category
-        from collections import defaultdict
-        resources_by_category = defaultdict(list)
-        for resource in context['resources']:
-            resources_by_category[resource.get_category_display()].append(resource)
+        # Get category choices for filtering
+        context['categories'] = [
+            {'slug': choice[0], 'name': choice[1]} 
+            for choice in Resource.CATEGORY_CHOICES
+        ]
         
-        context['resources_by_category'] = dict(resources_by_category)
         return context
 
 

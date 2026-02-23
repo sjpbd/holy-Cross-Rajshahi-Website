@@ -36,8 +36,8 @@ class SchoolInfoAdmin(SummernoteModelAdmin):
     
     fieldsets = (
         ('Branding', {
-            'fields': ('logo',),
-            'description': 'Upload school logo for the website header'
+            'fields': ('logo', 'favicon'),
+            'description': 'Upload school logo and favicon for the website'
         }),
         ('About Us', {
             'fields': ('history', 'mission', 'vision', 'goal')

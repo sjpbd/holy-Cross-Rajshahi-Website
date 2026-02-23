@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-x)2u3wo&mvy@&jufmr6dxrm(zwx!8=04523gu69xbamyvy7a&v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Allow titanium domain and localhost
-ALLOWED_HOSTS = ['titanium.sjis.edu.bd', 'localhost', '127.0.0.1']
+# Allow official domain and local development
+ALLOWED_HOSTS = ['holycrossrajshahi.edu.bd', 'www.holycrossrajshahi.edu.bd', 'localhost', '127.0.0.1']
 
 
 # Application definition

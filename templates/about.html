@@ -39,106 +39,143 @@
 </section>
 
 <!-- Content Section -->
-<div class="bg-gray-50 py-16">
+<div class="bg-gray-50 py-20">
     <div class="container mx-auto px-4">
+        {% if page == 'history' %}
+        <!-- History Content -->
         <div class="max-w-4xl mx-auto">
-            {% if page == 'history' %}
-            <!-- History Content -->
-            <div class="card p-8 md:p-12 prose prose-lg max-w-none" data-aos="fade-up">
-                {{ school_info.history|safe }}
-            </div>
-
-            {% elif page == 'mission' %}
-            <!-- Mission, Vision, Goals -->
-            <div class="space-y-8">
-                <div class="card card-hover-lift p-8 md:p-12" data-aos="fade-up">
-                    <div class="flex items-center mb-6">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-bullseye text-white text-2xl"></i>
-                        </div>
-                        <h2 class="text-3xl md:text-4xl font-bold text-primary">Our Mission</h2>
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100" data-aos="fade-up">
+                <div class="p-8 md:p-16">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-1 h-1 bg-accent rounded-full"></div>
+                        <span class="text-accent font-bold uppercase tracking-widest text-sm">Established Legacy</span>
                     </div>
-                    <div class="prose prose-lg max-w-none">
+                    <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed school-history-content">
+                        {{ school_info.history|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% elif page == 'mission' %}
+        <!-- Mission, Vision, Goals Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Mission -->
+            <div class="group h-full" data-aos="fade-up">
+                <div
+                    class="bg-white rounded-3xl p-8 md:p-10 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <i class="fas fa-rocket text-8xl transform rotate-12"></i>
+                    </div>
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-primary/20 transform group-hover:scale-110 transition-transform duration-500">
+                        <i class="fas fa-rocket text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary mb-4">Our Mission</h2>
+                    <div class="prose prose-primary prose-sm line-height-relaxed text-gray-600 flex-grow">
                         {{ school_info.mission|safe }}
                     </div>
                 </div>
+            </div>
 
-                <div class="card card-hover-lift p-8 md:p-12" data-aos="fade-up" data-aos-delay="100">
-                    <div class="flex items-center mb-6">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-eye text-white text-2xl"></i>
-                        </div>
-                        <h2 class="text-3xl md:text-4xl font-bold text-primary">Our Vision</h2>
+            <!-- Vision -->
+            <div class="group h-full" data-aos="fade-up" data-aos-delay="100">
+                <div
+                    class="bg-white rounded-3xl p-8 md:p-10 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <i class="fas fa-lightbulb text-8xl transform rotate-12"></i>
                     </div>
-                    <div class="prose prose-lg max-w-none">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-accent to-accent-light rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-accent/20 transform group-hover:scale-110 transition-transform duration-500">
+                        <i class="fas fa-lightbulb text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary mb-4">Our Vision</h2>
+                    <div class="prose prose-primary prose-sm line-height-relaxed text-gray-600 flex-grow">
                         {{ school_info.vision|safe }}
                     </div>
                 </div>
+            </div>
 
-                {% if school_info.goal %}
-                <div class="card card-hover-lift p-8 md:p-12" data-aos="fade-up" data-aos-delay="200">
-                    <div class="flex items-center mb-6">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-primary-light to-accent rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-flag-checkered text-white text-2xl"></i>
-                        </div>
-                        <h2 class="text-3xl md:text-4xl font-bold text-primary">Our Goals</h2>
+            <!-- Goals -->
+            {% if school_info.goal %}
+            <div class="group h-full" data-aos="fade-up" data-aos-delay="200">
+                <div
+                    class="bg-white rounded-3xl p-8 md:p-10 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <i class="fas fa-trophy text-8xl transform rotate-12"></i>
                     </div>
-                    <div class="prose prose-lg max-w-none">
+                    <div
+                        class="w-16 h-16 bg-gradient-to-br from-primary-dark to-primary rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-primary-dark/20 transform group-hover:scale-110 transition-transform duration-500">
+                        <i class="fas fa-trophy text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-primary mb-4">Our Goals</h2>
+                    <div class="prose prose-primary prose-sm line-height-relaxed text-gray-600 flex-grow">
                         {{ school_info.goal|safe }}
                     </div>
                 </div>
-                {% endif %}
-            </div>
-
-            {% elif page == 'message' %}
-            <!-- Leadership Messages -->
-            <div class="space-y-8">
-                {% if school_info.principal_message %}
-                <div class="card card-hover-lift overflow-hidden" data-aos="fade-up">
-                    <div class="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
-                        <div class="flex items-center">
-                            {% if school_info.principal_photo %}
-                            <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
-                                class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-accent shadow-lg">
-                            {% endif %}
-                            <div class="ml-6">
-                                <h2 class="text-3xl md:text-4xl font-bold">{{ school_info.principal_name }}</h2>
-                                <p class="text-xl text-accent-light">Principal</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-8 md:p-12 prose prose-lg max-w-none">
-                        {{ school_info.principal_message|safe }}
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if school_info.vice_principal_message %}
-                <div class="card card-hover-lift overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-                    <div class="bg-gradient-to-r from-primary-dark to-primary p-6 text-white">
-                        <div class="flex items-center">
-                            {% if school_info.vice_principal_photo %}
-                            <img src="{{ school_info.vice_principal_photo.url }}"
-                                alt="{{ school_info.vice_principal_name }}"
-                                class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-accent shadow-lg">
-                            {% endif %}
-                            <div class="ml-6">
-                                <h2 class="text-3xl md:text-4xl font-bold">{{ school_info.vice_principal_name }}</h2>
-                                <p class="text-xl text-accent-light">Vice Principal</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-8 md:p-12 prose prose-lg max-w-none">
-                        {{ school_info.vice_principal_message|safe }}
-                    </div>
-                </div>
-                {% endif %}
             </div>
             {% endif %}
         </div>
+
+        {% elif page == 'message' %}
+        <!-- Leadership Messages -->
+        <div class="max-w-5xl mx-auto space-y-16">
+            {% if school_info.principal_message %}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100"
+                data-aos="fade-up">
+                <div
+                    class="lg:col-span-4 bg-gradient-to-br from-primary to-primary-dark p-12 flex flex-col items-center justify-center text-center text-white">
+                    {% if school_info.principal_photo %}
+                    <div class="relative mb-6">
+                        <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
+                            class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-2xl">
+                        <div
+                            class="absolute -bottom-2 -right-2 w-10 h-10 bg-accent rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-quote-right text-white text-xs"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <h2 class="text-2xl font-bold mb-1">{{ school_info.principal_name }}</h2>
+                    <p class="text-accent-light font-medium tracking-widest uppercase text-sm">Principal</p>
+                </div>
+                <div class="lg:col-span-8 p-12 md:p-16 relative">
+                    <i class="fas fa-quote-left text-gray-100 text-8xl absolute top-8 left-8 opacity-50 z-0"></i>
+                    <div class="prose prose-lg max-w-none text-gray-600 relative z-10">
+                        {{ school_info.principal_message|safe }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if school_info.vice_principal_message %}
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100"
+                data-aos="fade-up" data-aos-delay="100">
+                <div
+                    class="lg:col-span-4 lg:order-last bg-gradient-to-br from-primary-dark to-primary p-12 flex flex-col items-center justify-center text-center text-white">
+                    {% if school_info.vice_principal_photo %}
+                    <div class="relative mb-6">
+                        <img src="{{ school_info.vice_principal_photo.url }}"
+                            alt="{{ school_info.vice_principal_name }}"
+                            class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-2xl">
+                        <div
+                            class="absolute -bottom-2 -right-2 w-10 h-10 bg-accent rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-quote-right text-white text-xs"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <h2 class="text-2xl font-bold mb-1">{{ school_info.vice_principal_name }}</h2>
+                    <p class="text-accent-light font-medium tracking-widest uppercase text-sm">Vice Principal</p>
+                </div>
+                <div class="lg:col-span-8 p-12 md:p-16 relative">
+                    <i class="fas fa-quote-left text-gray-100 text-8xl absolute top-8 left-8 opacity-50 z-0"></i>
+                    <div class="prose prose-lg max-w-none text-gray-600 relative z-10">
+                        {{ school_info.vice_principal_message|safe }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 </div>
 

@@ -38,14 +38,29 @@ class Resource(models.Model):
     def __str__(self):
         return f"{self.title} ({self.get_category_display()})"
 
-    def get_link(self):
-        """Return file URL or external link"""
+    def get_extension(self):
+        """Return file extension without dot"""
         if self.file:
-            return self.file.url
-        return self.external_link
+            import os
+            return os.path.splitext(self.file.name)[1][1:].lower()
+        return None
+
+    def get_file_size(self):
+        """Return human readable file size"""
+        if self.file:
+            try:
+                size = self.file.size
+                for unit in ['B', 'KB', 'MB', 'GB']:
+                    if size < 1024:
+                        return f"{size:.1f} {unit}"
+                    size /= 1024
+            except:
+                return None
+        return None
 
     def increment_download_count(self):
         """Increment download count atomically"""
-        self.download_count = models.F('download_count') + 1
+        from django.db.models import F
+        self.download_count = F('download_count') + 1
         self.save(update_fields=['download_count'])
         self.refresh_from_db()

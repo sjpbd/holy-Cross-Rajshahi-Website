@@ -6,19 +6,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- SEO Meta Tags -->
-    <title>{% block title %}{{ page_title|default:"Holy Cross School and College, Rajshahi" }}{% endblock %}</title>
-    <meta name="description"
-        content="{% block description %}{{ page_description|default:'Holy Cross School and College, Rajshahi - A premier educational institution dedicated to excellence in education since its establishment.' }}{% endblock %}">
-    <meta name="keywords" content="Holy Cross School, Rajshahi, Bangladesh, Education, School, College">
+    <!-- Favicon -->
+    {% if school_info.favicon %}
+    <link rel="icon" href="{{ school_info.favicon.url }}">
+    {% endif %}
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title"
-        content="{% block og_title %}{{ page_title|default:'Holy Cross School and College, Rajshahi' }}{% endblock %}">
+    <!-- Dynamic SEO Meta Tags -->
+    <title>{% block title %}{% firstof seo.title page_title "Holy Cross School and College, Rajshahi" %}{% endblock %}
+    </title>
+    <meta name="description" content="{% block description %}{% firstof seo.description page_description " Holy Cross
+        School and College, Rajshahi - A premier educational institution dedicated to excellence in education, character
+        development, and holistic growth since its establishment." %}{% endblock %}">
+    <meta name="keywords"
+        content="{{ seo.keywords|default:'Holy Cross School, Holy Cross College, Rajshahi, Best School in Rajshahi, Top College in Rajshahi, Education, Bangladesh' }}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <meta name="robots" content="{{ seo.robots|default:'index, follow' }}">
+    <meta name="author" content="Holy Cross School and College, Rajshahi">
+
+    <!-- Open Graph Meta Tags (Social Media) -->
+    <meta property="og:title" content="{% block og_title %}{% firstof seo.get_og_title page_title " Holy Cross School
+        and College, Rajshahi" %}{% endblock %}">
     <meta property="og:description"
-        content="{% block og_description %}{{ page_description|default:'Premier educational institution in Rajshahi' }}{% endblock %}">
-    <meta property="og:type" content="website">
+        content="{% block og_description %}{% firstof seo.get_og_description page_description " Premier educational
+        institution in Rajshahi dedicated to excellence and holistic development." %}{% endblock %}">
+    <meta property="og:type" content="{{ seo.og_type|default:'website' }}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    {% if seo.og_image %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ seo.og_image.url }}">
+    {% elif school_info.logo %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ school_info.logo.url }}">
+    {% endif %}
+
+    <!-- JSON-LD Structured Data (Schema.org) for Search Engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "Holy Cross School and College, Rajshahi",
+      "url": "{{ request.scheme }}://{{ request.get_host }}",
+      "logo": "{{ request.scheme }}://{{ request.get_host }}{{ school_info.logo.url }}",
+      "description": "{{ school_info.mission|striptags|truncatewords:30 }}",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "{{ school_info.address }}",
+        "addressLocality": "Rajshahi",
+        "addressRegion": "Rajshahi",
+        "addressCountry": "Bangladesh"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "{{ school_info.phone }}",
+        "contactType": "Administrative",
+        "email": "{{ school_info.email }}"
+      },
+      "sameAs": [
+        "{{ school_info.facebook_url }}",
+        "{{ school_info.twitter_url }}",
+        "{{ school_info.youtube_url }}",
+        "{{ school_info.instagram_url }}"
+      ]
+    }
+    </script>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -29,8 +77,10 @@
                     colors: {
                         'primary': '#1e3a8a',      // Navy Blue
                         'primary-dark': '#1c2a4e',
+                        'primary-light': '#3b82f6',
                         'accent': '#d4af37',       // Metallic Gold
                         'accent-dark': '#b8941e',
+                        'accent-light': '#f4d03f',
                         'footer-text': '#E5E7EB', // Light Gray
                     }
                 }
