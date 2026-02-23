@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
     
     # Third-party apps
     'easy_thumbnails',
@@ -54,6 +56,9 @@ INSTALLED_APPS = [
     'contact',
     'seo',
 ]
+
+# Required by django.contrib.sites
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
