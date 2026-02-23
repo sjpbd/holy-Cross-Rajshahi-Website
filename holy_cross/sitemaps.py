@@ -35,7 +35,7 @@ class NewsSitemap(sitemaps.Sitemap):
         return NewsItem.objects.filter(is_published=True)
 
     def lastmod(self, obj):
-        return obj.published_at
+        return obj.published_date
 
 class ClubSitemap(sitemaps.Sitemap):
     changefreq = 'monthly'

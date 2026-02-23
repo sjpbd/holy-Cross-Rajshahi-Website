@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Club(models.Model):
@@ -28,6 +29,9 @@ class Club(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('club_detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         """Auto-generate slug from name"""

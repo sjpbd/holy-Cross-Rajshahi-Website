@@ -1,5 +1,6 @@
 # notices/models.py
 from django.db import models
+from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 import os
 
@@ -27,6 +28,9 @@ class Notice(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('notice_detail', kwargs={'pk': self.pk})
 
     def increment_view_count(self):
         """Increment view count atomically"""
