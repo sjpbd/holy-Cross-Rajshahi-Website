@@ -42,9 +42,12 @@
                         <div>
                             <h3 class="text-lg font-bold text-primary mb-2">Our Location</h3>
                             <p class="text-gray-600">{{ contact_info.address|linebreaksbr }}</p>
-                            {% if contact_info.city %}
-                            <p class="text-gray-600">{{ contact_info.city }}{% if contact_info.postal_code %}, {{
-                                contact_info.postal_code }}{% endif %}</p>
+                            {% if contact_info.city or contact_info.postal_code %}
+                            <p class="text-gray-600">
+                                {% if contact_info.city %}{{ contact_info.city }}{% endif %}
+                                {% if contact_info.city and contact_info.postal_code %}, {% endif %}
+                                {% if contact_info.postal_code %}{{ contact_info.postal_code }}{% endif %}
+                            </p>
                             {% endif %}
                         </div>
                     </div>

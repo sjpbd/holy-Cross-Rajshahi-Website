@@ -4,7 +4,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from core.views import HomeView, AboutView, PrivacyPolicyView, TermsOfServiceView, SitemapView
-from people.views import TeacherListView, AdministrationListView
+from people.views import TeacherListView, AdministrationListView, TeacherDetailView, StaffListView
 from notices.views import NoticeListView, NoticeDetailView, increment_notice_view
 from news.views import NewsListView, NewsDetailView
 
@@ -35,7 +35,9 @@ urlpatterns = [
     
     # People
     path('teachers/', TeacherListView.as_view(), name='teachers'),
+    path('teachers/<slug:slug>/', TeacherDetailView.as_view(), name='teacher_detail'),
     path('administration/', AdministrationListView.as_view(), name='administration'),
+    path('staff/', StaffListView.as_view(), name='staff'),
     
     # Notices
     path('notices/', NoticeListView.as_view(), name='notice_list'),

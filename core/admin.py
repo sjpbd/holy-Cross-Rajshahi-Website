@@ -49,7 +49,7 @@ class SchoolInfoAdmin(SummernoteModelAdmin):
             'fields': ('vice_principal_name', 'vice_principal_photo', 'vice_principal_message')
         }),
         ('Contact Information', {
-            'fields': ('address', 'phone', 'email')
+            'fields': ('address', 'city', 'postal_code', 'phone', 'email')
         }),
         ('Social Media', {
             'fields': ('facebook_url', 'twitter_url', 'youtube_url', 'instagram_url')

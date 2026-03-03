@@ -28,77 +28,78 @@
 <!-- Teachers Grid -->
 <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        <!-- Department Filter (if applicable) -->
-        {% if departments %}
-        <div class="flex flex-wrap gap-3 mb-8" data-aos="fade-up">
-            <button data-filter="all" class="btn btn-primary active">All Departments</button>
-            {% for dept in departments %}
-            <button data-filter="{{ dept.slug }}" class="btn btn-outline">{{ dept.name }}</button>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <!-- Teachers Grid -->
-        <!-- Teachers Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {% for teacher in teachers %}
-            <div class="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
-                data-category="{{ teacher.department.slug|default:'general' }}" data-aos="fade-up"
-                data-aos-delay="{{ forloop.counter0|add:'00' }}">
-
-                <!-- Teacher Photo -->
-                <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
-                    {% if teacher.photo %}
-                    <img src="{{ teacher.photo.url }}" alt="{{ teacher.name }}"
-                        class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
-                    {% else %}
-                    <div
-                        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
-                        <span class="text-6xl font-bold text-primary/20">{{ teacher.name|first }}</span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Overlay Gradient -->
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    </div>
-
-                    <!-- Quick Actions -->
-                </div>
-
-                <div class="p-6 text-center relative">
-                    <!-- Department Badge -->
-                    {% if teacher.department %}
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span
-                            class="bg-white text-primary text-xs font-bold px-3 py-1 rounded-full shadow-md border border-gray-100 uppercase tracking-wider">
-                            {{ teacher.get_department_display }}
-                        </span>
-                    </div>
-                    {% endif %}
-
-                    <!-- Name -->
-                    <h3 class="text-xl font-bold text-gray-800 mb-1 mt-2 group-hover:text-primary transition-colors">{{ teacher.name }}</h3>
-
-                    <!-- Designation -->
-                    <p class="text-accent font-medium text-sm mb-4">{{ teacher.designation }}</p>
-
-                    <!-- Bio/Qualifications -->
-                    {% if teacher.bio %}
-                    <p class="text-sm text-gray-500 line-clamp-2 mb-0">{{ teacher.bio|striptags|truncatewords:12 }}</p>
-                    {% endif %}
-                </div>
+        {% for section in sections %}
+        <div class="mb-20" data-aos="fade-up">
+            <div class="flex items-center mb-10">
+                <div class="h-10 w-1.5 bg-accent rounded-full mr-4"></div>
+                <h2 class="text-3xl md:text-4xl font-bold text-primary italic">{{ section.name }}</h2>
             </div>
-            {% empty %}
-            <div class="col-span-full text-center py-16" data-aos="fade-up">
-                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-chalkboard-teacher text-4xl text-gray-300"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-600 mb-2">No Teachers Listed</h3>
-                <p class="text-gray-500">Check back later for updates</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {% for teacher in section.teachers %}
+                <a href="{% url 'teacher_detail' teacher.slug %}"
+                    class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col"
+                    data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
+
+                    <!-- Teacher Photo -->
+                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                        {% if teacher.photo %}
+                        <img src="{{ teacher.photo.url }}" alt="{{ teacher.name }}"
+                            class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
+                        {% else %}
+                        <div
+                            class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
+                            <span class="text-6xl font-bold text-primary/20">{{ teacher.name|first }}</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Overlay Gradient -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                            <span
+                                class="text-white font-bold text-sm tracking-widest uppercase bg-accent/80 px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                View Profile
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-6 text-center relative flex-grow">
+                        <!-- Department Badge -->
+                        {% if teacher.department %}
+                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                            <span
+                                class="bg-white text-primary text-[10px] font-bold px-3 py-1 rounded-full shadow-md border border-gray-100 uppercase tracking-wider">
+                                {{ teacher.get_department_display }}
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <!-- Name -->
+                        <h3
+                            class="text-lg font-bold text-gray-800 mb-1 mt-2 group-hover:text-primary transition-colors line-clamp-1">
+                            {{ teacher.name }}</h3>
+
+                        <!-- Designation -->
+                        <p class="text-accent font-medium text-xs mb-4">{{ teacher.designation }}</p>
+
+                        <!-- Bio/Qualifications -->
+                        {% if teacher.bio %}
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-0 italic">{{ teacher.bio|striptags|truncatewords:10 }}</p>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
+        {% empty %}
+        <div class="text-center py-16" data-aos="fade-up">
+            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-chalkboard-teacher text-4xl text-gray-300"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-600 mb-2">No Teachers Listed</h3>
+            <p class="text-gray-500">Check back later for updates</p>
+        </div>
+        {% endfor %}
     </div>
 </section>
 

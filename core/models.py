@@ -56,6 +56,8 @@ class SchoolInfo(models.Model):
     
     # Contact Information
     address = models.TextField(blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
     phone = models.CharField(max_length=100, blank=True)
     email = models.EmailField(blank=True)
     
