@@ -1,0 +1,23 @@
+/* Fix Summernote editor width in Django Admin */
+.note-editor.note-frame {
+    width: 100% !important;
+}
+
+.note-editor .note-editing-area {
+    width: 100% !important;
+}
+
+.note-editor .note-editable {
+    width: 100% !important;
+}
+
+/* Ensure the field container itself is full width */
+.django-summernote-widget {
+    width: 100% !important;
+    display: block !important;
+}
+
+.form-row .note-editor {
+    margin-left: 0 !important;
+    width: 100% !important;
+}

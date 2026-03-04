@@ -196,4 +196,7 @@ SUMMERNOTE_CONFIG = {
             ['view', ['fullscreen', 'codeview', 'help']],
         ],
     },
+    'css': [
+        '/static/css/admin_custom.css',
+    ],
 }

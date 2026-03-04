@@ -26,6 +26,11 @@ class SchoolInfoAdmin(SummernoteModelAdmin):
     """Singleton admin for school information"""
     summernote_fields = ('history', 'mission', 'vision', 'goal', 'principal_message', 'vice_principal_message')
     
+    class Media:
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
+    
     def has_add_permission(self, request):
         # Only allow one instance
         return not SchoolInfo.objects.exists()
