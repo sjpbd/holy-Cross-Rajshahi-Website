@@ -1,9 +1,10 @@
 /* 
-   Professional Industry-Standard Admin UI Overrides
-   Designed for maximum consistency and clarity in wide content layouts.
+   THE ULTIMATE INDUSTRIAL RESET - STACKED EDITOR 
+   This is the most aggressive override possible to ensure the editor is full-width 
+   and positioned correctly under its label.
 */
 
-/* 1. Global Reset for Summernote Fields in Aligned Admin */
+/* 1. Target and Reset the Row */
 .aligned .form-row.field-history,
 .aligned .form-row.field-mission,
 .aligned .form-row.field-vision,
@@ -14,39 +15,19 @@
 .aligned .form-row.field-message,
 .aligned .form-row.field-principal_message,
 .aligned .form-row.field-vice_principal_message,
-.aligned .form-row.field-objectives,
-fieldset.modern-editor .form-row {
+.aligned .form-row.field-objectives {
     display: block !important;
     float: none !important;
-    width: 100% !important;
-    clear: both !important;
-    padding: 30px 20px !important;
-    border-bottom: 2px solid #f9f9f9 !important;
-    box-sizing: border-box !important;
-}
-
-/* 2. THE CRITICAL FIX: Kill the 170px margin that pushes the editor to the right */
-.aligned .form-row.field-history>div,
-.aligned .form-row.field-mission>div,
-.aligned .form-row.field-vision>div,
-.aligned .form-row.field-goal>div,
-.aligned .form-row.field-bio>div,
-.aligned .form-row.field-content>div,
-.aligned .form-row.field-description>div,
-.aligned .form-row.field-message>div,
-.aligned .form-row.field-principal_message>div,
-.aligned .form-row.field-vice_principal_message>div,
-.aligned .form-row.field-objectives>div,
-fieldset.modern-editor .form-row>div {
-    margin-left: 0 !important;
-    padding: 0 !important;
     width: 100% !important;
     max-width: none !important;
-    display: block !important;
-    float: none !important;
+    clear: both !important;
+    padding: 30px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    position: relative !important;
 }
 
-/* 3. Modern Label Styling (Stacked Header Layout) */
+/* 2. Style the Label to be a Massive Block Header */
 .aligned .form-row.field-history label,
 .aligned .form-row.field-mission label,
 .aligned .form-row.field-vision label,
@@ -57,48 +38,67 @@ fieldset.modern-editor .form-row>div {
 .aligned .form-row.field-message label,
 .aligned .form-row.field-principal_message label,
 .aligned .form-row.field-vice_principal_message label,
-.aligned .form-row.field-objectives label,
-fieldset.modern-editor .form-row label {
+.aligned .form-row.field-objectives label {
     display: block !important;
-    width: 100% !important;
     float: none !important;
+    width: 100% !important;
     text-align: left !important;
-    padding: 0 0 12px 0 !important;
+    padding: 0 0 15px 0 !important;
     margin: 0 !important;
-    font-size: 1.1rem !important;
+    font-size: 18px !important;
     font-weight: 800 !important;
-    color: #417690 !important;
-    /* Django Admin Header Blue */
+    color: #009688 !important;
+    /* Standout Teal to verify application */
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
+    border-bottom: 2px solid #009688 !important;
+    margin-bottom: 20px !important;
 }
 
-/* 4. Shadowed Editor Wrapper */
+/* 3. RESET EVERY SINGLE ATTRIBUTE of the Content Div */
+.aligned .form-row.field-history>div,
+.aligned .form-row.field-mission>div,
+.aligned .form-row.field-vision>div,
+.aligned .form-row.field-goal>div,
+.aligned .form-row.field-bio>div,
+.aligned .form-row.field-content>div,
+.aligned .form-row.field-description>div,
+.aligned .form-row.field-message>div,
+.aligned .form-row.field-principal_message>div,
+.aligned .form-row.field-vice_principal_message>div,
+.aligned .form-row.field-objectives>div {
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    min-width: 100% !important;
+    position: static !important;
+}
+
+/* 4. Force Summernote Widget Visibility */
 .django-summernote-widget {
     width: 100% !important;
     display: block !important;
-    margin-top: 10px !important;
 }
 
 .note-editor.note-frame {
     width: 100% !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
-    border: 1px solid #d1d5db !important;
+    min-width: 100% !important;
+    border: 1px solid #ccd0d5 !important;
     border-radius: 8px !important;
-    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .note-editable {
     width: 100% !important;
-    min-height: 600px !important;
-    font-size: 15px !important;
-    line-height: 1.6 !important;
-    padding: 25px !important;
+    min-height: 550px !important;
+    padding: 30px !important;
 }
 
-/* 5. Mobile/Small Display Support */
-@media (max-width: 767px) {
-    .aligned .form-row {
-        padding: 15px 10px !important;
-    }
+/* 5. Fix internal Django Admin floating which targets 'aligned' children */
+.aligned .form-row div.help {
+    margin-left: 0 !important;
+    padding: 10px 0 !important;
 }
