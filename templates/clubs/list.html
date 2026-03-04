@@ -1,100 +1,144 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Clubs & Organizations - Holy Cross School and College{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
-    <div class="decorative-shape decorative-circle-1"></div>
-    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+<section class="pt-32 pb-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1" style="opacity: 0.2;"></div>
+    <div class="absolute inset-0 decorative-dots opacity-10"></div>
 
-    <div class="container mx-auto px-4 py-16 relative z-10">
-        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
-            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
-                    style="color: white !important;">Home</a></div>
-            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Clubs & Organizations</div>
+    <div class="container mx-auto px-4 relative z-10">
+        <nav class="breadcrumb mb-6" data-aos="fade-down">
+            <div class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></div>
+            <div class="breadcrumb-item active">Clubs & Organizations</div>
         </nav>
 
-        <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">Clubs & Organizations</h1>
-        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
-            data-aos-delay="100"></div>
-        <p class="text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
-            Explore our vibrant student organizations and extracurricular activities
-        </p>
+        <div class="max-w-3xl">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6" data-aos="fade-up">Student <span
+                    class="text-accent-light">Clubs</span></h1>
+            <p class="text-xl md:text-2xl text-gray-200 leading-relaxed mb-0" data-aos="fade-up" data-aos-delay="100">
+                Fostering leadership, creativity, and community through diverse extracurricular opportunities.
+            </p>
+        </div>
     </div>
 </section>
 
 <!-- Clubs Grid -->
-<section class="py-16 bg-gray-50">
+<section class="py-24 bg-gray-50">
     <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {% for club in clubs %}
-            <div class="card card-hover-lift overflow-hidden" data-aos="fade-up"
-                data-aos-delay="{{ forloop.counter0|add:'00' }}" data-tilt>
-                <!-- Club Logo/Image -->
-                {% if club.logo %}
-                <div class="h-48 bg-gradient-to-br from-primary to-primary-light flex items-center justify-center p-8">
-                    <img src="{{ club.logo.url }}" alt="{{ club.name }}" class="max-h-full max-w-full object-contain">
-                </div>
-                {% else %}
+            <div class="card card-hover-lift h-full flex flex-col group" data-aos="fade-up"
+                data-aos-delay="{{ forloop.counter0|add:'1' }}00" data-tilt>
+
+                <!-- Club Header/Logo Area -->
                 <div
-                    class="h-48 bg-gradient-to-br from-primary via-primary-light to-accent flex items-center justify-center">
-                    <i class="fas fa-users text-6xl text-white"></i>
+                    class="relative h-56 bg-white overflow-hidden flex items-center justify-center p-10 border-b border-gray-100">
+                    {% if club.logo %}
+                    <img src="{{ club.logo.url }}" alt="{{ club.name }}"
+                        class="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110">
+                    {% else %}
+                    <div
+                        class="w-24 h-24 rounded-full bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-white text-4xl shadow-inner">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    {% endif %}
+
+                    {% if club.established_year %}
+                    <div
+                        class="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        EST. {{ club.established_year }}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
 
-                <div class="p-6">
-                    <!-- Club Name -->
-                    <h3 class="text-2xl font-bold text-primary mb-3">{{ club.name }}</h3>
+                <div class="p-8 flex-1 flex flex-col">
+                    <h3 class="text-2xl font-bold text-primary mb-3 group-hover:text-primary-light transition-colors">{{
+                        club.name }}</h3>
 
-                    <!-- Club Description -->
-                    <p class="text-gray-600 mb-4 line-clamp-3">
-                        {{ club.description|striptags|truncatewords:20|safe }}
+                    {% if club.motto %}
+                    <p class="text-sm font-semibold text-accent-dark italic mb-4">"{{ club.motto|truncatechars:60 }}"
                     </p>
+                    {% endif %}
 
-                    <!-- Club Stats -->
-                    <div class="flex items-center gap-4 mb-4 text-sm text-gray-500">
-                        {% if club.member_count %}
-                        <div class="flex items-center">
-                            <i class="fas fa-users mr-1"></i>
-                            <span>{{ club.member_count }} Members</span>
-                        </div>
-                        {% endif %}
-                        {% if club.category %}
-                        <span class="badge badge-primary">{{ club.category }}</span>
-                        {% endif %}
+                    <div class="text-gray-600 mb-8 line-clamp-3 text-sm leading-relaxed">
+                        {{ club.description|striptags|truncatewords:25 }}
                     </div>
 
-                    <!-- View Details Button -->
-                    <a href="{% url 'club_detail' club.slug %}" class="btn btn-primary btn-sm w-full">
-                        View Details <i class="fas fa-arrow-right ml-2"></i>
-                    </a>
+                    <div class="mt-auto">
+                        <a href="{% url 'club_detail' club.slug %}" class="btn btn-primary btn-sm w-full py-3">
+                            Explore Club <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
             {% empty %}
-            <div class="col-span-full text-center py-16" data-aos="fade-up">
-                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-users text-4xl text-gray-400"></i>
+            <div class="col-span-full text-center py-20 bg-white rounded-3xl shadow-sm border border-dashed border-gray-300"
+                data-aos="fade-up">
+                <div
+                    class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+                    <i class="fas fa-users-slash text-5xl"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-600 mb-2">No Clubs Available</h3>
-                <p class="text-gray-500">Check back later for updates</p>
+                <h3 class="text-3xl font-bold text-gray-400 mb-2">No Clubs Found</h3>
+                <p class="text-gray-500">We're currently updating our club list. Please check back soon!</p>
             </div>
             {% endfor %}
         </div>
     </div>
 </section>
 
-<!-- Call to Action -->
-<section class="py-16 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
-    <div class="absolute inset-0 decorative-dots opacity-5"></div>
-    <div class="container mx-auto px-4 text-center relative z-10" data-aos="fade-up">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">Interested in Joining a Club?</h2>
-        <p class="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Contact our student affairs office to learn more about club memberships and activities
-        </p>
-        <a href="{% url 'home' %}#contact" class="btn btn-accent">
-            <i class="fas fa-envelope mr-2"></i>Get in Touch
-        </a>
+<!-- Stats/Info Section -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div data-aos="fade-up">
+                <div class="text-5xl font-extrabold text-primary mb-2">15+</div>
+                <p class="text-gray-500 font-medium uppercase tracking-widest text-sm">Active Clubs</p>
+            </div>
+            <div data-aos="fade-up" data-aos-delay="100">
+                <div class="text-5xl font-extrabold text-primary mb-2">500+</div>
+                <p class="text-gray-500 font-medium uppercase tracking-widest text-sm">Student Members</p>
+            </div>
+            <div data-aos="fade-up" data-aos-delay="200">
+                <div class="text-5xl font-extrabold text-primary mb-2">50+</div>
+                <p class="text-gray-500 font-medium uppercase tracking-widest text-sm">Annual Events</p>
+            </div>
+        </div>
     </div>
 </section>
+
+<!-- Call to Action -->
+<section class="py-24 bg-primary text-white relative overflow-hidden">
+    <div class="absolute inset-0 decorative-dots opacity-10"></div>
+    <div class="container mx-auto px-4 text-center relative z-10" data-aos="fade-up">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to lead?</h2>
+        <p class="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Joining a club is the best way to develop leadership skills and make lasting friendships at Holy Cross.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'home' %}#contact" class="btn btn-accent btn-lg px-10">
+                <i class="fas fa-paper-plane mr-2"></i>Inquire Now
+            </a>
+            <a href="{% url 'contact' %}" class="btn btn-glass btn-lg px-10">
+                <i class="fas fa-info-circle mr-2"></i>Contact Admissions
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('[data-tilt]').tilt({
+            maxTilt: 7,
+            perspective: 1000,
+            scale: 1.02,
+            speed: 400
+        });
+    });
+</script>
 {% endblock %}

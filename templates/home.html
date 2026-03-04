@@ -227,8 +227,7 @@
                             </div>
                             <div class="flex-grow text-center md:text-left">
                                 <div class="mb-4">
-                                    <h3 class="text-2xl font-bold text-primary mb-1">{{ school_info.vice_principal_name
-                                        }}</h3>
+                                    <h3 class="text-2xl font-bold text-primary mb-1">{{ school_info.vice_principal_name }}</h3>
                                     <p class="text-accent font-semibold tracking-wide text-sm uppercase">Vice Principal
                                     </p>
                                 </div>
@@ -280,12 +279,12 @@
 <!-- Notice Board -->
 <section class="py-16 bg-gradient-to-b from-gray-50 to-white relative">
     <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center mb-8" data-aos="fade-up">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10" data-aos="fade-up">
             <div>
-                <h2 class="text-4xl md:text-5xl font-bold text-primary">Notice Board</h2>
-                <div class="section-divider ml-0"></div>
+                <h2 class="text-3xl md:text-5xl font-bold text-primary">Notice Board</h2>
+                <div class="section-divider ml-0 mt-2 mb-0"></div>
             </div>
-            <a href="{% url 'notice_list' %}" class="btn btn-outline">
+            <a href="{% url 'notice_list' %}" class="btn btn-outline btn-sm sm:btn-md self-start sm:self-auto">
                 View All <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>
@@ -335,12 +334,12 @@
     </div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <div class="flex justify-between items-center mb-8" data-aos="fade-up">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10" data-aos="fade-up">
             <div>
-                <h2 class="text-4xl md:text-5xl font-bold text-primary">Latest News & Events</h2>
-                <div class="section-divider ml-0"></div>
+                <h2 class="text-3xl md:text-5xl font-bold text-primary">Latest News & Events</h2>
+                <div class="section-divider ml-0 mt-2 mb-0"></div>
             </div>
-            <a href="{% url 'news_list' %}" class="btn btn-accent">
+            <a href="{% url 'news_list' %}" class="btn btn-accent btn-sm sm:btn-md self-start sm:self-auto">
                 View All <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>
@@ -711,6 +710,7 @@
         background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
         animation: shine-text 4s linear infinite;
     }
 
