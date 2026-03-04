@@ -1,4 +1,3 @@
-<!-- templates/people/teachers.html -->
 {% extends 'base.html' %}
 
 {% block title %}Our Teachers - Holy Cross School and College{% endblock %}
@@ -25,101 +24,177 @@
     </div>
 </section>
 
-<!-- Teachers Grid -->
+<!-- Teachers Grid & Pagination -->
 <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
-        {% for section in sections %}
-        <div class="mb-20" data-aos="fade-up">
-            <div class="flex items-center mb-10">
-                <div class="h-10 w-1.5 bg-accent rounded-full mr-4"></div>
-                <h2 class="text-3xl md:text-4xl font-bold text-primary italic">{{ section.name }}</h2>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {% for teacher in section.teachers %}
-                <a href="{% url 'teacher_detail' teacher.slug %}"
-                    class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col"
-                    data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap justify-center gap-4 mb-16" data-aos="fade-up">
+            <a href="?section="
+                class="px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 {% if not current_section %}bg-primary text-white shadow-lg shadow-primary/30{% else %}bg-white text-gray-500 hover:bg-gray-100 hover:text-primary{% endif %} border border-gray-200">
+                All Sections
+            </a>
+            {% for section_id, section_name in sections %}
+            <a href="?section={{ section_id }}"
+                class="px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 {% if current_section == section_id %}bg-primary text-white shadow-lg shadow-primary/30{% else %}bg-white text-gray-500 hover:bg-gray-100 hover:text-primary{% endif %} border border-gray-200">
+                {{ section_name }}
+            </a>
+            {% endfor %}
+        </div>
 
-                    <!-- Teacher Photo -->
-                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
-                        {% if teacher.photo %}
-                        <img src="{{ teacher.photo.url }}" alt="{{ teacher.name }}"
-                            class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
-                        {% else %}
-                        <div
-                            class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
-                            <span class="text-6xl font-bold text-primary/20">{{ teacher.name|first }}</span>
-                        </div>
-                        {% endif %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for teacher in teachers %}
+            <a href="{% url 'teacher_detail' teacher.slug %}"
+                class="group bg-white rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100 flex flex-col relative transform hover:-translate-y-2"
+                data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
 
-                        <!-- Overlay Gradient -->
-                        <div
-                            class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
-                            <span
-                                class="text-white font-bold text-sm tracking-widest uppercase bg-accent/80 px-4 py-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                View Profile
-                            </span>
-                        </div>
+                <!-- Decorative corner accent -->
+                <div
+                    class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-accent/20 to-transparent rounded-tr-[2rem] z-0">
+                </div>
+
+                <!-- Teacher Photo -->
+                <div class="relative aspect-[4/5] overflow-hidden bg-gray-50 m-2 rounded-[1.5rem] z-10">
+                    {% if teacher.photo %}
+                    <img src="{{ teacher.photo.url }}" alt="{{ teacher.name }}"
+                        class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700">
+                    {% else %}
+                    <div
+                        class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
+                        <span class="text-7xl font-bold text-primary/10">{{ teacher.name|first }}</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Overlay Detail Button -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8 backdrop-blur-[2px]">
+                        <span
+                            class="text-white font-bold text-sm tracking-widest uppercase bg-accent px-6 py-3 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-xl">
+                            View Profile
+                        </span>
                     </div>
 
-                    <div class="p-6 text-center relative flex-grow">
-                        <!-- Department Badge -->
-                        {% if teacher.department %}
-                        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                            <span
-                                class="bg-white text-primary text-[10px] font-bold px-3 py-1 rounded-full shadow-md border border-gray-100 uppercase tracking-wider">
-                                {{ teacher.get_department_display }}
-                            </span>
-                        </div>
-                        {% endif %}
-
-                        <!-- Name -->
-                        <h3
-                            class="text-lg font-bold text-gray-800 mb-1 mt-2 group-hover:text-primary transition-colors line-clamp-1">
-                            {{ teacher.name }}</h3>
-
-                        <!-- Designation -->
-                        <p class="text-accent font-medium text-xs mb-4">{{ teacher.designation }}</p>
-
-                        <!-- Bio/Qualifications -->
-                        {% if teacher.bio %}
-                        <p class="text-xs text-gray-500 line-clamp-2 mb-0 italic">{{
-                            teacher.bio|striptags|truncatewords:10|safe }}</p>
-                        {% endif %}
+                    <!-- Department Badge -->
+                    {% if teacher.department %}
+                    <div
+                        class="absolute bottom-4 left-4 z-20 transition-transform duration-300 group-hover:translate-y-10 group-hover:opacity-0">
+                        <span
+                            class="bg-white/95 backdrop-blur-sm text-primary text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg uppercase tracking-wider inline-block">
+                            <i class="fas fa-book-open mr-1"></i> {{ teacher.get_department_display }}
+                        </span>
                     </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-6 text-center relative flex-grow z-10 bg-white">
+                    <!-- Name -->
+                    <h3
+                        class="text-xl font-bold text-gray-800 mb-2 mt-2 group-hover:text-primary transition-colors line-clamp-1">
+                        {{ teacher.name }}
+                    </h3>
+
+                    <!-- Designation -->
+                    <p class="text-accent font-semibold text-sm tracking-wide uppercase mb-4">{{ teacher.designation }}
+                    </p>
+
+                    <!-- Section Tag -->
+                    <p
+                        class="inline-block px-3 py-1 bg-gray-50 text-gray-400 text-xs rounded-lg font-medium border border-gray-100 mb-0 italic shadow-inner">
+                        <i class="fas fa-layer-group text-[10px] mr-1"></i> {{ teacher.get_section_display }}
+                    </p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-full text-center py-24 bg-white rounded-3xl shadow-sm border border-dashed border-gray-300 mt-8"
+                data-aos="fade-up">
+                <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-chalkboard-teacher text-5xl text-gray-300"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-400 mb-2">No Teachers Found</h3>
+                <p class="text-gray-500 font-medium">Try selecting a different section or check back later.</p>
+                {% if current_section %}
+                <a href="?" class="mt-6 inline-block text-primary hover:text-accent font-bold transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i> View all teachers
                 </a>
-                {% endfor %}
+                {% endif %}
             </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="text-center py-16" data-aos="fade-up">
-            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-chalkboard-teacher text-4xl text-gray-300"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-600 mb-2">No Teachers Listed</h3>
-            <p class="text-gray-500">Check back later for updates</p>
+
+        <!-- Premium Pagination -->
+        {% if is_paginated %}
+        <div class="mt-20 flex justify-center" data-aos="fade-up">
+            <nav class="inline-flex bg-white rounded-2xl shadow-lg p-2 gap-2 border border-gray-100"
+                aria-label="Pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if current_section %}&section={{ current_section }}{% endif %}"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
+                    <i class="fas fa-chevron-left text-sm"></i>
+                </a>
+                {% else %}
+                <span
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed">
+                    <i class="fas fa-chevron-left text-sm"></i>
+                </span>
+                {% endif %}
+
+                {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                <span
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-white font-bold shadow-md transform scale-110 transition-transform">
+                    {{ i }}
+                </span>
+                {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %} <a
+                    href="?page={{ i }}{% if current_section %}&section={{ current_section }}{% endif %}"
+                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-600 hover:bg-primary/10 hover:text-primary font-bold transition-all duration-300 shadow-sm">
+                    {{ i }}
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if current_section %}&section={{ current_section }}{% endif %}"
+                        class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 hover:bg-primary hover:text-white transition-all duration-300 shadow-sm">
+                        <i class="fas fa-chevron-right text-sm"></i>
+                    </a>
+                    {% else %}
+                    <span
+                        class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-300 opacity-50 cursor-not-allowed">
+                        <i class="fas fa-chevron-right text-sm"></i>
+                    </span>
+                    {% endif %}
+            </nav>
         </div>
-        {% endfor %}
+        {% endif %}
+
     </div>
 </section>
 
 <!-- Stats Section -->
-<section class="py-16 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
-    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+<section class="py-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="absolute inset-0 decorative-dots opacity-10"></div>
     <div class="container mx-auto px-4 relative z-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div data-aos="zoom-in">
-                <div class="text-5xl font-bold mb-2" data-count="{{ teachers.count }}">{{ teachers.count }}</div>
-                <div class="text-xl text-gray-200">Dedicated Teachers</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div data-aos="fade-up">
+                <div class="text-6xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light"
+                    data-count="{{ total_teachers|default:teachers.count }}">{{ total_teachers|default:teachers.count }}
+                </div>
+                <div class="text-xl font-bold uppercase tracking-widest text-blue-100">Dedicated Teachers</div>
+                <div class="w-12 h-1 bg-accent/50 mx-auto mt-4 rounded-full"></div>
             </div>
-            <div data-aos="zoom-in" data-aos-delay="100">
-                <div class="text-5xl font-bold mb-2">15+</div>
-                <div class="text-xl text-gray-200">Years Average Experience</div>
+            <div data-aos="fade-up" data-aos-delay="100">
+                <div
+                    class="text-6xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light">
+                    15+</div>
+                <div class="text-xl font-bold uppercase tracking-widest text-blue-100">Years Avg Experience</div>
+                <div class="w-12 h-1 bg-accent/50 mx-auto mt-4 rounded-full"></div>
             </div>
-            <div data-aos="zoom-in" data-aos-delay="200">
-                <div class="text-5xl font-bold mb-2">100%</div>
-                <div class="text-xl text-gray-200">Qualified Educators</div>
+            <div data-aos="fade-up" data-aos-delay="200">
+                <div
+                    class="text-6xl font-black mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light">
+                    100%</div>
+                <div class="text-xl font-bold uppercase tracking-widest text-blue-100">Qualified Educators</div>
+                <div class="w-12 h-1 bg-accent/50 mx-auto mt-4 rounded-full"></div>
             </div>
         </div>
     </div>

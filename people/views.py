@@ -7,26 +7,25 @@ class TeacherListView(ListView):
     model = Teacher
     template_name = 'people/teachers.html'
     context_object_name = 'teachers'
+    paginate_by = 16
     
     def get_queryset(self):
-        return Teacher.objects.filter(is_active=True).order_by('section', 'order', 'name')
+        queryset = Teacher.objects.filter(is_active=True).order_by('section', 'order', 'name')
+        section = self.request.GET.get('section')
+        if section and any(section == choice[0] for choice in Teacher.SECTION_CHOICES):
+            queryset = queryset.filter(section=section)
+        return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = "Our Teachers - Holy Cross School"
         context['page_description'] = "Meet our dedicated and qualified teaching staff at Holy Cross School and College."
-        # Group by section
-        teachers = self.get_queryset()
-        sections = []
-        for section_id, section_name in Teacher.SECTION_CHOICES:
-            section_teachers = teachers.filter(section=section_id)
-            if section_teachers.exists():
-                sections.append({
-                    'id': section_id,
-                    'name': section_name,
-                    'teachers': section_teachers
-                })
-        context['sections'] = sections
+        
+        # For the filter tabs
+        context['sections'] = Teacher.SECTION_CHOICES
+        context['current_section'] = self.request.GET.get('section', '')
+        context['total_teachers'] = Teacher.objects.filter(is_active=True).count()
+        
         return context
 
 
