@@ -1,10 +1,19 @@
 /* 
-   Modern Professional Admin Layout Overrides
-   Goal: Industry-standard "Stacked" layout for large editors.
+   Modern Professional Admin Layout Overrides - Refined
+   Goal: Industry-standard "Stacked" layout. Fixes floating/alignment issues.
 */
 
-/* Reset flex containers to allow vertical stacking */
-.aligned .form-row.modern-editor,
+/* 1. Target the Fieldset directly if it has the modern-editor class */
+fieldset.modern-editor .form-row {
+    display: block !important;
+    /* Force block layout to ensure stacking */
+    width: 100% !important;
+    padding: 20px 0 !important;
+    border-bottom: 1px solid #eee !important;
+    clear: both !important;
+}
+
+/* 2. Specific Field Targets (Fallback) */
 .aligned .form-row.field-history,
 .aligned .form-row.field-mission,
 .aligned .form-row.field-vision,
@@ -15,77 +24,76 @@
 .aligned .form-row.field-message,
 .aligned .form-row.field-principal_message,
 .aligned .form-row.field-vice_principal_message {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
+    display: block !important;
+    width: 100% !important;
     padding: 20px 0 !important;
-    border-bottom: 1px solid var(--border-color, #eee) !important;
+    border-bottom: 1px solid #eee !important;
+    clear: both !important;
 }
 
-/* Ensure the wrapper div takes full width */
-.aligned .form-row.modern-editor>div,
+/* 3. Style the Content Wrapper (the div that holds the editor) */
+fieldset.modern-editor .form-row>div,
 .aligned .form-row.field-history>div,
 .aligned .form-row.field-mission>div,
 .aligned .form-row.field-vision>div,
 .aligned .form-row.field-goal>div,
 .aligned .form-row.field-bio>div,
 .aligned .form-row.field-content>div,
-.aligned .form-row.field-description>div,
-.aligned .form-row.field-message>div,
-.aligned .form-row.field-principal_message>div,
-.aligned .form-row.field-vice_principal_message>div {
-    margin-left: 0 !important;
-    padding-left: 0 !important;
+.aligned .form-row.field-description>div {
+    margin: 0 !important;
+    padding: 0 !important;
     width: 100% !important;
     max-width: none !important;
-    flex: 1 1 auto !important;
+    display: block !important;
 }
 
-/* Style labels as headers for the stacked inputs */
-.aligned .form-row.modern-editor label,
+/* 4. Style the Labels to sit on TOP */
+fieldset.modern-editor .form-row label,
 .aligned .form-row.field-history label,
 .aligned .form-row.field-mission label,
 .aligned .form-row.field-vision label,
 .aligned .form-row.field-goal label,
 .aligned .form-row.field-bio label,
 .aligned .form-row.field-content label,
-.aligned .form-row.field-description label,
-.aligned .form-row.field-message label,
-.aligned .form-row.field-principal_message label,
-.aligned .form-row.field-vice_principal_message label {
+.aligned .form-row.field-description label {
+    display: block !important;
     width: 100% !important;
     float: none !important;
     text-align: left !important;
-    padding: 0 0 12px 0 !important;
-    font-size: 15px !important;
+    padding: 0 0 10px 0 !important;
+    margin: 0 !important;
+    font-size: 14px !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    color: var(--body-fg, #333) !important;
+    color: #444 !important;
 }
 
-/* Force the editor to use every pixel of horizontal space */
+/* 5. Force the Editor to fill the horizontal space */
 .django-summernote-widget {
     width: 100% !important;
     display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .note-editor.note-frame {
     width: 100% !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--border-color, #ddd) !important;
-    overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
 }
 
 .note-editable {
     width: 100% !important;
-    min-height: 550px !important;
-    padding: 20px !important;
+    min-height: 500px !important;
+    background: #fff !important;
 }
 
-/* Support for wide class on fieldsets */
-.wide-fieldset .form-row {
-    max-width: none !important;
+/* 6. Fix for unexpected floating in some Admin themes */
+.vLargeTextField,
+.vTextField,
+.summernote-div {
     width: 100% !important;
+    max-width: none !important;
+    float: none !important;
 }
