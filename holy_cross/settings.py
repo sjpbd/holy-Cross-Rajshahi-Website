@@ -176,3 +176,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your email
 EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your email password or app password
 DEFAULT_FROM_EMAIL = 'Holy Cross School <your-email@gmail.com>'
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
