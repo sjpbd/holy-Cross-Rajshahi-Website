@@ -16,6 +16,7 @@ class TeacherAdmin(SummernoteModelAdmin):
         css = {
             'all': ('css/admin_custom.css',)
         }
+        js = ('js/admin_fix.js',)
 
     prepopulated_fields = {'slug': ('name',)}
     
@@ -44,6 +45,7 @@ class AdministrationAdmin(SummernoteModelAdmin):
         css = {
             'all': ('css/admin_custom.css',)
         }
+        js = ('js/admin_fix.js',)
 
     
     fieldsets = (

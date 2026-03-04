@@ -30,6 +30,7 @@ class SchoolInfoAdmin(SummernoteModelAdmin):
         css = {
             'all': ('css/admin_custom.css',)
         }
+        js = ('js/admin_fix.js',)
     
     def has_add_permission(self, request):
         # Only allow one instance

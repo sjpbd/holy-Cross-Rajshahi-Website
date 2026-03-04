@@ -1,73 +1,91 @@
 /* 
-   Industry-Standard Fix for Summernote Width in Django Admin 
-   This CSS overrides the default Django Admin field constraints to allow 
-   rich-text editors to use the full horizontal space.
+   THE NUCLEAR OPTION: Industry-Standard Full-Width Admin Overrides 
+   This stylesheet is designed to break every common constraint in the Django Admin 
+   that prevents rich-text editors from spanning the full width of the screen.
 */
 
-/* 1. Remove max-width constraints from the Django Admin form layout */
-.aligned .form-row>div,
-.form-horizontal .form-group>div {
+/* 1. Expand the main content container to the edges of the screen */
+#content {
+    padding: 20px !important;
     max-width: none !important;
-    width: 80% !important;
-    /* Standard width for large inputs */
-    flex: 1 !important;
 }
 
-/* 2. Specialized target for Summernote widget rows */
-div.form-row:has(.django-summernote-widget),
-div.form-row.field-history,
-div.form-row.field-mission,
-div.form-row.field-vision,
-div.form-row.field-goal,
-div.form-row.field-principal_message,
-div.form-row.field-vice_principal_message {
-    max-width: none !important;
-    width: 98% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    /* Stack label on top for full-width editors */
-}
-
-div.form-row:has(.django-summernote-widget) label,
-div.form-row.field-history label,
-div.form-row.field-mission label {
+#content-main {
     width: 100% !important;
     float: none !important;
-    padding: 0 0 10px 0 !important;
-    font-weight: bold !important;
+}
+
+/* 2. Remove width limits from the form and modules */
+form {
+    width: 100% !important;
+}
+
+.module {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 3. Redesign Aligned Form Rows (Stack Label on Top) */
+.aligned .form-row {
+    display: block !important;
+    width: 100% !important;
+    padding: 15px 0 !important;
+    border-bottom: 1px solid #eee !important;
+    box-sizing: border-box !important;
+}
+
+.aligned .form-row>div {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    float: none !important;
+}
+
+.aligned .form-row label {
+    display: block !important;
+    padding: 0 0 8px 0 !important;
+    width: 100% !important;
+    float: none !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
     color: #444 !important;
 }
 
-/* 3. Force the Summernote Editor to fill 100% of the available area */
+/* 4. Force Summernote Widget to occupy all available horizontal space */
 .django-summernote-widget {
     width: 100% !important;
     display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.note-editor.note-frame,
-.note-editor.note-airframe {
+.note-editor.note-frame {
     width: 100% !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #ccc !important;
+    margin-bottom: 15px !important;
+    border: 1px solid #ddd !important;
+    background: #fff !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
 .note-editing-area,
 .note-editable {
     width: 100% !important;
     min-height: 500px !important;
-    background: #fff !important;
-    color: #333 !important;
 }
 
-/* 4. Toolbar styling and responsiveness */
-.note-toolbar {
-    background-color: #f5f5f5 !important;
-    border-bottom: 1px solid #ddd !important;
+/* 5. Clean up help text */
+.help {
+    padding: 5px 0 !important;
+    margin: 0 !important;
+    color: #888 !important;
 }
 
-/* 5. Fix for small-width containers in specific admin themes */
-.vLargeTextField,
-.vTextField {
-    width: 100% !important;
-    max-width: none !important;
+/* 6. Verify CSS is loading (Subtle visual hint: change fieldset header color) */
+fieldset h2 {
+    background: #417690 !important;
+    /* Standard Django blue, but ensuring override */
+    color: white !important;
 }

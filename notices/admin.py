@@ -18,6 +18,7 @@ class NoticeAdmin(SummernoteModelAdmin):
         css = {
             'all': ('css/admin_custom.css',)
         }
+        js = ('js/admin_fix.js',)
 
     
     fieldsets = (
