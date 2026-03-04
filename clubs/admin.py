@@ -9,7 +9,7 @@ class ClubAdmin(SummernoteModelAdmin):
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'motto', 'description']
     readonly_fields = ['slug', 'created_at', 'updated_at']
-    summernote_fields = ('description', 'objectives')
+    summernote_fields = ('description', 'mission', 'vision', 'objectives')
     
     class Media:
         css = {
@@ -22,7 +22,7 @@ class ClubAdmin(SummernoteModelAdmin):
             'fields': ('name', 'slug', 'logo', 'motto', 'established_year')
         }),
         ('Content', {
-            'fields': ('description', 'objectives'),
+            'fields': ('description', 'mission', 'vision', 'objectives'),
             'classes': ('modern-editor',),
         }),
         ('Coordinator', {

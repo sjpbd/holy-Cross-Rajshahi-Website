@@ -9,6 +9,8 @@ class Club(models.Model):
     logo = models.ImageField(upload_to='clubs/', blank=True, help_text="Club logo - Recommended size: 300x300px")
     motto = models.CharField(max_length=500, blank=True, help_text="Club motto or tagline")
     description = models.TextField(help_text="Detailed description of the club")
+    mission = models.TextField(blank=True, help_text="Club mission statement")
+    vision = models.TextField(blank=True, help_text="Club vision statement")
     objectives = models.TextField(blank=True, help_text="Club objectives and goals")
     
     # Contact

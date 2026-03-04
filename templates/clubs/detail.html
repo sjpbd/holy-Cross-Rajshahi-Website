@@ -75,7 +75,9 @@
         </nav>
 
         <div class="max-w-4xl" data-aos="fade-up">
-            <h1 class="text-4xl md:text-6xl font-extrabold mb-4">{{ club.name }}</h1>
+            <h1
+                class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 whitespace-nowrap overflow-hidden text-ellipsis">
+                {{ club.name }}</h1>
             {% if club.motto %}
             <p class="text-xl md:text-2xl text-accent-light font-medium italic opacity-90 mb-0">
                 "{{ club.motto }}"
@@ -85,8 +87,55 @@
     </div>
 </section>
 
+<!-- Mission & Vision Section (Premium Industry Standard) -->
+{% if club.mission or club.vision %}
+<section class="py-12 -mt-10 relative z-30">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {% if club.mission %}
+            <div class="group relative bg-white p-8 rounded-3xl shadow-xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-primary overflow-hidden"
+                data-aos="fade-up">
+                <div
+                    class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700">
+                </div>
+                <div class="flex items-center gap-4 mb-6">
+                    <div
+                        class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-2xl group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary">Our Mission</h3>
+                </div>
+                <div class="prose prose-blue text-gray-700 leading-relaxed italic">
+                    {{ club.mission|safe }}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if club.vision %}
+            <div class="group relative bg-white p-8 rounded-3xl shadow-xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-accent overflow-hidden"
+                data-aos="fade-up" data-aos-delay="100">
+                <div
+                    class="absolute -right-6 -top-6 w-24 h-24 bg-accent/5 rounded-full group-hover:scale-150 transition-transform duration-700">
+                </div>
+                <div class="flex items-center gap-4 mb-6">
+                    <div
+                        class="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center text-accent text-2xl group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary">Our Vision</h3>
+                </div>
+                <div class="prose prose-blue text-gray-700 leading-relaxed italic">
+                    {{ club.vision|safe }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- Content Section -->
-<section class="pb-20 bg-gray-50">
+<section class="pb-20 bg-gray-50 pt-10">
     <div class="container mx-auto px-4">
         <div class="flex flex-col lg:flex-row gap-12">
 
