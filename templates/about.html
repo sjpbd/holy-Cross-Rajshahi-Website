@@ -1,6 +1,380 @@
 <!-- templates/about.html -->
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<style>
+    /* Message Card Premium Styling */
+    .message-card-premium {
+        display: grid;
+        grid-template-columns: 1fr;
+        background: white;
+        border-radius: 2.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        min-height: 600px;
+    }
+
+    @media (min-width: 1024px) {
+        .message-card-premium {
+            grid-template-columns: 350px 1fr;
+        }
+    }
+
+    /* Identity Column */
+    .identity-col {
+        padding: 3rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+
+    .identity-col-principal {
+        background: linear-gradient(135deg, var(--tw-color-primary, #1e3a8a) 0%, #172554 100%);
+    }
+
+    .identity-col-vice {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+
+    /* Monogram Shadow Background */
+    .monogram-bg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 20rem;
+        font-weight: 900;
+        opacity: 0.05;
+        z-index: 0;
+        pointer-events: none;
+        line-height: 1;
+    }
+
+    /* Photo Frame */
+    .photo-frame-ring {
+        position: relative;
+        z-index: 10;
+        width: 195px;
+        height: 195px;
+        border-radius: 50%;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        margin-bottom: 2.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .photo-frame-ring:hover {
+        transform: scale(1.05) rotate(2deg);
+    }
+
+    .photo-frame-gold {
+        background: rgba(212, 175, 55, 0.1);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .leader-photo {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        background: #f1f5f9;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .identity-col::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.05;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .identity-col::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -100%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(to right,
+                transparent,
+                rgba(255, 255, 255, 0.05) 45%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.05) 55%,
+                transparent);
+        transform: rotate(30deg);
+        animation: shimmerLoop 10s infinite linear;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    @keyframes shimmerLoop {
+        0% {
+            transform: translate(-30%, -30%) rotate(30deg);
+        }
+
+        100% {
+            transform: translate(30%, 30%) rotate(30deg);
+        }
+    }
+
+    .photo-frame-gold .leader-photo {
+        border-color: #d4af37;
+    }
+
+    .leader-identity {
+        position: relative;
+        z-index: 10;
+    }
+
+    .leader-name {
+        font-size: 2.25rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.03em;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        line-height: 1.1;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.6rem 1.75rem;
+        background: rgba(212, 175, 55, 0.2);
+        color: #fef08a;
+        border-radius: 9999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .role-badge-gold {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Signature Line Decoration */
+    .signature-line {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .sig-line {
+        height: 1px;
+        width: 40px;
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .sig-dot {
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+    }
+
+    .sig-star {
+        font-size: 0.75rem;
+        color: #f4d03f;
+    }
+
+    .sig-line-gold {
+        background: rgba(212, 175, 55, 0.3);
+    }
+
+    .sig-dot-gold {
+        background: rgba(212, 175, 55, 0.5);
+    }
+
+    .sig-star-gold {
+        color: white;
+    }
+
+    /* Stat Pills */
+    .stat-pill {
+        padding: 0.4rem 0.8rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .stat-pill-gold {
+        background: rgba(212, 175, 55, 0.08);
+        border-color: rgba(212, 175, 55, 0.1);
+    }
+
+    /* Message Column */
+    .message-col {
+        padding: 4rem 3rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (min-width: 1024px) {
+        .message-col {
+            padding: 5rem 6rem;
+        }
+    }
+
+    .quote-giant {
+        position: absolute;
+        top: 2rem;
+        left: 3rem;
+        font-size: 12rem;
+        font-family: serif;
+        line-height: 1;
+        color: #f1f5f9;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .quote-giant-gold {
+        color: #fef3c7;
+    }
+
+    .message-body {
+        position: relative;
+        z-index: 10;
+        flex-grow: 1;
+    }
+
+    .message-tag {
+        display: inline-flex;
+        align-items: center;
+        color: var(--tw-color-primary, #1e3a8a);
+        font-weight: 700;
+        font-size: 0.875rem;
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .message-tag-gold {
+        color: #b45309;
+        border-color: #fef3c7;
+    }
+
+    .message-prose {
+        color: #334155;
+        line-height: 1.8;
+        font-size: 1.125rem;
+    }
+
+    .message-footer {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .closing-quote {
+        font-style: italic;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+
+    .sign-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .sign-title {
+        font-size: 0.875rem;
+        color: #94a3b8;
+    }
+
+    /* Tabs Layout */
+    .leader-tab {
+        border: 2px solid #f1f5f9;
+        color: #475569;
+        background: white;
+        padding: 0.8rem 2.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .leader-tab:hover {
+        border-color: #cbd5e1;
+        background: #f1f5f9;
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .leader-tab.active-tab {
+        border-color: transparent;
+        color: white;
+        background: var(--tw-color-primary, #1e3a8a);
+        box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.25);
+    }
+
+    .leader-tab.active-tab span {
+        color: white;
+    }
+
+    .leader-tab:not(.active-tab) img {
+        filter: grayscale(1);
+        opacity: 0.6;
+    }
+
+    #panel-vice .message-tag {
+        border-color: #fde68a;
+    }
+
+    /* Animation */
+    .leader-panel {
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .leader-panel.hidden {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .leader-panel:not(.hidden) {
+        animation: panelFadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes panelFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 <!-- Hero Section with Breadcrumb -->
 <section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
@@ -118,63 +492,197 @@
         </div>
 
         {% elif page == 'message' %}
-        <!-- Leadership Messages -->
-        <div class="max-w-5xl mx-auto space-y-16">
+        <!-- ══════════════════════════════════════════
+             LEADERSHIP MESSAGES — Premium Tab Design
+             ══════════════════════════════════════════ -->
+
+        <!-- Section Intro -->
+        <div class="text-center mb-14" data-aos="fade-up">
+            <span
+                class="inline-block px-5 py-1.5 rounded-full bg-accent/10 text-accent font-bold text-xs uppercase tracking-widest mb-3">
+                <i class="fas fa-star mr-1"></i> Words of Wisdom
+            </span>
+            <h2 class="text-3xl md:text-4xl font-bold text-primary">Messages from Our Leaders</h2>
+            <p class="text-gray-500 mt-3 max-w-xl mx-auto">Guiding our institution with vision, dedication, and
+                compassion</p>
+        </div>
+
+        <!-- Leader Switcher Tabs -->
+        <div class="flex justify-center gap-4 mb-10" data-aos="fade-up" data-aos-delay="100">
             {% if school_info.principal_message %}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100"
-                data-aos="fade-up">
+            <button id="tab-principal" onclick="switchLeader('principal')"
+                class="leader-tab active-tab group flex items-center gap-3 px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-300 border-2">
+                {% if school_info.principal_photo %}
+                <img src="{{ school_info.principal_photo.url }}"
+                    class="w-9 h-9 rounded-full object-cover border-2 border-white shadow" alt="">
+                {% else %}
                 <div
-                    class="lg:col-span-4 bg-gradient-to-br from-primary to-primary-dark p-12 flex flex-col items-center justify-center text-center text-white">
-                    {% if school_info.principal_photo %}
-                    <div class="relative mb-6">
-                        <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
-                            class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-2xl">
-                        <div
-                            class="absolute -bottom-2 -right-2 w-10 h-10 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-quote-right text-white text-xs"></i>
+                    class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+                    {{ school_info.principal_name|first }}</div>
+                {% endif %}
+                <span>Principal</span>
+            </button>
+            {% endif %}
+            {% if school_info.vice_principal_message %}
+            <button id="tab-vice" onclick="switchLeader('vice')"
+                class="leader-tab group flex items-center gap-3 px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-300 border-2">
+                {% if school_info.vice_principal_photo %}
+                <img src="{{ school_info.vice_principal_photo.url }}"
+                    class="w-9 h-9 rounded-full object-cover border-2 border-white shadow" alt="">
+                {% else %}
+                <div
+                    class="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-white font-bold text-sm">
+                    {{ school_info.vice_principal_name|first }}</div>
+                {% endif %}
+                <span>Vice Principal</span>
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- Message Cards Container -->
+        <div class="max-w-6xl mx-auto" data-aos="fade-up" data-aos-delay="150">
+
+            <!-- ── Principal Message Panel ── -->
+            {% if school_info.principal_message %}
+            <div id="panel-principal" class="leader-panel">
+                <div class="message-card-premium">
+                    <!-- Left: Identity Column -->
+                    <div class="identity-col identity-col-principal">
+                        <!-- Decorative background monogram -->
+                        <div class="monogram-bg">{{ school_info.principal_name|first }}</div>
+
+                        <!-- Photo -->
+                        <div class="photo-frame-ring">
+                            {% if school_info.principal_photo %}
+                            <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
+                                class="leader-photo">
+                            {% else %}
+                            <div class="leader-photo flex items-center justify-center text-5xl font-bold text-white/50">
+                                {{ school_info.principal_name|first }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Name & Role Badge -->
+                        <div class="leader-identity">
+                            <h2 class="leader-name">{{ school_info.principal_name }}</h2>
+                            <div class="role-badge">
+                                <i class="fas fa-graduation-cap mr-2"></i>Principal
+                            </div>
+                            <!-- Signature line decoration -->
+                            <div class="signature-line">
+                                <div class="sig-dot"></div>
+                                <div class="sig-line"></div>
+                                <div class="sig-star"><i class="fas fa-star"></i></div>
+                                <div class="sig-line"></div>
+                                <div class="sig-dot"></div>
+                            </div>
+                        </div>
+
+                        <!-- Social/contact strip -->
+                        <div class="mt-6 flex gap-3 justify-center">
+                            <div class="stat-pill"><i class="fas fa-school mr-1"></i> Holy Cross</div>
+                            <div class="stat-pill"><i class="fas fa-map-marker-alt mr-1"></i> Rajshahi</div>
                         </div>
                     </div>
-                    {% endif %}
-                    <h2 class="text-2xl font-bold mb-1">{{ school_info.principal_name }}</h2>
-                    <p class="text-accent-light font-medium tracking-widest uppercase text-sm">Principal</p>
-                </div>
-                <div class="lg:col-span-8 p-12 md:p-16 relative">
-                    <i class="fas fa-quote-left text-gray-100 text-8xl absolute top-8 left-8 opacity-50 z-0"></i>
-                    <div class="prose prose-lg max-w-none text-gray-600 relative z-10">
-                        {{ school_info.principal_message|safe }}
+
+                    <!-- Right: Message Column -->
+                    <div class="message-col">
+                        <!-- Giant decorative quote -->
+                        <div class="quote-giant">&ldquo;</div>
+
+                        <div class="message-body">
+                            <span class="message-tag"><i class="fas fa-envelope-open-text mr-2"></i>Principal's
+                                Message</span>
+                            <div class="prose prose-lg message-prose">
+                                {{ school_info.principal_message|safe }}
+                            </div>
+                        </div>
+
+                        <!-- Closing quote & signature area -->
+                        <div class="message-footer">
+                            <div class="closing-quote">&mdash; With warm regards,</div>
+                            <div class="sign-name">{{ school_info.principal_name }}</div>
+                            <div class="sign-title">Principal, Holy Cross School &amp; College, Rajshahi</div>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endif %}
 
+            <!-- ── Vice Principal Message Panel ── -->
             {% if school_info.vice_principal_message %}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white rounded-[2rem] shadow-xl overflow-hidden border border-gray-100"
-                data-aos="fade-up" data-aos-delay="100">
-                <div
-                    class="lg:col-span-4 lg:order-last bg-gradient-to-br from-primary-dark to-primary p-12 flex flex-col items-center justify-center text-center text-white">
-                    {% if school_info.vice_principal_photo %}
-                    <div class="relative mb-6">
-                        <img src="{{ school_info.vice_principal_photo.url }}"
-                            alt="{{ school_info.vice_principal_name }}"
-                            class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-2xl">
-                        <div
-                            class="absolute -bottom-2 -right-2 w-10 h-10 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                            <i class="fas fa-quote-right text-white text-xs"></i>
+            <div id="panel-vice" class="leader-panel hidden">
+                <div class="message-card-premium">
+                    <!-- Left: Identity Column (Vice Principal - gold accent) -->
+                    <div class="identity-col identity-col-vice">
+                        <div class="monogram-bg">{{ school_info.vice_principal_name|first }}</div>
+
+                        <div class="photo-frame-ring photo-frame-gold">
+                            {% if school_info.vice_principal_photo %}
+                            <img src="{{ school_info.vice_principal_photo.url }}"
+                                alt="{{ school_info.vice_principal_name }}" class="leader-photo">
+                            {% else %}
+                            <div class="leader-photo flex items-center justify-center text-5xl font-bold text-white/50">
+                                {{ school_info.vice_principal_name|first }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="leader-identity">
+                            <h2 class="leader-name">{{ school_info.vice_principal_name }}</h2>
+                            <div class="role-badge role-badge-gold">
+                                <i class="fas fa-user-tie mr-2"></i>Vice Principal
+                            </div>
+                            <div class="signature-line">
+                                <div class="sig-dot sig-dot-gold"></div>
+                                <div class="sig-line sig-line-gold"></div>
+                                <div class="sig-star sig-star-gold"><i class="fas fa-star"></i></div>
+                                <div class="sig-line sig-line-gold"></div>
+                                <div class="sig-dot sig-dot-gold"></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex gap-3 justify-center">
+                            <div class="stat-pill stat-pill-gold"><i class="fas fa-school mr-1"></i> Holy Cross</div>
+                            <div class="stat-pill stat-pill-gold"><i class="fas fa-map-marker-alt mr-1"></i> Rajshahi
+                            </div>
                         </div>
                     </div>
-                    {% endif %}
-                    <h2 class="text-2xl font-bold mb-1">{{ school_info.vice_principal_name }}</h2>
-                    <p class="text-accent-light font-medium tracking-widest uppercase text-sm">Vice Principal</p>
-                </div>
-                <div class="lg:col-span-8 p-12 md:p-16 relative">
-                    <i class="fas fa-quote-left text-gray-100 text-8xl absolute top-8 left-8 opacity-50 z-0"></i>
-                    <div class="prose prose-lg max-w-none text-gray-600 relative z-10">
-                        {{ school_info.vice_principal_message|safe }}
+
+                    <!-- Right: Message Column -->
+                    <div class="message-col">
+                        <div class="quote-giant quote-giant-gold">&ldquo;</div>
+
+                        <div class="message-body">
+                            <span class="message-tag message-tag-gold"><i
+                                    class="fas fa-envelope-open-text mr-2"></i>Vice Principal's Message</span>
+                            <div class="prose prose-lg message-prose">
+                                {{ school_info.vice_principal_message|safe }}
+                            </div>
+                        </div>
+
+                        <div class="message-footer">
+                            <div class="closing-quote">&mdash; With warm regards,</div>
+                            <div class="sign-name">{{ school_info.vice_principal_name }}</div>
+                            <div class="sign-title">Vice Principal, Holy Cross School &amp; College, Rajshahi</div>
+                        </div>
                     </div>
                 </div>
             </div>
             {% endif %}
+
+        </div><!-- /max-w-6xl -->
+
+        <!-- Small divider before CTA -->
+        <div class="text-center mt-16" data-aos="fade-up">
+            <div class="inline-flex items-center gap-3 text-gray-400 text-sm">
+                <div class="w-12 h-px bg-gray-300"></div>
+                <i class="fas fa-school text-accent"></i>
+                <div class="w-12 h-px bg-gray-300"></div>
+            </div>
         </div>
+
         {% endif %}
     </div>
 </div>
@@ -200,4 +708,37 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function switchLeader(leader) {
+        // Tabs
+        const tabPrin = document.getElementById('tab-principal');
+        const tabVice = document.getElementById('tab-vice');
+
+        // Panels
+        const panelPrin = document.getElementById('panel-principal');
+        const panelVice = document.getElementById('panel-vice');
+
+        if (leader === 'principal') {
+            tabPrin.classList.add('active-tab');
+            if (tabVice) tabVice.classList.remove('active-tab');
+
+            panelPrin.classList.remove('hidden');
+            if (panelVice) panelVice.classList.add('hidden');
+        } else {
+            if (tabPrin) tabPrin.classList.remove('active-tab');
+            tabVice.classList.add('active-tab');
+
+            if (panelPrin) panelPrin.classList.add('hidden');
+            panelVice.classList.remove('hidden');
+        }
+
+        // Trigger AOS refresh if present
+        if (typeof AOS !== 'undefined') {
+            AOS.refresh();
+        }
+    }
+</script>
 {% endblock %}
