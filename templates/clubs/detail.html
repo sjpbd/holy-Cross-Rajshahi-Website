@@ -71,16 +71,16 @@
         <nav class="breadcrumb mb-6" data-aos="fade-down">
             <div class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></div>
             <div class="breadcrumb-item"><a href="{% url 'club_list' %}">Clubs</a></div>
-            <div class="breadcrumb-item active">{{ club.name }}</div>
+            <div class="breadcrumb-item active">{{ club.name|safe }}</div>
         </nav>
 
         <div class="max-w-4xl" data-aos="fade-up">
             <h1
                 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 whitespace-nowrap overflow-hidden text-ellipsis">
-                {{ club.name }}</h1>
+                {{ club.name|safe }}</h1>
             {% if club.motto %}
             <p class="text-xl md:text-2xl text-accent-light font-medium italic opacity-90 mb-0">
-                "{{ club.motto }}"
+                "{{ club.motto|safe }}"
             </p>
             {% endif %}
         </div>
