@@ -178,3 +178,22 @@ EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your email password or
 DEFAULT_FROM_EMAIL = 'Holy Cross School <your-email@gmail.com>'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# Django Summernote Configuration
+SUMMERNOTE_CONFIG = {
+    'iframe': False,
+    'summernote': {
+        'width': '100%',
+        'height': '480',
+        'toolbar': [
+            ['style', ['style']],
+            ['font', ['bold', 'italic', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video', 'hr']],
+            ['view', ['fullscreen', 'codeview', 'help']],
+        ],
+    },
+}
