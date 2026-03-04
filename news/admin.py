@@ -12,6 +12,12 @@ class NewsItemAdmin(SummernoteModelAdmin):
     date_hierarchy = 'published_date'
     readonly_fields = ['slug', 'published_date', 'updated_at']
     summernote_fields = ('content',)
+    
+    class Media:
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
+
     prepopulated_fields = {}
     
     fieldsets = (

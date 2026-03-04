@@ -14,6 +14,12 @@ class NoticeAdmin(SummernoteModelAdmin):
     readonly_fields = ['view_count', 'created_at', 'updated_at']
     summernote_fields = ('description',)
     
+    class Media:
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
+
+    
     fieldsets = (
         ('Content', {
             'fields': ('title', 'description', 'attachment')

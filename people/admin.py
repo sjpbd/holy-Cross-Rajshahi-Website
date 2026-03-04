@@ -11,6 +11,12 @@ class TeacherAdmin(SummernoteModelAdmin):
     search_fields = ['name', 'designation', 'department']
     date_hierarchy = 'created_at'
     summernote_fields = ('bio',)
+    
+    class Media:
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
+
     prepopulated_fields = {'slug': ('name',)}
     
     fieldsets = (
@@ -33,6 +39,12 @@ class AdministrationAdmin(SummernoteModelAdmin):
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'designation']
     summernote_fields = ('bio', 'message')
+    
+    class Media:
+        css = {
+            'all': ('css/admin_custom.css',)
+        }
+
     
     fieldsets = (
         ('Basic Information', {

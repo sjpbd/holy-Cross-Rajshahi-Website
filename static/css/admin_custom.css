@@ -1,23 +1,73 @@
-/* Fix Summernote editor width in Django Admin */
-.note-editor.note-frame {
-    width: 100% !important;
+/* 
+   Industry-Standard Fix for Summernote Width in Django Admin 
+   This CSS overrides the default Django Admin field constraints to allow 
+   rich-text editors to use the full horizontal space.
+*/
+
+/* 1. Remove max-width constraints from the Django Admin form layout */
+.aligned .form-row>div,
+.form-horizontal .form-group>div {
+    max-width: none !important;
+    width: 80% !important;
+    /* Standard width for large inputs */
+    flex: 1 !important;
 }
 
-.note-editor .note-editing-area {
-    width: 100% !important;
+/* 2. Specialized target for Summernote widget rows */
+div.form-row:has(.django-summernote-widget),
+div.form-row.field-history,
+div.form-row.field-mission,
+div.form-row.field-vision,
+div.form-row.field-goal,
+div.form-row.field-principal_message,
+div.form-row.field-vice_principal_message {
+    max-width: none !important;
+    width: 98% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    /* Stack label on top for full-width editors */
 }
 
-.note-editor .note-editable {
+div.form-row:has(.django-summernote-widget) label,
+div.form-row.field-history label,
+div.form-row.field-mission label {
     width: 100% !important;
+    float: none !important;
+    padding: 0 0 10px 0 !important;
+    font-weight: bold !important;
+    color: #444 !important;
 }
 
-/* Ensure the field container itself is full width */
+/* 3. Force the Summernote Editor to fill 100% of the available area */
 .django-summernote-widget {
     width: 100% !important;
     display: block !important;
 }
 
-.form-row .note-editor {
-    margin-left: 0 !important;
+.note-editor.note-frame,
+.note-editor.note-airframe {
     width: 100% !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #ccc !important;
+}
+
+.note-editing-area,
+.note-editable {
+    width: 100% !important;
+    min-height: 500px !important;
+    background: #fff !important;
+    color: #333 !important;
+}
+
+/* 4. Toolbar styling and responsiveness */
+.note-toolbar {
+    background-color: #f5f5f5 !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* 5. Fix for small-width containers in specific admin themes */
+.vLargeTextField,
+.vTextField {
+    width: 100% !important;
+    max-width: none !important;
 }
