@@ -211,7 +211,7 @@
                             {{ related.title }}
                         </h3>
                         <p class="related-card-excerpt">
-                            {{ related.description|striptags|truncatewords:15 }}
+                            {{ related.description|striptags|truncatewords:15|safe }}
                         </p>
                         <a href="{% url 'notice_detail' related.pk %}" class="related-card-link">
                             Read Notice

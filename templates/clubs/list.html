@@ -49,7 +49,7 @@
 
                     <!-- Club Description -->
                     <p class="text-gray-600 mb-4 line-clamp-3">
-                        {{ club.description|striptags|truncatewords:20 }}
+                        {{ club.description|striptags|truncatewords:20|safe }}
                     </p>
 
                     <!-- Club Stats -->

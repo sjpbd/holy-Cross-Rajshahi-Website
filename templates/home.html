@@ -152,7 +152,8 @@
             <div class="w-24 h-1.5 bg-gradient-to-r from-accent to-accent-light mx-auto mb-8 rounded-full"></div>
             <p class="text-gray-600 text-lg md:text-xl leading-relaxed">
                 A premier educational institution dedicated to excellence, character development, and holistic growth.
-                We nurture minds, inspire hearts, and empower students to become leaders of tomorrow in an environment of
+                We nurture minds, inspire hearts, and empower students to become leaders of tomorrow in an environment
+                of
                 faith, hope, and academic brilliance.
             </p>
         </div>
@@ -188,7 +189,7 @@
                                     <p class="text-accent font-semibold tracking-wide text-sm uppercase">Principal</p>
                                 </div>
                                 <div class="message-content text-gray-700 italic line-clamp-4 mb-6 leading-relaxed">
-                                    "{{ school_info.principal_message|striptags }}"
+                                    "{{ school_info.principal_message|striptags|safe }}"
                                 </div>
                                 <a href="{% url 'about_page' 'message' %}" class="message-link group">
                                     <span>Read Full Message</span>
@@ -226,12 +227,13 @@
                             </div>
                             <div class="flex-grow text-center md:text-left">
                                 <div class="mb-4">
-                                    <h3 class="text-2xl font-bold text-primary mb-1">{{ school_info.vice_principal_name }}</h3>
+                                    <h3 class="text-2xl font-bold text-primary mb-1">{{ school_info.vice_principal_name
+                                        }}</h3>
                                     <p class="text-accent font-semibold tracking-wide text-sm uppercase">Vice Principal
                                     </p>
                                 </div>
                                 <div class="message-content text-gray-700 italic line-clamp-4 mb-6 leading-relaxed">
-                                    "{{ school_info.vice_principal_message|striptags }}"
+                                    "{{ school_info.vice_principal_message|striptags|safe }}"
                                 </div>
                                 <a href="{% url 'about_page' 'message' %}" class="message-link group">
                                     <span>Read Full Message</span>
@@ -265,7 +267,8 @@
                     class="w-24 h-24 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
                     <i class="fas {{ fact.icon|default:'fa-star' }} text-4xl"></i>
                 </div>
-                <div class="text-5xl md:text-6xl font-bold mb-2" data-count="{{ fact.number|cut:'+' }}">{{ fact.number }}</div>
+                <div class="text-5xl md:text-6xl font-bold mb-2" data-count="{{ fact.number|cut:'+' }}">{{ fact.number
+                    }}</div>
                 <div class="text-xl text-gray-200">{{ fact.title }}</div>
             </div>
             {% endfor %}
@@ -307,7 +310,7 @@
                     </div>
                     <h3 class="text-xl font-bold text-primary mb-3 hover:text-accent transition">{{ notice.title }}</h3>
                     <div class="text-gray-600 mb-4 line-clamp-3">
-                        {{ notice.description|striptags|truncatewords:20 }}
+                        {{ notice.description|striptags|truncatewords:20|safe }}
                     </div>
                     <a href="{% url 'notice_detail' notice.pk %}"
                         class="btn btn-outline btn-sm inline-flex items-center">
@@ -645,6 +648,7 @@
             transform: scale(0.5);
             opacity: 1;
         }
+
         100% {
             transform: scale(2.5);
             opacity: 0;
@@ -652,7 +656,8 @@
     }
 
     .ticker-label i {
-        display: none; /* Replaced by live dot */
+        display: none;
+        /* Replaced by live dot */
     }
 
     .ticker-wrapper {
@@ -697,14 +702,12 @@
         position: relative;
         letter-spacing: 0.01em;
         /* Dynamic Colorful Text Effect */
-        background: linear-gradient(
-            to right, 
-            #ffffff 0%, 
-            #f4d03f 25%, 
-            #fbbf24 50%, 
-            #f4d03f 75%, 
-            #ffffff 100%
-        );
+        background: linear-gradient(to right,
+                #ffffff 0%,
+                #f4d03f 25%,
+                #fbbf24 50%,
+                #f4d03f 75%,
+                #ffffff 100%);
         background-size: 200% auto;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -712,8 +715,13 @@
     }
 
     @keyframes shine-text {
-        0% { background-position: 0% 50%; }
-        100% { background-position: 200% 50%; }
+        0% {
+            background-position: 0% 50%;
+        }
+
+        100% {
+            background-position: 200% 50%;
+        }
     }
 
     .ticker-item::before {

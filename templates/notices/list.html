@@ -85,7 +85,7 @@
                     </h3>
 
                     <div class="notice-excerpt">
-                        {{ notice.description|striptags|truncatewords:20 }}
+                        {{ notice.description|striptags|truncatewords:20|safe }}
                     </div>
 
                     {% if notice.attachment %}

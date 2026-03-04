@@ -84,7 +84,8 @@
 
                         <!-- Bio/Qualifications -->
                         {% if teacher.bio %}
-                        <p class="text-xs text-gray-500 line-clamp-2 mb-0 italic">{{ teacher.bio|striptags|truncatewords:10 }}</p>
+                        <p class="text-xs text-gray-500 line-clamp-2 mb-0 italic">{{
+                            teacher.bio|striptags|truncatewords:10|safe }}</p>
                         {% endif %}
                     </div>
                 </a>
