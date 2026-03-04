@@ -100,7 +100,7 @@
                     <li>
                         <i class="fas fa-map-marker-alt"></i>
                         <span>
-                            {{ school_info.address|safe }}
+                            {{ school_info.address|striptags|linebreaksbr }}
                             {% if school_info.city or school_info.postal_code %}
                             <br>
                             {% if school_info.city %}{{ school_info.city }}{% endif %}
