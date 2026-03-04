@@ -5,255 +5,355 @@
 
 {% block extra_head %}
 <style>
-    .club-hero {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    :root {
+        --club-primary: var(--primary);
+        --club-primary-dark: var(--primary-dark);
+        --club-accent: var(--accent);
+    }
+
+    .hero-advanced {
+        background: linear-gradient(135deg, var(--club-primary-dark) 0%, #1a365d 100%);
+        position: relative;
+        padding: 160px 0 120px;
+        overflow: hidden;
+    }
+
+    .hero-advanced::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://www.transparenttextures.com/patterns/cubes.png');
+        opacity: 0.05;
+    }
+
+    .hero-blob {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, var(--club-accent) 0%, transparent 70%);
+        filter: blur(80px);
+        opacity: 0.15;
+        z-index: 0;
+        animation: rotate-blob 20s linear infinite;
+    }
+
+    @keyframes rotate-blob {
+        from {
+            transform: translate(-10%, -10%) rotate(0deg);
+        }
+
+        to {
+            transform: translate(-10%, -10%) rotate(360deg);
+        }
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 40px;
+    }
+
+    .club-logo-float {
+        width: 180px;
+        height: 180px;
+        background: white;
+        border-radius: 30px;
+        padding: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        transform: translateY(-20px);
+    }
+
+    .section-header-modern {
+        border-left: 5px solid var(--club-accent);
+        padding-left: 20px;
+        margin-bottom: 40px;
+    }
+
+    .premium-badge {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .sidebar-stat-item {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-stat-item:hover {
+        background: white;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        transform: translateX(5px);
+    }
+
+    .mission-vision-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+    }
+
+    .mv-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        border: 1px solid #f1f5f9;
         position: relative;
         overflow: hidden;
     }
 
-    .club-logo-container {
-        width: 150px;
-        height: 150px;
-        background: white;
-        border-radius: var(--radius-lg);
-        padding: 1rem;
-        box-shadow: var(--shadow-xl);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: -75px;
-        position: relative;
-        z-index: 20;
-    }
-
-    .info-card {
-        background: white;
-        border-radius: var(--radius-md);
-        padding: 1.5rem;
-        border-left: 4px solid var(--accent);
-        box-shadow: var(--shadow-sm);
-        height: 100%;
-    }
-
-    .section-title {
-        position: relative;
-        padding-bottom: 0.75rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .section-title::after {
+    .mv-card::after {
         content: '';
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 50px;
-        height: 3px;
-        background: var(--gradient-accent);
-        border-radius: 2px;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: var(--club-accent);
+        opacity: 0.03;
+        border-radius: 0 0 0 100%;
     }
 
-    .prose h1,
     .prose h2,
     .prose h3 {
-        color: var(--primary);
-        font-weight: 700;
+        color: var(--club-primary);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="club-hero pt-32 pb-24 text-white">
-    <div class="decorative-shape decorative-circle-1"></div>
-    <div class="absolute inset-0 decorative-dots opacity-10"></div>
+<!-- Modern Hero Section -->
+<section class="hero-advanced text-white">
+    <div class="hero-blob" style="top: -10%; left: -10%;"></div>
+    <div class="hero-blob"
+        style="bottom: -10%; right: -10%; background: radial-gradient(circle, var(--primary) 0%, transparent 70%);">
+    </div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <nav class="breadcrumb mb-6" data-aos="fade-down">
-            <div class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></div>
-            <div class="breadcrumb-item"><a href="{% url 'club_list' %}">Clubs</a></div>
-            <div class="breadcrumb-item active">{{ club.name|safe }}</div>
-        </nav>
+        <div class="flex flex-col items-center text-center">
+            <div class="premium-badge mb-8" data-aos="fade-down">Holy Cross Student Organizations</div>
 
-        <div class="max-w-4xl" data-aos="fade-up">
-            <h1
-                class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 whitespace-nowrap overflow-hidden text-ellipsis">
-                TEST CLUB NAME</h1>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight" data-aos="fade-up">
+                {{ club.name|safe }}
+            </h1>
+
             {% if club.motto %}
-            <p class="text-xl md:text-2xl text-accent-light font-medium italic opacity-90 mb-0">
+            <p class="text-xl md:text-2xl text-blue-100/80 font-medium italic max-w-2xl mb-12" data-aos="fade-up"
+                data-aos-delay="100">
                 "{{ club.motto|safe }}"
             </p>
             {% endif %}
+
+            <div class="flex flex-wrap justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+                <a href="#about" class="btn btn-accent btn-lg px-8 py-4 rounded-2xl shadow-xl shadow-accent/20">
+                    <i class="fas fa-info-circle mr-2"></i>About Us
+                </a>
+                <a href="{% url 'club_list' %}" class="btn btn-glass btn-lg px-8 py-4 rounded-2xl">
+                    <i class="fas fa-th-large mr-2"></i>All Clubs
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Mission & Vision Section (Premium Industry Standard) -->
-{% if club.mission or club.vision %}
-<section class="py-12 -mt-10 relative z-30">
+<!-- Page Content -->
+<section id="about" class="py-24 bg-white">
     <div class="container mx-auto px-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {% if club.mission %}
-            <div class="group relative bg-white p-8 rounded-3xl shadow-xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-primary overflow-hidden"
-                data-aos="fade-up">
-                <div
-                    class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-700">
-                </div>
-                <div class="flex items-center gap-4 mb-6">
-                    <div
-                        class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-2xl group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                        <i class="fas fa-bullseye"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-primary">Our Mission</h3>
-                </div>
-                <div class="prose prose-blue text-gray-700 leading-relaxed italic">
-                    {{ club.mission|safe }}
-                </div>
-            </div>
-            {% endif %}
+        <div class="flex flex-col lg:flex-row gap-16">
 
-            {% if club.vision %}
-            <div class="group relative bg-white p-8 rounded-3xl shadow-xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-accent overflow-hidden"
-                data-aos="fade-up" data-aos-delay="100">
-                <div
-                    class="absolute -right-6 -top-6 w-24 h-24 bg-accent/5 rounded-full group-hover:scale-150 transition-transform duration-700">
-                </div>
-                <div class="flex items-center gap-4 mb-6">
-                    <div
-                        class="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center text-accent text-2xl group-hover:bg-accent group-hover:text-white transition-colors duration-300">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-primary">Our Vision</h3>
-                </div>
-                <div class="prose prose-blue text-gray-700 leading-relaxed italic">
-                    {{ club.vision|safe }}
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</section>
-{% endif %}
-
-<!-- Content Section -->
-<section class="pb-20 bg-gray-50 pt-10">
-    <div class="container mx-auto px-4">
-        <div class="flex flex-col lg:flex-row gap-12">
-
-            <!-- Main Content (Left) -->
+            <!-- Main Content Area -->
             <div class="lg:w-2/3">
-                <!-- Club Logo Mobile & Desktop Overlay -->
-                {% if club.logo %}
-                <div class="club-logo-container mb-12" data-tilt data-aos="zoom-in">
-                    <img src="{{ club.logo.url }}" alt="{{ club.name }} Logo"
-                        class="max-h-full max-w-full object-contain">
+
+                <!-- Description Section -->
+                <div class="section-header-modern" data-aos="fade-right">
+                    <h2 class="text-3xl font-extrabold text-primary mb-2">Club Overview</h2>
+                    <p class="text-gray-500 font-medium uppercase tracking-widest text-sm">Introduction & History</p>
+                </div>
+
+                <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed mb-16" data-aos="fade-up">
+                    {{ club.description|safe }}
+                </div>
+
+                <!-- Mission & Vision Integrated Section -->
+                {% if club.mission or club.vision %}
+                <div class="mission-vision-grid mb-16">
+                    {% if club.mission %}
+                    <div class="mv-card" data-aos="fade-up">
+                        <div
+                            class="w-16 h-16 bg-primary/5 rounded-2xl flex items-center justify-center text-primary text-3xl mb-6">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-4">Our Mission</h3>
+                        <div class="text-gray-600 leading-relaxed italic">
+                            {{ club.mission|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if club.vision %}
+                    <div class="mv-card" data-aos="fade-up" data-aos-delay="100">
+                        <div
+                            class="w-16 h-16 bg-accent/5 rounded-2xl flex items-center justify-center text-accent text-3xl mb-6">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-primary mb-4">Our Vision</h3>
+                        <div class="text-gray-600 leading-relaxed italic">
+                            {{ club.vision|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
 
-                <!-- Description -->
-                <div class="card p-8 md:p-10 mb-10 overflow-visible" data-aos="fade-up">
-                    <h2 class="section-title text-2xl font-bold text-primary flex items-center">
-                        <i class="fas fa-info-circle mr-3 text-accent"></i>About the Club
-                    </h2>
-                    <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                        {{ club.description|safe }}
-                    </div>
+                <!-- Objectives Section -->
+                {% if club.objectives %}
+                <div class="section-header-modern" data-aos="fade-right">
+                    <h2 class="text-3xl font-extrabold text-primary mb-2">Core Objectives</h2>
+                    <p class="text-gray-500 font-medium uppercase tracking-widest text-sm">Goals & Impact</p>
                 </div>
 
-                <!-- Objectives -->
-                {% if club.objectives %}
-                <div class="card p-8 md:p-10 mb-10" data-aos="fade-up" data-aos-delay="100">
-                    <h2 class="section-title text-2xl font-bold text-primary flex items-center">
-                        <i class="fas fa-bullseye mr-3 text-accent"></i>Our Objectives
-                    </h2>
+                <div class="bg-gray-50 p-10 rounded-3xl mb-16" data-aos="fade-up">
                     <div class="prose prose-lg max-w-none text-gray-700">
                         {{ club.objectives|safe }}
                     </div>
                 </div>
                 {% endif %}
 
-                <!-- Back Button -->
-                <div class="mt-8" data-aos="fade-up">
-                    <a href="{% url 'club_list' %}" class="btn btn-primary">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to All Clubs
-                    </a>
+                <!-- Application CTA -->
+                <div class="bg-gradient-to-br from-primary to-primary-dark p-12 rounded-[40px] text-white overflow-hidden relative"
+                    data-aos="zoom-in">
+                    <div class="absolute -right-10 -bottom-10 opacity-10">
+                        <i class="fas fa-users text-[200px]"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h3 class="text-4xl font-bold mb-4">Ready to be a part of it?</h3>
+                        <p class="text-xl text-blue-100 mb-8 max-w-xl">
+                            Join our vibrant community of learners and leaders. Apply today to become a member.
+                        </p>
+                        <a href="{% url 'home' %}#contact" class="btn btn-accent btn-lg px-10 rounded-2xl">
+                            Join Now <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Sidebar (Right) -->
-            <div class="lg:w-1/3 space-y-8">
-                <!-- Club Stats/Info Card -->
-                <div class="card p-8" data-aos="fade-left">
-                    <h3 class="text-xl font-bold text-primary mb-6 border-b pb-4">Club at a Glance</h3>
-                    <div class="space-y-6">
-                        {% if club.established_year %}
-                        <div class="flex items-start gap-4">
+            <!-- Sidebar -->
+            <div class="lg:w-1/3">
+                <div class="sticky top-32 space-y-10">
+
+                    <!-- Quick Info Card -->
+                    <div class="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50"
+                        data-aos="fade-left">
+                        <div class="club-logo-float">
+                            {% if club.logo %}
+                            <img src="{{ club.logo.url }}" alt="{{ club.name }} Logo"
+                                class="max-h-full max-w-full object-contain">
+                            {% else %}
                             <div
-                                class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 text-primary">
-                                <i class="fas fa-calendar-alt"></i>
+                                class="w-full h-full bg-primary/10 rounded-2xl flex items-center justify-center text-primary text-5xl">
+                                <i class="fas fa-users"></i>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 uppercase font-bold tracking-wider">Established</p>
-                                <p class="text-lg font-semibold text-gray-800">{{ club.established_year }}</p>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="text-xl font-bold text-primary mb-6 text-center">Quick Facts</h3>
+
+                        <div class="space-y-4">
+                            {% if club.established_year %}
+                            <div class="sidebar-stat-item flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-primary">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 font-bold uppercase">Founded</p>
+                                    <p class="font-bold text-gray-800">{{ club.established_year }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="sidebar-stat-item flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+                                    <i class="fas fa-signal"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 font-bold uppercase">Status</p>
+                                    <p class="font-bold text-gray-800">
+                                        {% if club.is_active %}<span class="text-green-600">Actively Recruiting</span>{%
+                                        else %}<span class="text-red-500">Currently Full</span>{% endif %}
+                                    </p>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Faculty In-Charge Card -->
+                    {% if club.coordinator_name %}
+                    <div class="bg-gray-900 rounded-3xl p-8 text-white relative overflow-hidden" data-aos="fade-left"
+                        data-aos-delay="100">
+                        <div class="absolute -right-4 -top-4 opacity-10">
+                            <i class="fas fa-graduation-cap text-8xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-6 text-blue-300">Club Coordinator</h3>
+                        <div class="flex items-center gap-4 mb-8">
+                            <div
+                                class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-white text-3xl font-black">
+                                {{ club.coordinator_name|first }}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-xl">{{ club.coordinator_name }}</h4>
+                                <p class="text-blue-200 text-sm">Faculty Member</p>
+                            </div>
+                        </div>
+                        {% if club.coordinator_email %}
+                        <a href="mailto:{{ club.coordinator_email }}"
+                            class="btn btn-glass btn-sm w-full py-4 rounded-xl">
+                            <i class="fas fa-paper-plane mr-2"></i>Contact Coordinator
+                        </a>
                         {% endif %}
-
-                        <div class="flex items-start gap-4">
-                            <div
-                                class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 text-green-600">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500 uppercase font-bold tracking-wider">Status</p>
-                                <p class="text-lg font-semibold text-gray-800">
-                                    {% if club.is_active %}<span class="text-green-600">Active</span>{% else %}<span
-                                        class="text-red-500">Inactive</span>{% endif %}
-                                </p>
-                            </div>
-                        </div>
                     </div>
-                </div>
-
-                <!-- Coordinator Card -->
-                {% if club.coordinator_name %}
-                <div class="card p-8 bg-gradient-to-br from-white to-gray-50 border-t-4 border-primary"
-                    data-aos="fade-left" data-aos-delay="100">
-                    <h3 class="text-xl font-bold text-primary mb-6">Club Coordinator</h3>
-                    <div class="flex items-center gap-4 mb-6">
-                        <div
-                            class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                            {{ club.coordinator_name|first }}
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-lg text-gray-800 leading-tight">{{ club.coordinator_name }}</h4>
-                            <p class="text-primary text-sm font-medium">Faculty Member</p>
-                        </div>
-                    </div>
-
-                    {% if club.coordinator_email %}
-                    <a href="mailto:{{ club.coordinator_email }}" class="btn btn-outline btn-sm w-full py-3">
-                        <i class="fas fa-envelope mr-2"></i>Email Coordinator
-                    </a>
                     {% endif %}
-                </div>
-                {% endif %}
 
-                <!-- Join/Contact CTA -->
-                <div class="card p-8 bg-primary text-white relative overflow-hidden" data-aos="fade-left"
-                    data-aos-delay="200">
-                    <div class="absolute top-0 right-0 p-4 opacity-10">
-                        <i class="fas fa-users text-8xl"></i>
+                    <!-- Share This Club -->
+                    <div class="bg-blue-50 rounded-3xl p-8 text-center" data-aos="fade-left" data-aos-delay="200">
+                        <p class="text-primary font-bold mb-4">Share this club</p>
+                        <div class="flex justify-center gap-3">
+                            <button
+                                class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-primary hover:text-white transition-all">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button
+                                class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-primary hover:text-white transition-all">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <button
+                                class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-primary hover:text-white transition-all">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4 relative z-10">Want to join?</h3>
-                    <p class="text-blue-100 mb-6 relative z-10">
-                        Become part of our vibrant community and develop your skills.
-                    </p>
-                    <a href="{% url 'home' %}#contact" class="btn btn-accent w-full relative z-10">
-                        <i class="fas fa-paper-plane mr-2"></i>Apply for Membership
-                    </a>
+
                 </div>
             </div>
-
         </div>
     </div>
 </section>
@@ -264,12 +364,12 @@
 <script>
     $(document).ready(function () {
         $('[data-tilt]').tilt({
-            maxTilt: 10,
-            perspective: 1000,
-            scale: 1.02,
-            speed: 300,
+            maxTilt: 15,
+            perspective: 1500,
+            scale: 1.05,
+            speed: 500,
             glare: true,
-            maxGlare: 0.1
+            maxGlare: 0.2
         });
     });
 </script>
