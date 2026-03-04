@@ -184,7 +184,7 @@ SUMMERNOTE_CONFIG = {
     'iframe': False,
     'summernote': {
         'width': '100%',
-        'height': '480',
+        'height': '600',
         'toolbar': [
             ['style', ['style']],
             ['font', ['bold', 'italic', 'underline', 'clear']],
