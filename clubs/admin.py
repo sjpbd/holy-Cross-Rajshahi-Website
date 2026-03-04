@@ -11,12 +11,19 @@ class ClubAdmin(SummernoteModelAdmin):
     readonly_fields = ['slug', 'created_at', 'updated_at']
     summernote_fields = ('description', 'objectives')
     
+    class Media:
+        css = {
+            'all': ('css/admin_modern.css',)
+        }
+        js = ('js/admin_fix.js',)
+
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'slug', 'logo', 'motto', 'established_year')
         }),
         ('Content', {
-            'fields': ('description', 'objectives')
+            'fields': ('description', 'objectives'),
+            'classes': ('modern-editor',),
         }),
         ('Coordinator', {
             'fields': ('coordinator_name', 'coordinator_email')

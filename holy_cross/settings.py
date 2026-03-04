@@ -197,6 +197,6 @@ SUMMERNOTE_CONFIG = {
         ],
     },
     'css': [
-        '/static/css/admin_custom.css',
+        '/static/css/admin_modern.css',
     ],
 }
