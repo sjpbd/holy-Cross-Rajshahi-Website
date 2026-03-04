@@ -28,9 +28,10 @@ class SchoolInfoAdmin(SummernoteModelAdmin):
     
     class Media:
         css = {
-            'all': ('css/admin_custom.css',)
+            'all': ('css/admin_modern.css',)
         }
         js = ('js/admin_fix.js',)
+
     
     def has_add_permission(self, request):
         # Only allow one instance
@@ -46,14 +47,20 @@ class SchoolInfoAdmin(SummernoteModelAdmin):
             'description': 'Upload school logo and favicon for the website'
         }),
         ('About Us', {
-            'fields': ('history', 'mission', 'vision', 'goal')
+            'fields': ('history', 'mission', 'vision', 'goal'),
+            'classes': ('modern-editor',),
         }),
+
         ("Principal's Information", {
-            'fields': ('principal_name', 'principal_photo', 'principal_message')
+            'fields': ('principal_name', 'principal_photo', 'principal_message'),
+            'classes': ('modern-editor',),
         }),
+
         ("Vice Principal's Information", {
-            'fields': ('vice_principal_name', 'vice_principal_photo', 'vice_principal_message')
+            'fields': ('vice_principal_name', 'vice_principal_photo', 'vice_principal_message'),
+            'classes': ('modern-editor',),
         }),
+
         ('Contact Information', {
             'fields': ('address', 'city', 'postal_code', 'phone', 'email')
         }),

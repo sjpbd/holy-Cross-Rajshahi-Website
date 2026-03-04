@@ -16,15 +16,18 @@ class NoticeAdmin(SummernoteModelAdmin):
     
     class Media:
         css = {
-            'all': ('css/admin_custom.css',)
+            'all': ('css/admin_modern.css',)
         }
         js = ('js/admin_fix.js',)
+
 
     
     fieldsets = (
         ('Content', {
-            'fields': ('title', 'description', 'attachment')
+            'fields': ('title', 'description', 'attachment'),
+            'classes': ('modern-editor',),
         }),
+
         ('Display Settings', {
             'fields': ('is_active', 'is_important')
         }),

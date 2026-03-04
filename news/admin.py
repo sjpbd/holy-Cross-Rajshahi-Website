@@ -15,16 +15,19 @@ class NewsItemAdmin(SummernoteModelAdmin):
     
     class Media:
         css = {
-            'all': ('css/admin_custom.css',)
+            'all': ('css/admin_modern.css',)
         }
         js = ('js/admin_fix.js',)
+
 
     prepopulated_fields = {}
     
     fieldsets = (
         ('Content', {
-            'fields': ('title', 'slug', 'excerpt', 'content', 'featured_image')
+            'fields': ('title', 'slug', 'excerpt', 'content', 'featured_image'),
+            'classes': ('modern-editor',),
         }),
+
         ('Publishing', {
             'fields': ('is_published', 'is_featured', 'published_date', 'updated_at'),
         }),

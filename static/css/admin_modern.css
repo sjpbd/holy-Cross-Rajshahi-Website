@@ -1,0 +1,91 @@
+/* 
+   Modern Professional Admin Layout Overrides
+   Goal: Industry-standard "Stacked" layout for large editors.
+*/
+
+/* Reset flex containers to allow vertical stacking */
+.aligned .form-row.modern-editor,
+.aligned .form-row.field-history,
+.aligned .form-row.field-mission,
+.aligned .form-row.field-vision,
+.aligned .form-row.field-goal,
+.aligned .form-row.field-bio,
+.aligned .form-row.field-content,
+.aligned .form-row.field-description,
+.aligned .form-row.field-message,
+.aligned .form-row.field-principal_message,
+.aligned .form-row.field-vice_principal_message {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 20px 0 !important;
+    border-bottom: 1px solid var(--border-color, #eee) !important;
+}
+
+/* Ensure the wrapper div takes full width */
+.aligned .form-row.modern-editor>div,
+.aligned .form-row.field-history>div,
+.aligned .form-row.field-mission>div,
+.aligned .form-row.field-vision>div,
+.aligned .form-row.field-goal>div,
+.aligned .form-row.field-bio>div,
+.aligned .form-row.field-content>div,
+.aligned .form-row.field-description>div,
+.aligned .form-row.field-message>div,
+.aligned .form-row.field-principal_message>div,
+.aligned .form-row.field-vice_principal_message>div {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    flex: 1 1 auto !important;
+}
+
+/* Style labels as headers for the stacked inputs */
+.aligned .form-row.modern-editor label,
+.aligned .form-row.field-history label,
+.aligned .form-row.field-mission label,
+.aligned .form-row.field-vision label,
+.aligned .form-row.field-goal label,
+.aligned .form-row.field-bio label,
+.aligned .form-row.field-content label,
+.aligned .form-row.field-description label,
+.aligned .form-row.field-message label,
+.aligned .form-row.field-principal_message label,
+.aligned .form-row.field-vice_principal_message label {
+    width: 100% !important;
+    float: none !important;
+    text-align: left !important;
+    padding: 0 0 12px 0 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: var(--body-fg, #333) !important;
+}
+
+/* Force the editor to use every pixel of horizontal space */
+.django-summernote-widget {
+    width: 100% !important;
+    display: block !important;
+}
+
+.note-editor.note-frame {
+    width: 100% !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color, #ddd) !important;
+    overflow: hidden !important;
+}
+
+.note-editable {
+    width: 100% !important;
+    min-height: 550px !important;
+    padding: 20px !important;
+}
+
+/* Support for wide class on fieldsets */
+.wide-fieldset .form-row {
+    max-width: none !important;
+    width: 100% !important;
+}
