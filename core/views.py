@@ -43,7 +43,7 @@ class HomeView(TemplateView):
 
 
 class AboutView(TemplateView):
-    """About pages (history, mission, vision)"""
+    """About pages (history, mission, vision, and custom pages)"""
     template_name = 'about.html'
     
     def get_context_data(self, **kwargs):
@@ -51,14 +51,26 @@ class AboutView(TemplateView):
         page_type = self.kwargs.get('page', 'history')
         context['page'] = page_type
         
-        # Meta information
+        # Meta information for hardcoded pages
         titles = {
             'history': 'Our History',
             'mission': 'Mission & Vision',
             'message': 'Leadership Messages',
             'governing': 'Governing Body'
         }
-        context['page_title'] = titles.get(page_type, 'About Us')
+        
+        # Try to find a dynamic page if not in hardcoded titles
+        if page_type not in titles:
+            from .models import StaticPage
+            static_page = StaticPage.objects.filter(slug=page_type, is_active=True).first()
+            if static_page:
+                context['page_title'] = static_page.title
+                context['static_page'] = static_page
+            else:
+                context['page_title'] = 'About Us'
+        else:
+            context['page_title'] = titles.get(page_type, 'About Us')
+            
         context['page_description'] = f"Learn more about Holy Cross School and College, Rajshahi - {context['page_title']}."
         
         return context

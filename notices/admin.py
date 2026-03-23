@@ -1,24 +1,21 @@
 # notices/admin.py
 from django.contrib import admin
+from django.db import models
 from .models import Notice
-from django_summernote.admin import SummernoteModelAdmin
+from django_summernote.widgets import SummernoteWidget
 
 
 @admin.register(Notice)
-class NoticeAdmin(SummernoteModelAdmin):
+class NoticeAdmin(admin.ModelAdmin):
     list_display = ['title', 'is_important', 'is_active', 'view_count', 'created_at']
     list_filter = ['is_active', 'is_important', 'created_at']
     list_editable = ['is_important', 'is_active']
     search_fields = ['title', 'description']
     date_hierarchy = 'created_at'
     readonly_fields = ['view_count', 'created_at', 'updated_at']
-    summernote_fields = ('description',)
-    
-    class Media:
-        css = {
-            'all': ('css/admin_modern.css',)
-        }
-        js = ('js/admin_fix.js',)
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
 
 
     

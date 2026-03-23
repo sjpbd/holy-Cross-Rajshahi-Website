@@ -108,3 +108,90 @@ class FactsFigures(models.Model):
 
     def __str__(self):
         return f"{self.title}: {self.number}"
+
+
+class StaticPage(models.Model):
+    """Generic model for custom content pages (e.g., Holy Cross Brothers)"""
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, help_text="Used in the URL (e.g., 'holy-cross-brothers')")
+    banner_image = models.ImageField(upload_to='pages/banners/', blank=True, null=True)
+    content = models.TextField(help_text="Main content of the page (supports HTML/Summernote)")
+    
+    # Meta
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Custom Page"
+        verbose_name_plural = "Custom Pages"
+
+    def __str__(self):
+        return self.title
+
+
+class AdmissionBanner(models.Model):
+    """Admission announcement banner shown prominently on the homepage."""
+    title = models.CharField(
+        max_length=200,
+        default="Admission is Open!",
+        help_text="Main banner headline, e.g. 'Admission is Open 2025-26'"
+    )
+    subtitle = models.CharField(
+        max_length=400,
+        blank=True,
+        help_text="Short subtitle text below the headline"
+    )
+    button_text = models.CharField(
+        max_length=100,
+        default="View Admission Notice",
+        help_text="Text shown on the call-to-action button"
+    )
+    external_link = models.URLField(
+        blank=True,
+        help_text="Optional external URL to link to (e.g. Google Drive link)"
+    )
+    # File attachments
+    notice_pdf = models.FileField(
+        upload_to='admission/notices/',
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        help_text="Upload PDF of admission circular/notice"
+    )
+    notice_image = models.ImageField(
+        upload_to='admission/notices/',
+        blank=True,
+        null=True,
+        help_text="Upload image of admission notice/circular"
+    )
+    # Control
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Toggle the banner on/off sitewide"
+    )
+    is_blinking = models.BooleanField(
+        default=True,
+        help_text="Enable attention-grabbing blink animation on the banner"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Admission Banner"
+        verbose_name_plural = "Admission Banner"
+
+    def __str__(self):
+        status = "Active" if self.is_active else "Inactive"
+        return f"Admission Banner ({status}) – {self.title}"
+
+    @property
+    def attachment_url(self):
+        """Returns the best available attachment URL."""
+        if self.notice_pdf:
+            return self.notice_pdf.url
+        if self.notice_image:
+            return self.notice_image.url
+        if self.external_link:
+            return self.external_link
+        return None

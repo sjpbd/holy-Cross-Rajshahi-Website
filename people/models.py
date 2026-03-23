@@ -117,3 +117,50 @@ class Staff(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.designation}"
+
+
+class GoverningBodyMember(models.Model):
+    """Members of the School Governing Body / Board of Directors"""
+    ROLE_CHOICES = [
+        ('chairman', 'Chairman'),
+        ('vice_chairman', 'Vice Chairman'),
+        ('secretary', 'Secretary'),
+        ('treasurer', 'Treasurer'),
+        ('member', 'Member'),
+        ('other', 'Other'),
+    ]
+
+    name = models.CharField(max_length=200)
+    role = models.CharField(
+        max_length=50,
+        choices=ROLE_CHOICES,
+        default='member',
+        help_text="Role in the governing body"
+    )
+    designation = models.CharField(
+        max_length=300,
+        help_text="Full official title/designation"
+    )
+    photo = models.ImageField(
+        upload_to='governing_body/',
+        blank=True,
+        help_text="Recommended size: 400x400px square photo"
+    )
+    bio = models.TextField(blank=True, help_text="Short biography or background")
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=50, blank=True)
+    order = models.PositiveIntegerField(default=0, help_text="Lower numbers appear first. Set Chairman to 0.")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = "Governing Body Member"
+        verbose_name_plural = "Governing Body Members"
+
+    def __str__(self):
+        return f"{self.name} - {self.get_role_display()}"
+
+    @property
+    def is_chairman(self):
+        return self.role == 'chairman'

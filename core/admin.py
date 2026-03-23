@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import Slider, SchoolInfo, FactsFigures
+from django.db import models
+from .models import Slider, SchoolInfo, FactsFigures, StaticPage, AdmissionBanner
 from django_summernote.admin import SummernoteModelAdmin
+from django_summernote.widgets import SummernoteWidget
 
 
 @admin.register(Slider)
@@ -22,17 +24,13 @@ class SliderAdmin(admin.ModelAdmin):
 
 
 @admin.register(SchoolInfo)
-class SchoolInfoAdmin(SummernoteModelAdmin):
+class SchoolInfoAdmin(admin.ModelAdmin):
     """Singleton admin for school information"""
-    summernote_fields = ('history', 'mission', 'vision', 'goal', 'principal_message', 'vice_principal_message')
     
-    class Media:
-        css = {
-            'all': ('css/admin_modern.css',)
-        }
-        js = ('js/admin_fix.js',)
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
 
-    
     def has_add_permission(self, request):
         # Only allow one instance
         return not SchoolInfo.objects.exists()
@@ -76,3 +74,34 @@ class FactsFiguresAdmin(admin.ModelAdmin):
     list_editable = ['order', 'is_active']
     list_filter = ['is_active']
     search_fields = ['title']
+
+
+@admin.register(StaticPage)
+class StaticPageAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug', 'is_active', 'updated_at']
+    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['title', 'content']
+
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
+
+
+@admin.register(AdmissionBanner)
+class AdmissionBannerAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_active', 'is_blinking', 'updated_at']
+    list_editable = ['is_active', 'is_blinking']
+
+    fieldsets = (
+        ('Banner Content', {
+            'fields': ('title', 'subtitle', 'button_text')
+        }),
+        ('Attachments & Links', {
+            'description': 'Upload a PDF or image of the admission notice, or provide an external link.',
+            'fields': ('notice_pdf', 'notice_image', 'external_link')
+        }),
+        ('Display Controls', {
+            'fields': ('is_active', 'is_blinking')
+        }),
+    )

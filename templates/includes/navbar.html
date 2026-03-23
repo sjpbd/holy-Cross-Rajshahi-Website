@@ -2,16 +2,16 @@
 <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-primary transition-all duration-300">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
-            <!-- Logo -->
-            <div class="flex items-center">
-                <a href="{% url 'home' %}" class="flex items-center space-x-3">
+            <!-- Logo & Branding -->
+            <div class="flex items-center mr-8 xl:mr-16">
+                <a href="{% url 'home' %}" class="flex items-center space-x-4 group">
                     {% if school_info.logo %}
-                    <div class="w-12 h-12 flex items-center justify-center">
-                        <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="h-12 w-auto object-contain">
+                    <div class="logo-container w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-white rounded-full p-1 shadow-lg transition-all duration-500">
+                        <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="h-full w-auto object-contain logo-img">
                     </div>
                     {% else %}
-                    <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-                        <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                    <div class="logo-container w-14 h-14 md:w-16 md:h-16 bg-accent rounded-full flex items-center justify-center shadow-lg transition-all duration-500">
+                        <i class="fas fa-graduation-cap text-white text-3xl"></i>
                     </div>
                     {% endif %}
                     <div class="text-white school-name-container">
@@ -22,7 +22,7 @@
             </div>
 
             <!-- Desktop Menu -->
-            <div class="hidden lg:flex items-center space-x-1">
+            <div class="hidden xl:flex items-center space-x-1 transition-all duration-300">
                 <a href="{% url 'home' %}" class="nav-link">
                     <i class="fas fa-home mr-1"></i>Home
                 </a>
@@ -42,6 +42,9 @@
                         <a href="{% url 'about_page' 'message' %}" class="dropdown-item">
                             <i class="fas fa-comment-dots mr-2"></i>Messages
                         </a>
+                        <a href="{% url 'about_page' 'holy-cross-brothers' %}" class="dropdown-item">
+                            <i class="fas fa-users mr-2"></i>Holy Cross Brothers
+                        </a>
                     </div>
                 </div>
 
@@ -53,6 +56,9 @@
                     <div class="dropdown-menu">
                         <a href="{% url 'administration' %}" class="dropdown-item">
                             <i class="fas fa-user-tie mr-2"></i>Administration
+                        </a>
+                        <a href="{% url 'governing_body' %}" class="dropdown-item">
+                            <i class="fas fa-shield-alt mr-2"></i>Governing Body
                         </a>
                         <a href="{% url 'teachers' %}" class="dropdown-item">
                             <i class="fas fa-chalkboard-teacher mr-2"></i>Teachers
@@ -69,6 +75,9 @@
                 <a href="{% url 'news_list' %}" class="nav-link">
                     <i class="fas fa-newspaper mr-1"></i>News
                 </a>
+                <a href="{% url 'gallery_home' %}" class="nav-link">
+                    <i class="fas fa-images mr-1"></i>Gallery
+                </a>
                 <a href="{% url 'club_list' %}" class="nav-link">
                     <i class="fas fa-users mr-1"></i>Clubs
                 </a>
@@ -81,14 +90,14 @@
             </div>
 
             <!-- Mobile Menu Button -->
-            <button id="mobileMenuBtn" class="lg:hidden text-white p-2 hover:bg-primary-dark rounded-lg transition">
+            <button id="mobileMenuBtn" class="xl:hidden text-white p-2 hover:bg-primary-dark rounded-lg transition-all duration-300">
                 <i class="fas fa-bars text-2xl"></i>
             </button>
         </div>
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="lg:hidden bg-primary-dark overflow-hidden transition-all duration-300 max-h-0">
+    <div id="mobileMenu" class="xl:hidden bg-primary-dark overflow-hidden transition-all duration-300 max-h-0">
         <div class="container mx-auto px-4 py-4 space-y-2">
             <a href="{% url 'home' %}" class="mobile-nav-link">
                 <i class="fas fa-home mr-2"></i>Home
@@ -105,6 +114,7 @@
                     <a href="{% url 'about_page' 'history' %}" class="mobile-nav-sublink">Our History</a>
                     <a href="{% url 'about_page' 'mission' %}" class="mobile-nav-sublink">Mission & Vision</a>
                     <a href="{% url 'about_page' 'message' %}" class="mobile-nav-sublink">Messages</a>
+                    <a href="{% url 'about_page' 'holy-cross-brothers' %}" class="mobile-nav-sublink">Holy Cross Brothers</a>
                 </div>
             </div>
 
@@ -117,6 +127,7 @@
                 </button>
                 <div id="peopleDropdown" class="pl-8 space-y-2 max-h-0 overflow-hidden transition-all duration-300">
                     <a href="{% url 'administration' %}" class="mobile-nav-sublink">Administration</a>
+                    <a href="{% url 'governing_body' %}" class="mobile-nav-sublink">Governing Body</a>
                     <a href="{% url 'teachers' %}" class="mobile-nav-sublink">Teachers</a>
                     <a href="{% url 'staff' %}" class="mobile-nav-sublink">Staff</a>
                 </div>
@@ -127,6 +138,9 @@
             </a>
             <a href="{% url 'news_list' %}" class="mobile-nav-link">
                 <i class="fas fa-newspaper mr-2"></i>News
+            </a>
+            <a href="{% url 'gallery_home' %}" class="mobile-nav-link">
+                <i class="fas fa-images mr-2"></i>Gallery
             </a>
             <a href="{% url 'club_list' %}" class="mobile-nav-link">
                 <i class="fas fa-users mr-2"></i>Clubs
@@ -150,8 +164,66 @@
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 2px solid rgba(212, 175, 55, 0.1);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ──── Logo Modern Animation ──── */
+    .logo-container {
+        position: relative;
+        overflow: hidden;
+        z-index: 10;
+        animation: logo-entrance 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
+
+    @keyframes logo-entrance {
+        from { opacity: 0; transform: scale(0.6) translateY(-20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Cinematic Metallic Shine Effect (Continuous & Hover) */
+    .logo-container::after {
+        content: "";
+        position: absolute;
+        top: -110%;
+        left: -210%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(to bottom right, 
+            rgba(255,255,255,0) 0%, 
+            rgba(255,255,255,0) 40%, 
+            rgba(255,255,255,0.6) 50%, 
+            rgba(255,255,255,0) 60%, 
+            rgba(255,255,255,0) 100%
+        );
+        transform: rotate(35deg);
+        animation: logo-shine-loop 6s ease-in-out infinite; /* Automatic Shine Sweep */
+        transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    @keyframes logo-shine-loop {
+        0%, 80% { left: -210%; top: -110%; } /* Pause state */
+        100% { left: 100%; top: 100%; } /* Fast sweep */
+    }
+
+    .group:hover .logo-container {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        border-color: #d4af37;
+    }
+
+    .group:hover .logo-container::after {
+        left: 100%;
+        top: 100%;
+        transition: all 0.5s ease;
+    }
+
+    .logo-img {
+        transition: all 0.6s ease;
+    }
+
+    .group:hover .logo-img {
+        filter: brightness(1.1);
     }
 
     .navbar-scrolled {
@@ -159,7 +231,7 @@
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        border-bottom: 2px solid #d4af37 !important;
     }
 
     /* School Name Styling */
@@ -170,44 +242,78 @@
     }
 
     .school-name-main {
-        font-weight: 800;
-        font-size: 1.125rem;
-        line-height: 1.1;
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: 1.4rem;
+        font-style: italic;
+        line-height: 1.25; /* Fixed: Prevents 'g' from clipping */
+        padding-bottom: 2px; /* Fixed: Extra breathing room for descenders */
         white-space: nowrap;
         letter-spacing: -0.01em;
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        transition: all 0.4s ease;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* More professional shadow */
     }
 
     .school-name-location {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.8);
+        font-family: 'Playfair Display', serif;
+        font-size: 0.85rem;
+        color: #d4af37 !important;
         font-weight: 500;
-        margin-top: 2px;
+        font-style: italic;
+        margin-top: -2px;
+        letter-spacing: 0.05em;
+        opacity: 0.95;
+        transition: all 0.4s ease;
+    }
+
+    /* Granular Branding Scaling */
+    @media (max-width: 1366px) {
+        .school-name-main { font-size: 1.15rem; }
+    }
+
+    @media (max-width: 1200px) {
+        .school-name-main { font-size: 1.1rem; }
     }
 
     @media (max-width: 480px) {
         .school-name-main {
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
 
         .school-name-location {
             font-size: 0.7rem;
+            letter-spacing: 0.1em;
         }
     }
 
     @media (max-width: 360px) {
         .school-name-main {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
+    }
+
+    /* Laptop Adaptation (1150px to 1320px) */
+    @media (max-width: 1320px) and (min-width: 1150px) {
+        .nav-link {
+            padding: 0.625rem 0.65rem !important;
+            font-size: 0.8125rem !important;
+            letter-spacing: 0;
+        }
+        .school-name-main { font-size: 1rem; }
+        #navbar .container { padding-left: 0.5rem; padding-right: 0.5rem; }
     }
 
     /* Desktop Navigation Links */
     .nav-link {
         position: relative;
         color: rgba(255, 255, 255, 0.95);
-        padding: 0.875rem 1.5rem;
+        padding: 0.75rem 0.875rem;
         border-radius: 0.625rem;
         font-weight: 600;
-        font-size: 0.9375rem;
+        font-size: 0.875rem;
         letter-spacing: 0.01em;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;

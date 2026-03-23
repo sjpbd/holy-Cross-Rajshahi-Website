@@ -1,0 +1,114 @@
+<!-- gallery/gallery_list.html -->
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .album-card {
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    .album-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .album-overlay {
+        background: linear-gradient(to top, rgba(30, 58, 138, 0.9) 0%, rgba(30, 58, 138, 0.2) 50%, transparent 100%);
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+    }
+    .album-card:hover .album-overlay {
+        opacity: 1;
+    }
+    .folder-icon {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <!-- Decorative Elements -->
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}" style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Photo Gallery</div>
+        </nav>
+
+        <h1 class="text-5xl md:text-6xl font-bold mb-4" data-aos="fade-up">Photo Gallery</h1>
+        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up" data-aos-delay="100"></div>
+        <p class="text-xl text-gray-200 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            Capturing the vibrant moments, academic milestones, and cherished memories of our school community.
+        </p>
+    </div>
+</section>
+
+<!-- Gallery Section -->
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+        {% if albums %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for album in albums %}
+            <a href="{% url 'album_detail' album.slug %}" class="album-card group relative block h-80 rounded-3xl overflow-hidden shadow-lg bg-white" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
+                <!-- Album Cover -->
+                {% if album.cover_image %}
+                <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                {% else %}
+                <div class="w-full h-full bg-primary-light flex items-center justify-center">
+                    <i class="fas fa-images text-6xl text-white/30"></i>
+                </div>
+                {% endif %}
+
+                <!-- Overlay -->
+                <div class="album-overlay absolute inset-0 flex flex-col justify-end p-8 text-white">
+                    <div class="folder-icon w-10 h-10 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-folder-open text-sm"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 group-hover:text-accent transition-colors">{{ album.title }}</h3>
+                    <div class="flex items-center gap-4 text-sm text-gray-200">
+                        <span><i class="fas fa-camera mr-2"></i>{{ album.photo_count }} Photos</span>
+                        {% if album.sub_albums.exists %}
+                        <span><i class="fas fa-folder mr-2"></i>{{ album.sub_albums.count }} Albums</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100" data-aos="zoom-in">
+            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-images text-4xl text-gray-300"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No Albums Yet</h3>
+            <p class="text-gray-500">Check back later for beautiful memories and event photos.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Stats / CTA -->
+<section class="py-16 bg-white border-t border-gray-100">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-wrap justify-center gap-12 md:gap-24">
+            <div class="text-center" data-aos="fade-up">
+                <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">10+</div>
+                <div class="text-gray-500 font-medium">Categories</div>
+            </div>
+            <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-4xl md:text-5xl font-extrabold text-accent mb-2">1000+</div>
+                <div class="text-gray-500 font-medium">Moments Captured</div>
+            </div>
+            <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-4xl md:text-5xl font-extrabold text-primary-dark mb-2">20+</div>
+                <div class="text-gray-500 font-medium">Annual Events</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,368 @@
+<!-- gallery/album_detail.html -->
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<!-- GLightbox CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+<style>
+    .photo-card {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .photo-card:hover {
+        transform: scale(1.05);
+        z-index: 10;
+    }
+    .photo-overlay {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .photo-card:hover .photo-overlay {
+        opacity: 1;
+    }
+    .sub-album-card {
+        border: 2px solid #e2e8f0;
+        background: white;
+        transition: all 0.3s ease;
+    }
+    .sub-album-card:hover {
+        border-color: var(--tw-color-accent, #d4af37);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Better Close Button Visibility */
+    .gclose {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-radius: 4px !important; /* Matches frame style */
+        padding: 5px !important;
+        top: 25px !important;
+        right: 25px !important;
+        transition: all 0.3s ease;
+        z-index: 10001 !important;
+        opacity: 0.8;
+    }
+    .gclose:hover {
+        background: rgba(255, 255, 255, 0.4) !important;
+        opacity: 1;
+    }
+    
+    /* ──── Professional Lightbox Overrides ──── */
+
+    /* Injected Viewer Branding (Custom Header) */
+    .viewer-custom-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 20px 30px;
+        z-index: 10000;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        pointer-events: none;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+    }
+
+    .viewer-logo-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        pointer-events: auto;
+        color: white;
+        text-decoration: none !important;
+    }
+
+    .viewer-logo-box img {
+        height: 35px;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+
+    .viewer-logo-box span {
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: -0.01em;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        color: white !important;
+    }
+    
+    /* High-Visibility Side Arrows */
+    .gnext, .gprev {
+        background: rgba(30, 58, 138, 0.4) !important;
+        border-radius: 50%;
+        width: 50px !important;
+        height: 50px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    .gnext:hover, .gprev:hover {
+        background: var(--tw-color-accent, #d4af37) !important;
+    }
+
+    /* 1. Breathing room for the whole slide */
+    .gslide-image {
+        padding-top: 50px !important;
+        padding-bottom: 50px !important;
+    }
+
+    /* 2. Style the photo itself with a 'frame' border */
+    .gslide-image img {
+        border: 4px solid white !important;
+        border-radius: 4px !important;
+        box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), 0 18px 36px -18px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    /* 3. Redesign the Caption area to be an OVERLAY ON IMAGE */
+    .glightbox-container .gslide-description {
+        position: absolute !important;
+        bottom: 70px !important; /* Floating over the image */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        background: rgba(0, 0, 0, 0.6) !important; /* Cinematic semi-transparent dark */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        width: auto !important;
+        max-width: 80% !important;
+        min-width: 250px;
+        border-radius: 50px !important; /* Pill shape */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4) !important;
+        margin: 0 !important;
+        transition: opacity 0.4s ease;
+        z-index: 1000 !important;
+    }
+
+    .gdesc-inner {
+        padding: 0.75rem 2.5rem !important;
+        text-align: center !important;
+    }
+
+    .gslide-title {
+        color: white !important; /* White for readability on overlay */
+        font-weight: 700 !important;
+        font-size: 1rem !important;
+        margin-bottom: 0.15rem !important;
+        text-transform: capitalize;
+        line-height: 1.2;
+    }
+
+    .gslide-desc {
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-weight: 600 !important;
+        font-size: 0.7rem !important;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: none !important;
+        padding-top: 0 !important;
+        margin: 0 !important;
+        display: block;
+    }
+
+    /* Gallery Counter (Status Indicator) */
+    .gcounter {
+        position: fixed;
+        bottom: 25px;
+        left: 25px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        z-index: 10000;
+        background: rgba(0,0,0,0.3);
+        padding: 5px 15px;
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Floating Back Button */
+    .floating-back {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 40;
+        background: var(--tw-color-accent, #d4af37);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .floating-back:hover {
+        transform: scale(1.05) translateY(-5px);
+        background: #b8941e;
+        color: white;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+    <div class="decorative-shape decorative-circle-1"></div>
+    <div class="absolute inset-0 decorative-dots opacity-5"></div>
+
+    <div class="container mx-auto px-4 py-16 relative z-10">
+        <!-- Breadcrumbs -->
+        <nav class="breadcrumb mb-6" data-aos="fade-down" style="color: white !important;">
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}" style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'gallery_home' %}" style="color: white !important;">Gallery</a></div>
+            {% for crumb in breadcrumbs %}
+                {% if not forloop.last %}
+                <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'album_detail' crumb.slug %}" style="color: white !important;">{{ crumb.title }}</a></div>
+                {% else %}
+                <div class="breadcrumb-item active" style="color: #f4d03f !important;">{{ crumb.title }}</div>
+                {% endif %}
+            {% endfor %}
+        </nav>
+
+        <div class="flex flex-col md:flex-row items-center gap-8" data-aos="fade-up">
+            {% if album.cover_image %}
+            <div class="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden border-4 border-white/20 shadow-2xl shrink-0">
+                <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="w-full h-full object-cover">
+            </div>
+            {% endif %}
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ album.title }}</h1>
+                <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light"></div>
+                {% if album.description %}
+                <p class="text-lg text-gray-200 mt-4 max-w-2xl">{{ album.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Floating Back Button -->
+<a href="{% url 'gallery_home' %}" class="floating-back">
+    <i class="fas fa-th-large"></i> Back to Gallery
+</a>
+
+<!-- Sub-Albums and Photos -->
+<div class="bg-gray-50 py-16 min-h-screen">
+    <div class="container mx-auto px-4">
+        
+        {% if sub_albums %}
+        <!-- Sub-Albums (Folders) Section -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-primary mb-8 flex items-center gap-3">
+                <i class="fas fa-folder-open text-accent"></i> Sub-Albums
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for sub in sub_albums %}
+                <a href="{% url 'album_detail' sub.slug %}" class="sub-album-card p-4 rounded-2xl flex items-center gap-4 group">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden shadow-md shrink-0 border border-gray-100 transition-transform group-hover:scale-105">
+                        {% if sub.cover_image %}
+                        <img src="{{ sub.cover_image.url }}" alt="{{ sub.title }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-folder text-gray-300"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 group-hover:text-primary transition-colors line-clamp-1">{{ sub.title }}</h4>
+                        <p class="text-xs text-gray-400 font-medium">{{ sub.photo_count }} Photos</p>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-gray-300 group-hover:text-accent transition-all transform group-hover:translate-x-1"></i>
+                </a>
+                {% endfor %}
+            </div>
+            <hr class="mt-16 border-gray-200">
+        </div>
+        {% endif %}
+
+        <!-- Photos Grid -->
+        <div>
+            {% if photos %}
+            <h2 class="text-2xl font-bold text-primary mb-8 flex items-center gap-3">
+                <i class="fas fa-camera text-accent"></i> Photos ({{ photos.count }})
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                {% for photo in photos %}
+                <a href="{{ photo.image.url }}" class="photo-card glightbox block relative aspect-square rounded-2xl overflow-hidden shadow-md group" data-gallery="gallery1" data-title="{{ photo.caption|default:album.title }}" data-description="{{ photo.created_at|date:'F d, Y' }}">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="w-full h-full object-cover">
+                    <div class="photo-overlay absolute inset-0 flex flex-col justify-end p-4 text-white">
+                        {% if photo.caption %}
+                        <p class="text-sm font-semibold line-clamp-1">{{ photo.caption }}</p>
+                        {% endif %}
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-white/50"><i class="fas fa-expand-alt mr-1"></i> View Large</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+                {% if not sub_albums %}
+                <div class="text-center py-24 bg-white rounded-3xl shadow-sm border border-gray-100">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-image text-4xl text-gray-300"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">This Album is Empty</h3>
+                    <p class="text-gray-500">Wait for the admin to add some memories here.</p>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- GLightbox JS -->
+<script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    const lightbox = GLightbox({
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: true,
+        zoomable: true,
+        draggable: true,
+        descPosition: 'inside'
+    });
+
+    // Custom Professional Enhancements for GLightbox
+    lightbox.on('open', () => {
+        // 1. Inject Institutional Branding into the viewer
+        const container = document.querySelector('.glightbox-container');
+        if (!document.querySelector('.viewer-custom-header')) {
+            const header = document.createElement('div');
+            header.className = 'viewer-custom-header';
+            header.innerHTML = `
+                <a href="/" class="viewer-logo-box">
+                    {% if school_info.logo %}
+                    <img src="{{ school_info.logo.url }}" alt="Logo">
+                    {% endif %}
+                    <span>Holy Cross School & College</span>
+                </a>
+            `;
+            container.appendChild(header);
+        }
+
+        // 2. Inject Counter
+        if (!document.querySelector('.gcounter')) {
+            const counter = document.createElement('div');
+            counter.className = 'gcounter';
+            container.appendChild(counter);
+        }
+    });
+
+    lightbox.on('slide_after_load', (data) => {
+        const { index, slide, player } = data;
+        const total = lightbox.elements.length;
+        const counter = document.querySelector('.gcounter');
+        if (counter) {
+            counter.innerText = `Image ${index + 1} of ${total}`;
+        }
+    });
+</script>
+{% endblock %}

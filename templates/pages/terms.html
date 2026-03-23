@@ -4,58 +4,169 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="pt-20 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
+<section class="pt-24 pb-16 bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden">
     <div class="decorative-shape decorative-circle-1"></div>
     <div class="absolute inset-0 decorative-dots opacity-5"></div>
 
-    <div class="container mx-auto px-4 py-16 relative z-10">
-        <nav class="breadcrumb mb-4" data-aos="fade-down" style="color: white !important;">
-            <div class="breadcrumb-item" style="color: white !important;"><a href="{% url 'home' %}"
-                    style="color: white !important;">Home</a></div>
-            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Terms of Service</div>
+    <div class="container mx-auto px-4 relative z-10">
+        <nav class="flex mb-8 text-sm font-medium" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="text-gray-300 hover:text-white transition-colors duration-200">
+                        <i class="fas fa-home mr-2"></i> Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-500 text-xs mx-2"></i>
+                        <span class="text-accent-light">Terms of Service</span>
+                    </div>
+                </li>
+            </ol>
         </nav>
 
-        <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Terms of Service</h1>
-        <div class="section-divider ml-0 bg-gradient-to-r from-accent to-accent-light" data-aos="fade-up"
-            data-aos-delay="100"></div>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight" data-aos="fade-up">Terms of Service</h1>
+        <div class="h-1.5 w-24 bg-gradient-to-r from-accent to-accent-light rounded-full mb-6" data-aos="fade-up" data-aos-delay="100"></div>
+        <p class="text-xl text-gray-300 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+            Please read these terms and conditions carefully before using the Holy Cross School and College services.
+        </p>
     </div>
 </section>
 
 <!-- Content Section -->
-<section class="py-16 bg-white">
+<section class="py-20 bg-gray-50">
     <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto prose prose-lg">
-            <p class="lead text-xl text-gray-600 mb-8">
-                Welcome to the Holy Cross School and College, Rajshahi website. By accessing or using our website, you
-                agree to comply with and be bound by the following terms and conditions.
-            </p>
+        <div class="flex flex-col lg:flex-row gap-12">
+            <!-- Sidebar / Quick Links -->
+            <div class="lg:w-1/4">
+                <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-28 border border-gray-100">
+                    <h3 class="text-lg font-bold text-primary mb-4 flex items-center">
+                        <i class="fas fa-book mr-2 text-accent"></i> Policy Index
+                    </h3>
+                    <ul class="space-y-3 text-gray-600 font-medium">
+                        <li><a href="#acceptance" class="hover:text-primary hover:translate-x-1 inline-block transition-all duration-200">1. Acceptance</a></li>
+                        <li><a href="#content" class="hover:text-primary hover:translate-x-1 inline-block transition-all duration-200">2. Content Usage</a></li>
+                        <li><a href="#conduct" class="hover:text-primary hover:translate-x-1 inline-block transition-all duration-200">3. User Conduct</a></li>
+                        <li><a href="#disclaimer" class="hover:text-primary hover:translate-x-1 inline-block transition-all duration-200">4. Disclaimer</a></li>
+                        <li><a href="#liability" class="hover:text-primary hover:translate-x-1 inline-block transition-all duration-200">5. Liability</a></li>
+                        <li><a href="#governing" class="hover:text-primary hover:translate-x-1 inline-block transition-all duration-200 text-primary font-bold">6. Governing Law</a></li>
+                    </ul>
+                    <div class="mt-8 pt-6 border-t border-gray-100">
+                        <p class="text-xs text-gray-400 font-medium italic">Binding Agreement for all Visitors</p>
+                    </div>
+                </div>
+            </div>
 
-            <h3>1. Acceptance of Terms</h3>
-            <p>By accessing this website, you acknowledge that you have read, understood, and agree to be bound by these
-                Terms of Service. If you do not agree with any part of these terms, please do not use our website.</p>
+            <!-- Main Documentation -->
+            <div class="lg:w-3/4">
+                <div class="bg-white rounded-3xl shadow-sm p-8 md:p-12 border border-gray-100">
+                    <div class="prose prose-lg prose-blue max-w-none text-gray-700 leading-relaxed shadow-none">
+                        
+                        <div id="acceptance" class="mb-12 scroll-mt-28">
+                            <div class="flex items-center mb-6">
+                                <span class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mr-4 shrink-0 shadow-inner">
+                                    <i class="fas fa-hand-point-up text-xl"></i>
+                                </span>
+                                <h2 class="text-2xl font-bold text-gray-800 m-0">1. Acceptance of Terms</h2>
+                            </div>
+                            <div class="bg-blue-50/30 p-6 rounded-2xl border-l-4 border-primary">
+                                <p class="m-0 italic">By accessing the Holy Cross School and College website, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use our website or services.</p>
+                            </div>
+                        </div>
 
-            <h3>2. Use of Content</h3>
-            <p>All content provided on this website is for informational purposes only. The materials contained in this
-                website are protected by applicable copyright and trademark law.</p>
+                        <div id="content" class="mb-12 scroll-mt-28 border-t border-gray-50 pt-10">
+                            <div class="flex items-center mb-6">
+                                <span class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mr-4 shrink-0 shadow-inner">
+                                    <i class="fas fa-copy text-xl"></i>
+                                </span>
+                                <h2 class="text-2xl font-bold text-gray-800 m-0">2. Use of Content</h2>
+                            </div>
+                            <p>All content provided on this website, including text, graphics, logos, images, and software, is the property of Holy Cross School and College or its content suppliers and is protected by international copyright and trademark laws.</p>
+                            <div class="grid md:grid-cols-2 gap-4 mt-6">
+                                <ul class="space-y-2">
+                                    <li class="flex items-start"><i class="fas fa-info-circle text-primary mt-1.5 mr-3"></i> <span>Educational use is permitted with attribution.</span></li>
+                                    <li class="flex items-start"><i class="fas fa-info-circle text-primary mt-1.5 mr-3"></i> <span>Strictly no redistribution for commercial gain.</span></li>
+                                </ul>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start"><i class="fas fa-info-circle text-primary mt-1.5 mr-3"></i> <span>Trademarks may not be used without written consent.</span></li>
+                                    <li class="flex items-start"><i class="fas fa-info-circle text-primary mt-1.5 mr-3"></i> <span>Personal-only licensing for student downloads.</span></li>
+                                </ul>
+                            </div>
+                        </div>
 
-            <h3>3. User Conduct</h3>
-            <p>You agree to use our website only for lawful purposes. You are prohibited from posting or transmitting
-                any unlawful, threatening, libelous, defamatory, obscene, or profane material.</p>
+                        <div id="conduct" class="mb-12 scroll-mt-28 border-t border-gray-50 pt-10">
+                            <div class="flex items-center mb-6">
+                                <span class="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mr-4 shrink-0 shadow-inner">
+                                    <i class="fas fa-user-shield text-xl"></i>
+                                </span>
+                                <h2 class="text-2xl font-bold text-gray-800 m-0">3. User Conduct</h2>
+                            </div>
+                            <p>You agree to use our website only for lawful purposes. You are specifically prohibited from:</p>
+                            <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                                <ul class="space-y-3 m-0">
+                                    <li class="flex items-center text-red-700 font-medium">
+                                        <i class="fas fa-ban mr-3 scale-110"></i> Posting or transmitting unlawful or threatening material.
+                                    </li>
+                                    <li class="flex items-center text-red-700 font-medium">
+                                        <i class="fas fa-ban mr-3 scale-110"></i> Any behavior that constitutes harassment or defamation.
+                                    </li>
+                                    <li class="flex items-center text-red-700 font-medium">
+                                        <i class="fas fa-ban mr-3 scale-110"></i> Attempting to breach website security or data integrity.
+                                    </li>
+                                    <li class="flex items-center text-red-700 font-medium">
+                                        <i class="fas fa-ban mr-3 scale-110"></i> Misrepresenting your identity as staff or alumni.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
 
-            <h3>4. Disclaimer</h3>
-            <p>The materials on Holy Cross School and College's website are provided on an 'as is' basis. We make no
-                warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without
-                limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or
-                non-infringement of intellectual property or other violation of rights.</p>
+                        <div id="disclaimer" class="mb-12 scroll-mt-28 border-t border-gray-50 pt-10">
+                            <div class="flex items-center mb-6">
+                                <span class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mr-4 shrink-0 shadow-inner">
+                                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                                </span>
+                                <h2 class="text-2xl font-bold text-gray-800 m-0">4. Disclaimer</h2>
+                            </div>
+                            <p>The materials on Holy Cross School and College's website are provided on an 'as is' basis. We make no
+                                warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without
+                                limitation, implied warranties or conditions of merchantability or fitness for a particular purpose.</p>
+                        </div>
 
-            <h3>5. Limitation of Liability</h3>
-            <p>In no event shall Holy Cross School and College or its suppliers be liable for any damages (including,
-                without limitation, damages for loss of data or profit, or due to business interruption) arising out of
-                the use or inability to use the materials on our website.</p>
+                        <div id="liability" class="mb-12 scroll-mt-28 border-t border-gray-50 pt-10">
+                            <div class="flex items-center mb-6">
+                                <span class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mr-4 shrink-0 shadow-inner">
+                                    <i class="fas fa-balance-scale text-xl"></i>
+                                </span>
+                                <h2 class="text-2xl font-bold text-gray-800 m-0">5. Limitation of Liability</h2>
+                            </div>
+                            <p>In no event shall Holy Cross School and College or its suppliers be liable for any damages (including,
+                                without limitation, damages for loss of data or profit, or due to business interruption) arising out of
+                                the use or inability to use the materials on our website.</p>
+                        </div>
 
-            <h3>6. Governing Law</h3>
-            <p>These terms and conditions are governed by and construed in accordance with the laws of Bangladesh and
-                you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>
+                        <div id="governing" class="scroll-mt-28 border-t border-gray-100 pt-10">
+                            <div class="bg-primary text-white p-8 rounded-3xl relative overflow-hidden shadow-lg">
+                                <div class="absolute inset-0 opacity-10 pointer-events-none">
+                                    <i class="fas fa-gavel absolute -right-4 -bottom-4 text-9xl"></i>
+                                </div>
+                                <h2 class="text-2xl font-extrabold mb-4 m-0">6. Governing Law</h2>
+                                <p class="text-blue-100 mb-6 leading-relaxed">
+                                    These terms and conditions are governed by and construed in accordance with the laws of **Bangladesh** and you irrevocably submit to the exclusive jurisdiction of the courts in that location for any disputes arising from website usage.
+                                </p>
+                                <div class="flex items-center space-x-6 text-sm font-bold">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-map-marker-alt text-accent-light mr-2"></i> Rajshahi, BD
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-alt text-accent-light mr-2"></i> Effective: 2026
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

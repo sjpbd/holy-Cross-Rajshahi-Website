@@ -1,5 +1,5 @@
 # core/context_processors.py
-from .models import SchoolInfo
+from .models import SchoolInfo, AdmissionBanner
 
 
 def school_info_context(request):
@@ -8,6 +8,8 @@ def school_info_context(request):
     This makes the school logo, contact info, and social media links
     available globally across all pages.
     """
+    banner = AdmissionBanner.objects.filter(is_active=True).first()
     return {
-        'school_info': SchoolInfo.load()
+        'school_info': SchoolInfo.load(),
+        'admission_banner': banner,
     }

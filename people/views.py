@@ -1,5 +1,5 @@
 from django.views.generic import ListView, DetailView
-from .models import Teacher, Administration, Staff
+from .models import Teacher, Administration, Staff, GoverningBodyMember
 
 
 class TeacherListView(ListView):
@@ -82,4 +82,23 @@ class StaffListView(ListView):
                     'staff': cat_staff
                 })
         context['categories'] = categories
+        return context
+
+
+class GoverningBodyListView(ListView):
+    """Governing Body / Board of Directors page"""
+    model = GoverningBodyMember
+    template_name = 'people/governing_body.html'
+    context_object_name = 'members'
+
+    def get_queryset(self):
+        return GoverningBodyMember.objects.filter(is_active=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "Governing Body - Holy Cross School & College"
+        context['page_description'] = "Meet the esteemed members of the Governing Body of Holy Cross School and College, Rajshahi."
+        members = self.get_queryset()
+        context['chairman'] = members.filter(role='chairman').first()
+        context['other_members'] = members.exclude(role='chairman')
         return context

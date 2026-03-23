@@ -1,0 +1,681 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Governing Body — Holy Cross School & College, Rajshahi{% endblock %}
+{% block description %}Meet the esteemed members of the Governing Body of Holy Cross School and College, Rajshahi.{% endblock %}
+
+{% block content %}
+<div class="governing-body-page" style="padding-top: 80px;">
+
+    <!-- ═══ HERO SECTION ═══ -->
+    <section class="gb-hero">
+        <div class="gb-hero-overlay"></div>
+        <div class="gb-hero-content">
+            <div class="gb-hero-badge">
+                <i class="fas fa-shield-alt"></i>
+                Holy Cross School & College, Rajshahi
+            </div>
+            <h1 class="gb-hero-title">Governing Body</h1>
+            <p class="gb-hero-subtitle">The distinguished leaders who guide the vision, integrity, and excellence of our institution</p>
+            <div class="gb-hero-divider">
+                <span class="gb-hero-line"></span>
+                <i class="fas fa-star gb-hero-star"></i>
+                <span class="gb-hero-line"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ BREADCRUMB ═══ -->
+    <nav class="gb-breadcrumb-bar" aria-label="Breadcrumb">
+        <div class="container mx-auto px-6 py-3">
+            <ol class="flex items-center gap-2 text-sm text-gray-500">
+                <li><a href="{% url 'home' %}" class="hover:text-primary transition-colors">Home</a></li>
+                <li><i class="fas fa-chevron-right text-xs text-gray-400"></i></li>
+                <li><a href="{% url 'administration' %}" class="hover:text-primary transition-colors">Administration</a></li>
+                <li><i class="fas fa-chevron-right text-xs text-gray-400"></i></li>
+                <li class="text-primary font-semibold">Governing Body</li>
+            </ol>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-16 max-w-7xl">
+
+        <!-- ═══ CHAIRMAN SPOTLIGHT ═══ -->
+        {% if chairman %}
+        <div class="gb-chairman-section">
+            <div class="gb-section-label">
+                <i class="fas fa-crown"></i> Chairperson
+            </div>
+            <div class="gb-chairman-card">
+                <div class="gb-chairman-glow"></div>
+                <div class="gb-chairman-inner">
+                    <div class="gb-chairman-photo-wrap">
+                        <div class="gb-chairman-ring"></div>
+                        {% if chairman.photo %}
+                        <img src="{{ chairman.photo.url }}" alt="{{ chairman.name }}" class="gb-chairman-photo">
+                        {% else %}
+                        <div class="gb-chairman-photo gb-photo-placeholder">
+                            <i class="fas fa-user-tie text-5xl text-white opacity-60"></i>
+                        </div>
+                        {% endif %}
+                        <div class="gb-chairman-badge-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                    </div>
+                    <div class="gb-chairman-info">
+                        <div class="gb-chairman-role-tag">{{ chairman.get_role_display }}</div>
+                        <h2 class="gb-chairman-name">{{ chairman.name }}</h2>
+                        <p class="gb-chairman-designation">{{ chairman.designation }}</p>
+                        {% if chairman.bio %}
+                        <p class="gb-chairman-bio">{{ chairman.bio|safe }}</p>
+                        {% endif %}
+                        <div class="gb-chairman-contacts">
+                            {% if chairman.email %}
+                            <a href="mailto:{{ chairman.email }}" class="gb-contact-chip">
+                                <i class="fas fa-envelope"></i> {{ chairman.email }}
+                            </a>
+                            {% endif %}
+                            {% if chairman.phone %}
+                            <a href="tel:{{ chairman.phone }}" class="gb-contact-chip">
+                                <i class="fas fa-phone"></i> {{ chairman.phone }}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ═══ BOARD MEMBERS GRID ═══ -->
+        {% if other_members %}
+        <div class="gb-board-section">
+            <div class="gb-section-header">
+                <div class="gb-section-label"><i class="fas fa-users"></i> Board Members</div>
+                <p class="gb-section-count">{{ other_members.count }} Member{{ other_members.count|pluralize }}</p>
+            </div>
+            <div class="gb-members-grid">
+                {% for member in other_members %}
+                <div class="gb-member-card" style="animation-delay: {{ forloop.counter0 }}00ms">
+                    <div class="gb-member-card-inner">
+                        <!-- Front -->
+                        <div class="gb-member-front">
+                            <div class="gb-member-photo-wrap">
+                                {% if member.photo %}
+                                <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="gb-member-photo">
+                                {% else %}
+                                <div class="gb-member-photo gb-photo-placeholder-sm">
+                                    <i class="fas fa-user-tie text-3xl text-white opacity-50"></i>
+                                </div>
+                                {% endif %}
+                                <div class="gb-member-role-badge">{{ member.get_role_display }}</div>
+                            </div>
+                            <div class="gb-member-info">
+                                <h3 class="gb-member-name">{{ member.name }}</h3>
+                                <p class="gb-member-designation">{{ member.designation }}</p>
+                            </div>
+                            <div class="gb-member-hover-indicator">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </div>
+                        </div>
+                        <!-- Back (Flip on hover) -->
+                        <div class="gb-member-back">
+                            <div class="gb-member-back-content">
+                                <div class="gb-member-back-role">{{ member.get_role_display }}</div>
+                                <h3 class="gb-member-back-name">{{ member.name }}</h3>
+                                {% if member.bio %}
+                                <p class="gb-member-back-bio">{{ member.bio|striptags|truncatewords:30 }}</p>
+                                {% else %}
+                                <p class="gb-member-back-bio">Esteemed member of the Holy Cross Governing Body, dedicated to upholding the institution's mission and values.</p>
+                                {% endif %}
+                                <div class="gb-member-back-contacts">
+                                    {% if member.email %}
+                                    <a href="mailto:{{ member.email }}" class="gb-contact-chip-sm">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if member.phone %}
+                                    <a href="tel:{{ member.phone }}" class="gb-contact-chip-sm">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ═══ EMPTY STATE ═══ -->
+        {% if not chairman and not other_members %}
+        <div class="gb-empty-state">
+            <i class="fas fa-users-cog gb-empty-icon"></i>
+            <h3>Governing Body profiles coming soon</h3>
+            <p>Please check back later or contact the administration.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ════════════════════════════════════════
+       GOVERNING BODY PAGE — PREMIUM STYLES
+    ════════════════════════════════════════ */
+
+    .governing-body-page { background: #f8f9fc; min-height: 100vh; }
+
+    /* ─── HERO ─── */
+    .gb-hero {
+        position: relative;
+        height: 380px;
+        background: linear-gradient(135deg, #0f1f5c 0%, #1e3a8a 45%, #0c3067 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .gb-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .gb-hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at center, rgba(212,175,55,0.08) 0%, transparent 70%);
+    }
+
+    .gb-hero-content {
+        position: relative;
+        text-align: center;
+        color: white;
+        z-index: 2;
+        padding: 0 2rem;
+    }
+
+    .gb-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(212,175,55,0.18);
+        border: 1px solid rgba(212,175,55,0.4);
+        color: #d4af37;
+        padding: 6px 20px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(4px);
+    }
+
+    .gb-hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #ffffff 0%, #d4af37 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .gb-hero-subtitle {
+        font-size: clamp(0.95rem, 2vw, 1.1rem);
+        color: rgba(255,255,255,0.75);
+        max-width: 580px;
+        margin: 0 auto 1.5rem;
+        line-height: 1.7;
+    }
+
+    .gb-hero-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .gb-hero-line {
+        width: 60px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(212,175,55,0.6));
+    }
+
+    .gb-hero-line:last-child {
+        background: linear-gradient(90deg, rgba(212,175,55,0.6), transparent);
+    }
+
+    .gb-hero-star { color: #d4af37; font-size: 0.75rem; }
+
+    /* ─── BREADCRUMB ─── */
+    .gb-breadcrumb-bar {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    /* ─── SECTION LABELS ─── */
+    .gb-section-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #d4af37;
+        font-weight: 800;
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+    }
+
+    .gb-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .gb-section-count {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 600;
+        background: #f3f4f6;
+        padding: 4px 16px;
+        border-radius: 20px;
+    }
+
+    /* ─── CHAIRMAN CARD ─── */
+    .gb-chairman-section { margin-bottom: 5rem; }
+
+    .gb-chairman-card {
+        position: relative;
+        background: linear-gradient(135deg, #0f1f5c 0%, #1e3a8a 100%);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(30,58,138,0.25), 0 0 0 1px rgba(212,175,55,0.2);
+    }
+
+    .gb-chairman-glow {
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .gb-chairman-inner {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+        padding: 3rem 3.5rem;
+        z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+        .gb-chairman-inner {
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            gap: 2rem;
+        }
+    }
+
+    .gb-chairman-photo-wrap {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .gb-chairman-ring {
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, #d4af37, #f4d03f, #d4af37, #8b6914, #d4af37);
+        animation: spin-ring 10s linear infinite;
+    }
+
+    @keyframes spin-ring {
+        to { transform: rotate(360deg); }
+    }
+
+    .gb-chairman-photo {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+        z-index: 1;
+        display: block;
+    }
+
+    .gb-photo-placeholder {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 5px solid white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .gb-chairman-badge-icon {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #d4af37, #f4d03f);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        border: 3px solid white;
+        z-index: 2;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .gb-chairman-info { flex: 1; }
+
+    .gb-chairman-role-tag {
+        display: inline-block;
+        background: rgba(212,175,55,0.2);
+        border: 1px solid rgba(212,175,55,0.5);
+        color: #d4af37;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 4px 16px;
+        border-radius: 20px;
+        margin-bottom: 1rem;
+    }
+
+    .gb-chairman-name {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 900;
+        color: white;
+        line-height: 1.1;
+        margin-bottom: 0.5rem;
+    }
+
+    .gb-chairman-designation {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.95rem;
+        margin-bottom: 1.25rem;
+        line-height: 1.5;
+        font-style: italic;
+    }
+
+    .gb-chairman-bio {
+        color: rgba(255,255,255,0.8);
+        line-height: 1.8;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        border-left: 3px solid rgba(212,175,55,0.5);
+        padding-left: 1rem;
+    }
+
+    .gb-chairman-contacts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .gb-contact-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.85);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(4px);
+    }
+
+    .gb-contact-chip:hover {
+        background: rgba(212,175,55,0.25);
+        border-color: #d4af37;
+        color: #d4af37;
+    }
+
+    /* ─── MEMBERS GRID ─── */
+    .gb-board-section { margin-top: 1rem; }
+
+    .gb-members-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.75rem;
+    }
+
+    .gb-member-card {
+        height: 360px;
+        perspective: 1000px;
+        animation: card-fade-in 0.6s ease both;
+    }
+
+    @keyframes card-fade-in {
+        from { opacity: 0; transform: translateY(24px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .gb-member-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+
+    .gb-member-card:hover .gb-member-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .gb-member-front, .gb-member-back {
+        position: absolute;
+        inset: 0;
+        border-radius: 20px;
+        backface-visibility: hidden;
+        overflow: hidden;
+    }
+
+    /* Front */
+    .gb-member-front {
+        background: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .gb-member-card:hover .gb-member-front {
+        box-shadow: 0 16px 40px rgba(30,58,138,0.15);
+    }
+
+    .gb-member-photo-wrap {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    }
+
+    .gb-member-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .gb-member-card:hover .gb-member-photo {
+        transform: scale(1.05);
+    }
+
+    .gb-photo-placeholder-sm {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gb-member-role-badge {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(30,58,138,0.85);
+        color: white;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 3px 12px;
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(212,175,55,0.4);
+    }
+
+    .gb-member-info {
+        padding: 1.25rem 1.25rem 0.5rem;
+        text-align: center;
+        flex: 1;
+    }
+
+    .gb-member-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 0.35rem;
+        line-height: 1.2;
+    }
+
+    .gb-member-designation {
+        font-size: 0.8rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    .gb-member-hover-indicator {
+        font-size: 0.72rem;
+        color: #d4af37;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 0.75rem;
+        border-top: 1px solid #f3f4f6;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Back */
+    .gb-member-back {
+        background: linear-gradient(135deg, #0f1f5c 0%, #1e3a8a 100%);
+        transform: rotateY(180deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gb-member-back-content {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        color: white;
+    }
+
+    .gb-member-back-role {
+        color: #d4af37;
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+    }
+
+    .gb-member-back-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .gb-member-back-bio {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.75);
+        line-height: 1.7;
+        margin-bottom: 1.25rem;
+    }
+
+    .gb-member-back-contacts {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .gb-contact-chip-sm {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(212,175,55,0.2);
+        border: 1px solid rgba(212,175,55,0.4);
+        color: #d4af37;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .gb-contact-chip-sm:hover {
+        background: #d4af37;
+        color: white;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .gb-empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: #9ca3af;
+    }
+
+    .gb-empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        color: #d1d5db;
+        display: block;
+    }
+
+    .gb-empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}

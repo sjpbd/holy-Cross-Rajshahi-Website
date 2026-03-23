@@ -1,22 +1,19 @@
 from django.contrib import admin
-from .models import Teacher, Administration, Staff
-from django_summernote.admin import SummernoteModelAdmin
+from django.db import models
+from .models import Teacher, Administration, Staff, GoverningBodyMember
+from django_summernote.widgets import SummernoteWidget
 
 
 @admin.register(Teacher)
-class TeacherAdmin(SummernoteModelAdmin):
+class TeacherAdmin(admin.ModelAdmin):
     list_display = ['name', 'designation', 'section', 'department', 'order', 'is_active']
     list_filter = ['section', 'department', 'is_active', 'joined_date']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'designation', 'department']
     date_hierarchy = 'created_at'
-    summernote_fields = ('bio',)
-    
-    class Media:
-        css = {
-            'all': ('css/admin_custom.css',)
-        }
-        js = ('js/admin_fix.js',)
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
 
     prepopulated_fields = {'slug': ('name',)}
     
@@ -34,18 +31,14 @@ class TeacherAdmin(SummernoteModelAdmin):
 
 
 @admin.register(Administration)
-class AdministrationAdmin(SummernoteModelAdmin):
+class AdministrationAdmin(admin.ModelAdmin):
     list_display = ['name', 'role', 'designation', 'order', 'is_active']
     list_filter = ['role', 'is_active']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'designation']
-    summernote_fields = ('bio', 'message')
-    
-    class Media:
-        css = {
-            'all': ('css/admin_custom.css',)
-        }
-        js = ('js/admin_fix.js',)
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
 
     
     fieldsets = (
@@ -74,6 +67,32 @@ class StaffAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'category', 'designation', 'photo')
+        }),
+        ('Contact', {
+            'fields': ('email', 'phone')
+        }),
+        ('Display Settings', {
+            'fields': ('order', 'is_active')
+        }),
+    )
+
+
+@admin.register(GoverningBodyMember)
+class GoverningBodyMemberAdmin(admin.ModelAdmin):
+    list_display = ['name', 'role', 'designation', 'order', 'is_active']
+    list_filter = ['role', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['name', 'designation']
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'role', 'designation', 'photo')
+        }),
+        ('Biography', {
+            'fields': ('bio',)
         }),
         ('Contact', {
             'fields': ('email', 'phone')

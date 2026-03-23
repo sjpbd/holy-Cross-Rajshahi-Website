@@ -684,6 +684,28 @@
         </div>
 
         {% endif %}
+
+        {% if static_page %}
+        <!-- Dynamic Static Page Content (e.g., Holy Cross Brothers) -->
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100" data-aos="fade-up">
+                {% if static_page.banner_image %}
+                <div class="h-64 overflow-hidden">
+                    <img src="{{ static_page.banner_image.url }}" alt="{{ static_page.title }}" class="w-full h-full object-cover">
+                </div>
+                {% endif %}
+                <div class="p-8 md:p-16">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-1 bg-accent rounded-full"></div>
+                        <span class="text-accent font-bold uppercase tracking-widest text-sm">{{ static_page.title }}</span>
+                    </div>
+                    <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed static-page-content">
+                        {{ static_page.content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 

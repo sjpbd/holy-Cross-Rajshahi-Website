@@ -1,0 +1,149 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
+<style>
+    .dropzone {
+        border: 2px dashed #1e3a8a;
+        background-color: #f1f5f9;
+        border-radius: 1rem;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 400px;
+        transition: all 0.3s ease;
+    }
+    .dropzone:hover {
+        background-color: #e2e8f0;
+        border-color: #d4af37;
+    }
+    .dropzone .dz-message {
+        color: #1e3a8a;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+    .dropzone .dz-message i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+        color: #d4af37;
+    }
+    .dz-preview {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    .action-bar {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #fff;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .btn-submit {
+        background: #1e3a8a !important;
+        color: #fff !important;
+        padding: 0.75rem 2rem !important;
+        border-radius: 0.5rem !important;
+        font-weight: 600 !important;
+        cursor: pointer;
+        transition: transform 0.2s;
+        border: none;
+    }
+    .btn-submit:hover {
+        background: #172554 !important;
+        transform: translateY(-2px);
+    }
+    .album-header {
+        background: #1e3a8a;
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem 1rem 0 0;
+        margin-bottom: 0;
+    }
+    .album-info {
+        background: white;
+        padding: 1rem 2rem;
+        border: 1px solid #e2e8f0;
+        border-top: none;
+        border-radius: 0 0 1rem 1rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .info-tag {
+        background: #f1f5f9;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="album-header">
+    <h1 style="color: white; margin: 0; font-size: 1.5rem;">
+        <i class="fas fa-images"></i> Bulk Photo Upload 
+    </h1>
+</div>
+<div class="album-info">
+    <span class="info-tag">Target Album: <strong>{{ album.title }}</strong></span>
+    {% if album.parent %}
+    <span class="info-tag">Parent: {{ album.parent.title }}</span>
+    {% endif %}
+</div>
+
+<form id="myDropzone" action="." method="post" enctype="multipart/form-data" class="dropzone">
+    {% csrf_token %}
+    <div class="dz-message" data-dz-message>
+        <i class="fas fa-cloud-upload-alt"></i>
+        <span>Drag and drop multiple photos here or click to browse</span>
+        <p style="font-size: 0.8rem; font-weight: 400; color: #64748b; margin-top: 1rem;">
+            Images will be automatically added to the <strong>{{ album.title }}</strong> album.
+        </p>
+    </div>
+    <div class="fallback">
+        <input name="photos" type="file" multiple />
+    </div>
+</form>
+
+<div class="action-bar">
+    <p style="margin:0; font-weight: 500; color: #64748b;">
+        <i class="fas fa-info-circle"></i> Once the icons turn green, click the finish button below.
+    </p>
+    <a href="{% url 'admin:gallery_album_changelist' %}" class="btn-submit" style="text-decoration: none;">
+        <i class="fas fa-check-circle mr-2"></i> Finished Uploads
+    </a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+<script>
+    Dropzone.options.myDropzone = {
+        paramName: "photos", // The name that will be used to transfer the file
+        maxFilesize: 10, // MB
+        acceptedFiles: 'image/*',
+        parallelUploads: 5,
+        addRemoveLinks: true,
+        dictDefaultMessage: "Drop files here to upload",
+        init: function() {
+            this.on("complete", function(file) {
+                if (this.getUploadingFiles().length === 0 && this.getQueuedFiles().length === 0) {
+                    // All files have been uploaded
+                    console.log("All uploads complete");
+                }
+            });
+        }
+    };
+</script>
+{% endblock %}

@@ -1,23 +1,20 @@
 from django.contrib import admin
+from django.db import models
 from .models import NewsItem
-from django_summernote.admin import SummernoteModelAdmin
+from django_summernote.widgets import SummernoteWidget
 
 
 @admin.register(NewsItem)
-class NewsItemAdmin(SummernoteModelAdmin):
+class NewsItemAdmin(admin.ModelAdmin):
     list_display = ['title', 'is_featured', 'is_published', 'published_date']
     list_filter = ['is_published', 'is_featured', 'published_date']
     list_editable = ['is_featured', 'is_published']
     search_fields = ['title', 'content', 'excerpt']
     date_hierarchy = 'published_date'
     readonly_fields = ['slug', 'published_date', 'updated_at']
-    summernote_fields = ('content',)
-    
-    class Media:
-        css = {
-            'all': ('css/admin_modern.css',)
-        }
-        js = ('js/admin_fix.js',)
+    formfield_overrides = {
+        models.TextField: {'widget': SummernoteWidget}
+    }
 
 
     prepopulated_fields = {}

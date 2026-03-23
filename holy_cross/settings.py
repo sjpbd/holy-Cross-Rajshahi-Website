@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'clubs',
     'contact',
     'seo',
+    'gallery',
 ]
 
 # Required by django.contrib.sites
@@ -196,7 +197,7 @@ SUMMERNOTE_CONFIG = {
             ['view', ['fullscreen', 'codeview', 'help']],
         ],
     },
-    'css': [
+    'css': (
         '/static/css/admin_modern.css',
-    ],
+    ),
 }
