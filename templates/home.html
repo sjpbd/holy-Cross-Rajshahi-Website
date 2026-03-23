@@ -53,7 +53,7 @@
 
 <!-- Hero Slider Section with Enhanced Swiper.js - Full Screen -->
 <section class="relative">
-    <div class="swiper heroSwiper h-screen">
+    <div class="swiper heroSwiper h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-screen">
         <div class="swiper-wrapper">
             {% for slider in sliders %}
             <div class="swiper-slide relative overflow-hidden">
@@ -72,19 +72,19 @@
                 <!-- Content -->
                 <div class="relative container mx-auto px-4 h-full flex items-center z-10">
                     <div class="text-white slide-content">
-                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
+                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight"
                             style="text-shadow: 2px 4px 12px rgba(0,0,0,0.7);">
                             {{ slider.title }}
                         </h1>
                         {% if slider.subtitle %}
-                        <p class="text-base md:text-lg lg:text-xl mb-10 text-gray-100 font-light"
+                        <p class="text-base md:text-lg lg:text-xl mb-6 md:mb-10 text-gray-100 font-light"
                             style="text-shadow: 1px 2px 6px rgba(0,0,0,0.6);">
                             {{ slider.subtitle }}
                         </p>
                         {% endif %}
                         {% if slider.link %}
                         <a href="{{ slider.link }}"
-                            class="inline-flex items-center bg-accent hover:bg-accent-dark text-white font-bold px-10 py-5 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-accent/50 text-lg">
+                            class="inline-flex items-center bg-accent hover:bg-accent-dark text-white font-bold px-6 py-3 md:px-10 md:py-5 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-accent/50 text-base md:text-lg">
                             Learn More <i class="fas fa-arrow-right ml-3"></i>
                         </a>
                         {% endif %}
@@ -97,11 +97,11 @@
                 <div class="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark"></div>
                 <div class="relative container mx-auto px-4 h-full flex items-center z-10">
                     <div class="text-white max-w-4xl">
-                        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+                        <h1 class="text-4xl md:text-7xl lg:text-8xl font-bold mb-4 md:mb-6 leading-tight"
                             style="text-shadow: 2px 4px 12px rgba(0,0,0,0.7);">
                             Welcome to Holy Cross School & College
                         </h1>
-                        <p class="text-xl md:text-3xl lg:text-4xl mb-10 text-gray-100 font-light"
+                        <p class="text-lg md:text-3xl lg:text-4xl mb-6 md:mb-10 text-gray-100 font-light"
                             style="text-shadow: 1px 2px 6px rgba(0,0,0,0.6);">
                             Excellence in Education Since Establishment
                         </p>
