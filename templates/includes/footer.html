@@ -22,18 +22,18 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             <!-- About Section -->
             <div class="footer-section" data-aos="fade-up">
-                <div class="flex items-center mb-4">
+                <div class="footer-brand-lockup mb-8">
                     {% if school_info.logo %}
-                    <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="h-12 w-auto mr-3">
+                    <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="footer-logo">
                     {% else %}
-                    <div
-                        class="w-12 h-12 bg-gradient-to-br from-accent to-accent-light rounded-full flex items-center justify-center mr-3">
-                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    <div class="footer-logo-placeholder">
+                        <i class="fas fa-graduation-cap text-white text-3xl"></i>
                     </div>
                     {% endif %}
-                    <div>
-                        <h3 class="footer-heading">Holy Cross</h3>
-                        <p class="text-accent text-xs font-semibold">School & College</p>
+                    <div class="brand-text">
+                        <h3 class="footer-brand-title">Holy Cross</h3>
+                        <div class="brand-divider"></div>
+                        <p class="footer-brand-subtitle">School & College</p>
                     </div>
                 </div>
                 <p class="footer-text mb-6">
@@ -214,6 +214,69 @@
         height: 3px;
         background: linear-gradient(90deg, #d4af37, #f4d03f);
         border-radius: 2px;
+    }
+
+    /* Brand Lockup Styles */
+    .footer-brand-lockup {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .footer-logo {
+        height: 70px; /* Increased from 48px */
+        width: auto;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+        transition: transform 0.3s ease;
+    }
+
+    .footer-logo:hover {
+        transform: scale(1.05);
+    }
+
+    .footer-logo-placeholder {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        border-radius: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .footer-brand-title {
+        font-family: 'Outfit', 'Inter', sans-serif;
+        color: white;
+        font-size: 2rem; /* Modern, larger size */
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand-divider {
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #d4af37 0%, transparent 100%);
+        border-radius: 2px;
+        margin-bottom: 0.5rem;
+    }
+
+    .footer-brand-subtitle {
+        font-family: 'Outfit', sans-serif;
+        color: #f4d03f;
+        font-size: 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin: 0;
     }
 
     .footer-text {

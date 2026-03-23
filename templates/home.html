@@ -1,6 +1,6 @@
 <!-- templates/home.html -->
 {% extends 'base.html' %}
-{% load static %}
+{% load static thumbnail %}
 
 {% block content %}
 
@@ -60,7 +60,14 @@
                 <!-- Background Image with Zoom Effect -->
                 {% if slider.image %}
                 <div class="slide-image-wrapper">
-                    <img src="{{ slider.image.url }}" alt="{{ slider.title }}" class="slide-image">
+                    {% thumbnail slider.image "slider" as thumb %}
+                    <img src="{{ thumb.url }}" 
+                         alt="{{ slider.title }}" 
+                         class="slide-image"
+                         width="{{ thumb.width }}"
+                         height="{{ thumb.height }}"
+                         {% if forloop.first %}fetchpriority="high" loading="eager"{% else %}loading="lazy"{% endif %}
+                         decoding="async">
                 </div>
                 {% else %}
                 <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-900 to-black"></div>
@@ -170,8 +177,15 @@
                             <div class="flex-shrink-0 relative">
                                 <div class="image-frame">
                                     {% if school_info.principal_photo %}
-                                    <img src="{{ school_info.principal_photo.url }}"
-                                        alt="{{ school_info.principal_name }}" class="portrait">
+                                    {% thumbnail school_info.principal_photo "medium" as thumb %}
+                                    <img src="{{ thumb.url }}"
+                                         alt="{{ school_info.principal_name }}" 
+                                         width="{{ thumb.width }}"
+                                         height="{{ thumb.height }}"
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="portrait">
+
                                     {% else %}
                                     <div class="portrait flex items-center justify-center bg-gray-100">
                                         <i class="fas fa-user text-4xl text-gray-400"></i>
@@ -213,8 +227,15 @@
                             <div class="flex-shrink-0 relative">
                                 <div class="image-frame silver">
                                     {% if school_info.vice_principal_photo %}
-                                    <img src="{{ school_info.vice_principal_photo.url }}"
-                                        alt="{{ school_info.vice_principal_name }}" class="portrait">
+                                    {% thumbnail school_info.vice_principal_photo "medium" as thumb %}
+                                    <img src="{{ thumb.url }}"
+                                         alt="{{ school_info.vice_principal_name }}" 
+                                         width="{{ thumb.width }}"
+                                         height="{{ thumb.height }}"
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="portrait">
+
                                     {% else %}
                                     <div class="portrait flex items-center justify-center bg-gray-100">
                                         <i class="fas fa-user text-4xl text-gray-400"></i>
@@ -349,8 +370,14 @@
             <div class="card card-hover-lift image-zoom-container relative" data-aos="fade-up"
                 data-aos-delay="{{ forloop.counter0|add:'00' }}">
                 {% if news.featured_image %}
-                <img src="{{ news.featured_image.url }}" alt="{{ news.title }}"
-                    class="w-full h-56 object-cover image-zoom">
+                {% thumbnail news.featured_image "news_thumb" as thumb %}
+                <img src="{{ thumb.url }}" 
+                     alt="{{ news.title }}"
+                     width="{{ thumb.width }}"
+                     height="{{ thumb.height }}"
+                     loading="lazy"
+                     decoding="async"
+                     class="w-full h-56 object-cover image-zoom">
                 <div class="image-overlay"></div>
                 {% else %}
                 <div class="w-full h-56 bg-gradient-to-br from-primary via-primary-light to-accent"></div>

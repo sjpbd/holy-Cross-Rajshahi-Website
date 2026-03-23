@@ -1,5 +1,7 @@
 <!-- templates/people/administration.html -->
 {% extends 'base.html' %}
+{% load thumbnail %}
+
 
 {% block title %}Administration - Holy Cross School and College{% endblock %}
 
@@ -35,8 +37,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
                     <div class="bg-gradient-to-br from-primary to-primary-dark p-8 flex items-center justify-center">
                         {% if school_info.principal_photo %}
-                        <img src="{{ school_info.principal_photo.url }}" alt="{{ school_info.principal_name }}"
-                            class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-xl">
+                        {% thumbnail school_info.principal_photo "medium" as thumb %}
+                        <img src="{{ thumb.url }}" 
+                             alt="{{ school_info.principal_name }}"
+                             width="{{ thumb.width }}"
+                             height="{{ thumb.height }}"
+                             loading="lazy"
+                             decoding="async"
+                             class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-xl">
+
                         {% else %}
                         <div
                             class="w-48 h-48 rounded-full bg-accent flex items-center justify-center text-white text-6xl font-bold">
@@ -67,9 +76,15 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
                     <div class="bg-gradient-to-br from-primary-dark to-primary p-8 flex items-center justify-center">
                         {% if school_info.vice_principal_photo %}
-                        <img src="{{ school_info.vice_principal_photo.url }}"
-                            alt="{{ school_info.vice_principal_name }}"
-                            class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-xl">
+                        {% thumbnail school_info.vice_principal_photo "medium" as thumb %}
+                        <img src="{{ thumb.url }}"
+                             alt="{{ school_info.vice_principal_name }}"
+                             width="{{ thumb.width }}"
+                             height="{{ thumb.height }}"
+                             loading="lazy"
+                             decoding="async"
+                             class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-xl">
+
                         {% else %}
                         <div
                             class="w-48 h-48 rounded-full bg-accent flex items-center justify-center text-white text-6xl font-bold">
@@ -105,8 +120,14 @@
                     data-aos-delay="{{ forloop.counter0|add:'00' }}">
                     <div class="pt-8 px-8">
                         {% if staff.photo %}
-                        <img src="{{ staff.photo.url }}" alt="{{ staff.name }}"
-                            class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-accent shadow-lg">
+                        {% thumbnail staff.photo "admin_profile" as thumb %}
+                        <img src="{{ thumb.url }}" 
+                             alt="{{ staff.name }}"
+                             width="{{ thumb.width }}"
+                             height="{{ thumb.height }}"
+                             loading="lazy"
+                             decoding="async"
+                             class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-accent shadow-lg">
                         {% else %}
                         <div
                             class="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-accent mx-auto flex items-center justify-center text-white text-4xl font-bold shadow-lg">

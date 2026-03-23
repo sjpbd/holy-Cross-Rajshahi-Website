@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
+
 
 {% block title %}Our Teachers - Holy Cross School and College{% endblock %}
 
@@ -54,11 +56,17 @@
                 </div>
 
                 <!-- Teacher Photo -->
-                <div class="relative aspect-[4/5] overflow-hidden bg-gray-50 m-2 rounded-[1.5rem] z-10">
+                <div class="relative aspect-[4/5] overflow-hidden bg-gray-100 m-2 rounded-[1.5rem] z-10 shadow-inner">
                     {% if teacher.photo %}
-                    <img src="{{ teacher.photo.url }}" alt="{{ teacher.name }}"
-                        class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700">
-                    {% else %}
+                    {% thumbnail teacher.photo "teacher_grid" as thumb %}
+                    <img src="{{ thumb.url }}" 
+                         alt="{{ teacher.name }}"
+                         width="{{ thumb.width }}"
+                         height="{{ thumb.height }}"
+                         loading="lazy"
+                         decoding="async"
+                         class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700">
+{% else %}
                     <div
                         class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
                         <span class="text-7xl font-bold text-primary/10">{{ teacher.name|first }}</span>

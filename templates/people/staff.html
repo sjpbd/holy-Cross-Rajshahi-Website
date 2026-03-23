@@ -1,5 +1,7 @@
 <!-- templates/people/staff.html -->
 {% extends 'base.html' %}
+{% load thumbnail %}
+
 
 {% block title %}Our Staff - Holy Cross School and College{% endblock %}
 
@@ -41,11 +43,17 @@
                     data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:'00' }}">
 
                     <!-- Staff Photo -->
-                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-100 shadow-inner">
                         {% if staff.photo %}
-                        <img src="{{ staff.photo.url }}" alt="{{ staff.name }}"
-                            class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
-                        {% else %}
+                        {% thumbnail staff.photo "staff_grid" as thumb %}
+                        <img src="{{ thumb.url }}" 
+                             alt="{{ staff.name }}"
+                             width="{{ thumb.width }}"
+                             height="{{ thumb.height }}"
+                             loading="lazy"
+                             decoding="async"
+                             class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
+{% else %}
                         <div
                             class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
                             <span class="text-6xl font-bold text-primary/20">{{ staff.name|first }}</span>

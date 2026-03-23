@@ -1,5 +1,6 @@
-<!-- gallery/gallery_list.html -->
 {% extends 'base.html' %}
+{% load thumbnail %}
+
 
 {% block extra_head %}
 <style>
@@ -55,10 +56,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {% for album in albums %}
             <a href="{% url 'album_detail' album.slug %}" class="album-card group relative block h-80 rounded-3xl overflow-hidden shadow-lg bg-white" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
-                <!-- Album Cover -->
                 {% if album.cover_image %}
-                <img src="{{ album.cover_image.url }}" alt="{{ album.title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                {% else %}
+                {% thumbnail album.cover_image "gallery_thumb" as thumb %}
+                <img src="{{ thumb.url }}" 
+                     alt="{{ album.title }}" 
+                     width="{{ thumb.width }}"
+                     height="{{ thumb.height }}"
+                     loading="lazy"
+                     decoding="async"
+                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+{% else %}
                 <div class="w-full h-full bg-primary-light flex items-center justify-center">
                     <i class="fas fa-images text-6xl text-white/30"></i>
                 </div>
