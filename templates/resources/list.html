@@ -6,10 +6,10 @@
 <!-- jQuery (required by dflip) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <!-- DearFlip CSS -->
-<link href="https://cdn.jsdelivr.net/npm/dflip@2.2.222/css/dflip.min.css" rel="stylesheet" type="text/css">
-<link href="https://cdn.jsdelivr.net/npm/dflip@2.2.222/css/themify-icons.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@latest/dflip/css/dflip.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@latest/dflip/css/themify-icons.min.css" rel="stylesheet" type="text/css">
 <!-- DearFlip JS -->
-<script src="https://cdn.jsdelivr.net/npm/dflip@2.2.222/js/dflip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@dearhive/dearflip-jquery-flipbook@latest/dflip/js/dflip.min.js"></script>
 {% endblock %}
 {% block content %}
 <!-- Hero Section -->
@@ -141,7 +141,7 @@
                         {% if resource.file %}
                             {% if 'diary' in resource.title|lower or 'magazine' in resource.title|lower %}
                             <div source="{{ resource.file.url }}"
-                                class="_df_custom cursor-pointer flex items-center justify-center gap-3 w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-primary hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 transform active:scale-95 group/btn">
+                                class="_df_button cursor-pointer flex items-center justify-center gap-3 w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-primary hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 transform active:scale-95 group/btn">
                                 <span class="group-hover/btn:-translate-y-0.5 transition-transform duration-300">Open Flipbook</span>
                                 <i class="fas fa-book-open group-hover/btn:translate-y-0.5 transition-transform duration-300"></i>
                             </div>
@@ -158,7 +158,7 @@
                         {% else %}
                             {% if 'diary' in resource.title|lower or 'magazine' in resource.title|lower %}
                             <div source="{{ resource.external_link }}"
-                                class="_df_custom cursor-pointer flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
+                                class="_df_button cursor-pointer flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
                                 <span>Open Flipbook</span>
                                 <i class="fas fa-book-open transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
                             </div>
