@@ -2,6 +2,15 @@
 
 {% block title %}Resources & Downloads - Holy Cross School and College{% endblock %}
 
+{% block extra_head %}
+<!-- jQuery (required by dflip) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- DearFlip CSS -->
+<link href="https://cdn.jsdelivr.net/npm/dflip@2.2.222/css/dflip.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.jsdelivr.net/npm/dflip@2.2.222/css/themify-icons.min.css" rel="stylesheet" type="text/css">
+<!-- DearFlip JS -->
+<script src="https://cdn.jsdelivr.net/npm/dflip@2.2.222/js/dflip.min.js"></script>
+{% endblock %}
 {% block content %}
 <!-- Hero Section -->
 <section
@@ -130,21 +139,37 @@
                         </div>
 
                         {% if resource.file %}
-                        <a href="{{ resource.file.url }}" hx-post="{% url 'track_download' resource.pk %}"
-                            hx-trigger="click" hx-swap="none" download
-                            class="flex items-center justify-center gap-3 w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-primary hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 transform active:scale-95 group/btn">
-                            <span class="group-hover/btn:-translate-y-0.5 transition-transform duration-300">Download
-                                Report</span>
-                            <i
-                                class="fas fa-arrow-down-long group-hover/btn:translate-y-0.5 transition-transform duration-300"></i>
-                        </a>
+                            {% if 'diary' in resource.title|lower or 'magazine' in resource.title|lower %}
+                            <a href="javascript:void(0);" source="{{ resource.file.url }}"
+                                class="_df_button flex items-center justify-center gap-3 w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-primary hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 transform active:scale-95 group/btn">
+                                <span class="group-hover/btn:-translate-y-0.5 transition-transform duration-300">Open Flipbook</span>
+                                <i class="fas fa-book-open group-hover/btn:translate-y-0.5 transition-transform duration-300"></i>
+                            </a>
+                            {% else %}
+                            <a href="{{ resource.file.url }}" hx-post="{% url 'track_download' resource.pk %}"
+                                hx-trigger="click" hx-swap="none" download
+                                class="flex items-center justify-center gap-3 w-full py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-primary hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 transform active:scale-95 group/btn">
+                                <span class="group-hover/btn:-translate-y-0.5 transition-transform duration-300">Download
+                                    Report</span>
+                                <i
+                                    class="fas fa-arrow-down-long group-hover/btn:translate-y-0.5 transition-transform duration-300"></i>
+                            </a>
+                            {% endif %}
                         {% else %}
-                        <a href="{{ resource.external_link }}" target="_blank"
-                            class="flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
-                            <span>Open Resource</span>
-                            <i
-                                class="fas fa-arrow-up-right-from-square transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
-                        </a>
+                            {% if 'diary' in resource.title|lower or 'magazine' in resource.title|lower %}
+                            <a href="javascript:void(0);" source="{{ resource.external_link }}"
+                                class="_df_button flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
+                                <span>Open Flipbook</span>
+                                <i class="fas fa-book-open transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
+                            </a>
+                            {% else %}
+                            <a href="{{ resource.external_link }}" target="_blank"
+                                class="flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
+                                <span>Open Resource</span>
+                                <i
+                                    class="fas fa-arrow-up-right-from-square transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
+                            </a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
