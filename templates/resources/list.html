@@ -156,20 +156,11 @@
                             </a>
                             {% endif %}
                         {% else %}
-                            {% if 'diary' in resource.title|lower or 'magazine' in resource.title|lower %}
-                            <div source="{% url 'proxy_external_resource' resource.pk %}"
-                                class="_df_button cursor-pointer flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
-                                <span>Open Flipbook</span>
-                                <i class="fas fa-book-open transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
-                            </div>
-                            {% else %}
                             <a href="{{ resource.external_link }}" target="_blank"
                                 class="flex items-center justify-center gap-3 w-full py-4 bg-gray-100 text-primary rounded-2xl font-bold hover:bg-primary/10 transition-all duration-300 group/btn">
                                 <span>Open Resource</span>
-                                <i
-                                    class="fas fa-arrow-up-right-from-square transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
+                                <i class="fas fa-arrow-up-right-from-square transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"></i>
                             </a>
-                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
