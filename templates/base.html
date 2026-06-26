@@ -12,11 +12,8 @@
     {% endif %}
 
     <!-- Dynamic SEO Meta Tags -->
-    <title>{% block title %}{% firstof seo.title page_title "Holy Cross School and College, Rajshahi" %}{% endblock %}
-    </title>
-    <meta name="description" content="{% block description %}{% firstof seo.description page_description " Holy Cross
-        School and College, Rajshahi - A premier educational institution dedicated to excellence in education, character
-        development, and holistic growth since its establishment." %}{% endblock %}">
+    <title>{% block title %}{% firstof seo.title page_title "Holy Cross School and College, Rajshahi" %}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{% firstof seo.description page_description "Holy Cross School and College, Rajshahi - A premier educational institution dedicated to excellence in education, character development, and holistic growth since its establishment." %}{% endblock %}">
     <meta name="keywords"
         content="{{ seo.keywords|default:'Holy Cross School, Holy Cross College, Rajshahi, Best School in Rajshahi, Top College in Rajshahi, Education, Bangladesh' }}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
@@ -24,17 +21,17 @@
     <meta name="author" content="Holy Cross School and College, Rajshahi">
 
     <!-- Open Graph Meta Tags (Social Media) -->
-    <meta property="og:title" content="{% block og_title %}{% firstof seo.get_og_title page_title " Holy Cross School
-        and College, Rajshahi" %}{% endblock %}">
-    <meta property="og:description"
-        content="{% block og_description %}{% firstof seo.get_og_description page_description " Premier educational
-        institution in Rajshahi dedicated to excellence and holistic development." %}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{% firstof seo.get_og_title page_title "Holy Cross School and College, Rajshahi" %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% firstof seo.get_og_description page_description "Premier educational institution in Rajshahi dedicated to excellence and holistic development." %}{% endblock %}">
     <meta property="og:type" content="{{ seo.og_type|default:'website' }}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     {% if seo.og_image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ seo.og_image.url }}">
-    {% elif school_info.logo %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ school_info.logo.url }}">
+    {% else %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-logo.png' %}">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <meta property="og:image:alt" content="Holy Cross School and College, Rajshahi Logo">
     {% endif %}
 
     <!-- JSON-LD Structured Data (Schema.org) for Search Engines -->
@@ -44,7 +41,7 @@
       "@type": "EducationalOrganization",
       "name": "Holy Cross School and College, Rajshahi",
       "url": "{{ request.scheme }}://{{ request.get_host }}",
-      "logo": "{{ request.scheme }}://{{ request.get_host }}{{ school_info.logo.url }}",
+      "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-logo.png' %}",
       "description": "{{ school_info.mission|striptags|truncatewords:30 }}",
       "address": {
         "@type": "PostalAddress",

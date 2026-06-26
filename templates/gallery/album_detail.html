@@ -360,7 +360,7 @@
             header.innerHTML = `
                 <a href="/" class="viewer-logo-box">
                     {% if school_info.logo %}
-                    <img src="{{ school_info.logo.url }}" alt="Logo">
+                    <img src="{% static 'images/og-logo.png' %}" alt="Logo">
                     {% endif %}
                     <span>Holy Cross School & College</span>
                 </a>

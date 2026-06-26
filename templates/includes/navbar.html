@@ -7,7 +7,7 @@
                 <a href="{% url 'home' %}" class="flex items-center space-x-4 group">
                     {% if school_info.logo %}
                     <div class="logo-container w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-white rounded-full p-1 shadow-lg transition-all duration-500">
-                        <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="h-full w-auto object-contain logo-img">
+                        <img src="{% static 'images/og-logo.png' %}" alt="Holy Cross Logo" class="h-full w-auto object-contain logo-img">
                     </div>
                     {% else %}
                     <div class="logo-container w-14 h-14 md:w-16 md:h-16 bg-accent rounded-full flex items-center justify-center shadow-lg transition-all duration-500">

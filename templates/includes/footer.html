@@ -24,7 +24,7 @@
             <div class="footer-section" data-aos="fade-up">
                 <div class="footer-brand-lockup mb-8">
                     {% if school_info.logo %}
-                    <img src="{{ school_info.logo.url }}" alt="Holy Cross Logo" class="footer-logo">
+                    <img src="{% static 'images/og-logo.png' %}" alt="Holy Cross Logo" class="footer-logo">
                     {% else %}
                     <div class="footer-logo-placeholder">
                         <i class="fas fa-graduation-cap text-white text-3xl"></i>
