@@ -33,10 +33,12 @@ def track_download(request, pk):
     return HttpResponse(status=200)
 
 def proxy_external_resource(request, pk):
-    """Proxy external resources (like Google Drive PDFs) to avoid CORS issues with Flipbook"""
+    """Proxy external resources (like large Google Drive PDFs) avoiding CORS and Virus Scan walls"""
     import urllib.request
+    import urllib.parse
+    import http.cookiejar
     import re
-    from django.http import Http404, StreamingHttpResponse
+    from django.http import Http404, StreamingHttpResponse, HttpResponse
     
     resource = get_object_or_404(Resource, pk=pk, is_active=True)
     if not resource.external_link:
@@ -51,11 +53,27 @@ def proxy_external_resource(request, pk):
             url = f"https://drive.google.com/uc?export=download&id={file_id}"
             
     try:
+        cj = http.cookiejar.CookieJar()
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        response = urllib.request.urlopen(req)
-        content_type = response.headers.get('Content-Type', 'application/pdf')
+        response = opener.open(req)
         
-        # Stream the response chunk by chunk to avoid loading large PDFs into memory
+        content_type = response.headers.get('Content-Type', '')
+        
+        # If Google Drive intercepts large files with a virus scan warning (HTML page)
+        if 'text/html' in content_type.lower():
+            html_content = response.read().decode('utf-8', errors='ignore')
+            confirm_match = re.search(r'confirm=([0-9A-Za-z_-]+)', html_content)
+            if confirm_match:
+                confirm_token = confirm_match.group(1)
+                bypass_url = url + f"&confirm={confirm_token}"
+                req_bypass = urllib.request.Request(bypass_url, headers={'User-Agent': 'Mozilla/5.0'})
+                response = opener.open(req_bypass)
+                content_type = response.headers.get('Content-Type', 'application/pdf')
+            else:
+                return HttpResponse("Failed to bypass Google Drive virus scan. Please upload file directly.", status=500)
+        
+        # Stream the response chunk by chunk
         def file_iterator(resp, chunk_size=8192):
             while True:
                 chunk = resp.read(chunk_size)
