@@ -58,11 +58,11 @@
             <a href="{% url 'album_detail' album.slug %}" class="album-card group relative block h-80 rounded-3xl overflow-hidden shadow-lg bg-white" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1 }}00">
                 {% if album.cover_image %}
                 {% thumbnail album.cover_image "gallery_thumb" as thumb %}
-                <img src="{{ thumb.url }}" 
+                <img loading="lazy" src="{{ thumb.url }}" 
                      alt="{{ album.title }}" 
                      width="{{ thumb.width }}"
                      height="{{ thumb.height }}"
-                     loading="lazy"
+                     
                      decoding="async"
                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
 {% else %}

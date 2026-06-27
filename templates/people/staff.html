@@ -46,11 +46,11 @@
                     <div class="relative aspect-[3/4] overflow-hidden bg-gray-100 shadow-inner">
                         {% if staff.photo %}
                         {% thumbnail staff.photo "staff_grid" as thumb %}
-                        <img src="{{ thumb.url }}" 
+                        <img loading="lazy" src="{{ thumb.url }}" 
                              alt="{{ staff.name }}"
                              width="{{ thumb.width }}"
                              height="{{ thumb.height }}"
-                             loading="lazy"
+                             
                              decoding="async"
                              class="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-500">
 {% else %}

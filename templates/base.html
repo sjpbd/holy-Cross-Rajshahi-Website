@@ -73,25 +73,8 @@
     }
     </script>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#1e3a8a',      // Navy Blue
-                        'primary-dark': '#1c2a4e',
-                        'primary-light': '#3b82f6',
-                        'accent': '#d4af37',       // Metallic Gold
-                        'accent-dark': '#b8941e',
-                        'accent-light': '#f4d03f',
-                        'footer-text': '#E5E7EB', // Light Gray
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS (Compiled) -->
+    <link rel="stylesheet" href="{% static 'css/tailwind-compiled.css' %}">
 
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>

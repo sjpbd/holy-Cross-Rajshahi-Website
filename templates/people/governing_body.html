@@ -52,7 +52,7 @@
                     <div class="gb-chairman-photo-wrap">
                         <div class="gb-chairman-ring"></div>
                         {% if chairman.photo %}
-                        <img src="{{ chairman.photo.url }}" alt="{{ chairman.name }}" class="gb-chairman-photo">
+                        <img loading="lazy" src="{{ chairman.photo.url }}" alt="{{ chairman.name }}" class="gb-chairman-photo">
                         {% else %}
                         <div class="gb-chairman-photo gb-photo-placeholder">
                             <i class="fas fa-user-tie text-5xl text-white opacity-60"></i>
@@ -102,7 +102,7 @@
                         <div class="gb-member-front">
                             <div class="gb-member-photo-wrap">
                                 {% if member.photo %}
-                                <img src="{{ member.photo.url }}" alt="{{ member.name }}" class="gb-member-photo">
+                                <img loading="lazy" src="{{ member.photo.url }}" alt="{{ member.name }}" class="gb-member-photo">
                                 {% else %}
                                 <div class="gb-member-photo gb-photo-placeholder-sm">
                                     <i class="fas fa-user-tie text-3xl text-white opacity-50"></i>

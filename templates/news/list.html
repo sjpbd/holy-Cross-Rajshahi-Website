@@ -37,7 +37,7 @@
             <div class="card card-hover-lift image-zoom-container relative" data-aos="fade-up"
                 data-aos-delay="{{ forloop.counter0|add:'00' }}">
                 {% if news.featured_image %}
-                <img src="{{ news.featured_image.url }}" alt="{{ news.title }}"
+                <img loading="lazy" src="{{ news.featured_image.url }}" alt="{{ news.title }}"
                     class="w-full h-80 object-cover image-zoom">
                 <div class="image-overlay"></div>
                 {% else %}
@@ -83,7 +83,7 @@
             <div class="card card-hover-lift image-zoom-container relative" data-aos="fade-up"
                 data-aos-delay="{{ forloop.counter0|add:'00' }}">
                 {% if news.featured_image %}
-                <img src="{{ news.featured_image.url }}" alt="{{ news.title }}"
+                <img loading="lazy" src="{{ news.featured_image.url }}" alt="{{ news.title }}"
                     class="w-full h-56 object-cover image-zoom">
                 <div class="image-overlay"></div>
                 {% else %}

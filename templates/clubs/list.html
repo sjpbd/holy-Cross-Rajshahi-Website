@@ -37,7 +37,7 @@
                 <div
                     class="relative h-56 bg-white overflow-hidden flex items-center justify-center p-10 border-b border-gray-100">
                     {% if club.logo %}
-                    <img src="{{ club.logo.url }}" alt="{{ club.name }}"
+                    <img loading="lazy" src="{{ club.logo.url }}" alt="{{ club.name }}"
                         class="max-h-full max-w-full object-contain transition-transform duration-500 group-hover:scale-110">
                     {% else %}
                     <div

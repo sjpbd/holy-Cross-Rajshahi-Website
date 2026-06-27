@@ -38,11 +38,11 @@
                     <div class="bg-gradient-to-br from-primary to-primary-dark p-8 flex items-center justify-center">
                         {% if school_info.principal_photo %}
                         {% thumbnail school_info.principal_photo "medium" as thumb %}
-                        <img src="{{ thumb.url }}" 
+                        <img loading="lazy" src="{{ thumb.url }}" 
                              alt="{{ school_info.principal_name }}"
                              width="{{ thumb.width }}"
                              height="{{ thumb.height }}"
-                             loading="lazy"
+                             
                              decoding="async"
                              class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-xl">
 
@@ -77,11 +77,11 @@
                     <div class="bg-gradient-to-br from-primary-dark to-primary p-8 flex items-center justify-center">
                         {% if school_info.vice_principal_photo %}
                         {% thumbnail school_info.vice_principal_photo "medium" as thumb %}
-                        <img src="{{ thumb.url }}"
+                        <img loading="lazy" src="{{ thumb.url }}"
                              alt="{{ school_info.vice_principal_name }}"
                              width="{{ thumb.width }}"
                              height="{{ thumb.height }}"
-                             loading="lazy"
+                             
                              decoding="async"
                              class="w-48 h-48 rounded-full object-cover border-4 border-accent shadow-xl">
 
@@ -121,11 +121,11 @@
                     <div class="pt-8 px-8">
                         {% if staff.photo %}
                         {% thumbnail staff.photo "admin_profile" as thumb %}
-                        <img src="{{ thumb.url }}" 
+                        <img loading="lazy" src="{{ thumb.url }}" 
                              alt="{{ staff.name }}"
                              width="{{ thumb.width }}"
                              height="{{ thumb.height }}"
-                             loading="lazy"
+                             
                              decoding="async"
                              class="w-32 h-32 rounded-full object-cover mx-auto border-4 border-accent shadow-lg">
                         {% else %}

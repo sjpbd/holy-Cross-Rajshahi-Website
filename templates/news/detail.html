@@ -7,7 +7,7 @@
 <section class="pt-20 relative">
     {% if news.featured_image %}
     <div class="relative h-[500px] md:h-[600px]">
-        <img src="{{ news.featured_image.url }}" alt="{{ news.title }}" class="w-full h-full object-cover">
+        <img loading="lazy" src="{{ news.featured_image.url }}" alt="{{ news.title }}" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
         <div class="absolute bottom-0 left-0 right-0 pb-12">
@@ -122,7 +122,7 @@
                     {% for related in related_news %}
                     <div class="card card-hover-lift image-zoom-container relative">
                         {% if related.featured_image %}
-                        <img src="{{ related.featured_image.url }}" alt="{{ related.title }}"
+                        <img loading="lazy" src="{{ related.featured_image.url }}" alt="{{ related.title }}"
                             class="w-full h-48 object-cover image-zoom">
                         <div class="image-overlay"></div>
                         {% else %}
