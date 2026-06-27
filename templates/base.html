@@ -10,6 +10,13 @@
     <!-- Favicon -->
     {% if school_info.favicon %}
     <link rel="icon" href="{{ school_info.favicon.url }}">
+    <link rel="apple-touch-icon" href="{{ school_info.favicon.url }}">
+    {% elif school_info.logo %}
+    <link rel="icon" href="{{ school_info.logo.url }}">
+    <link rel="apple-touch-icon" href="{{ school_info.logo.url }}">
+    {% else %}
+    <link rel="icon" href="{% static 'images/og-logo.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/og-logo.png' %}">
     {% endif %}
 
     <!-- Dynamic SEO Meta Tags -->
