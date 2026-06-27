@@ -77,7 +77,8 @@
 }
 
 /* 4. Force Summernote Widget Visibility */
-.django-summernote-widget {
+.django-summernote-widget,
+.summernote-div {
     width: 100% !important;
     display: block !important;
 }
@@ -101,4 +102,19 @@
 .aligned .form-row div.help {
     margin-left: 0 !important;
     padding: 10px 0 !important;
+}
+/* 6. Django 5 .flex-container overrides */
+.aligned .form-row.field-history .flex-container,
+.aligned .form-row.field-mission .flex-container,
+.aligned .form-row.field-vision .flex-container,
+.aligned .form-row.field-goal .flex-container,
+.aligned .form-row.field-bio .flex-container,
+.aligned .form-row.field-content .flex-container,
+.aligned .form-row.field-description .flex-container,
+.aligned .form-row.field-message .flex-container,
+.aligned .form-row.field-principal_message .flex-container,
+.aligned .form-row.field-vice_principal_message .flex-container,
+.aligned .form-row.field-objectives .flex-container {
+    display: block !important;
+    width: 100% !important;
 }
