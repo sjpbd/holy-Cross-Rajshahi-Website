@@ -17,7 +17,7 @@ def process_model_images(model_cls, image_field_name):
     for obj in model_cls.objects.all():
         image_field = getattr(obj, image_field_name)
         if image_field and image_field.name:
-            if convert_image_to_webp(image_field):
+            if convert_image_to_webp(image_field, force=True):
                 obj.save(update_fields=[image_field_name])
                 print(f"Converted {model_cls.__name__} (ID: {obj.pk}) {image_field_name} -> {image_field.name}")
                 count += 1
@@ -40,7 +40,7 @@ def clean_cached_thumbnails():
     print(f"Removed {removed} old thumbnail cache files.")
 
 def main():
-    print("Starting WebP conversion for people, administration, and gallery images...")
+    print("Starting WebP studio canvas processing for people, administration, and gallery images...")
     t_count = process_model_images(Teacher, 'photo')
     a_count = process_model_images(Administration, 'photo')
     s_count = process_model_images(Staff, 'photo')
@@ -52,10 +52,10 @@ def main():
     # SchoolInfo principal & vice principal
     info = SchoolInfo.load()
     info_updated = False
-    if info.principal_photo and convert_image_to_webp(info.principal_photo):
+    if info.principal_photo and convert_image_to_webp(info.principal_photo, force=True):
         info_updated = True
         print(f"Converted SchoolInfo principal_photo -> {info.principal_photo.name}")
-    if info.vice_principal_photo and convert_image_to_webp(info.vice_principal_photo):
+    if info.vice_principal_photo and convert_image_to_webp(info.vice_principal_photo, force=True):
         info_updated = True
         print(f"Converted SchoolInfo vice_principal_photo -> {info.vice_principal_photo.name}")
     if info_updated:

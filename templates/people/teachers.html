@@ -56,7 +56,7 @@
                 </div>
 
                 <!-- Teacher Photo -->
-                <div class="relative aspect-[4/5] overflow-hidden bg-gray-100 m-2 rounded-[1.5rem] z-10 shadow-inner">
+                <div class="relative aspect-[3/4] overflow-hidden bg-gray-100 m-2 rounded-[1.5rem] z-10 shadow-inner">
                     {% if teacher.photo %}
                     {% thumbnail teacher.photo "teacher_grid" as thumb %}
                     <img loading="lazy" src="{{ thumb.url }}" 
@@ -65,7 +65,7 @@
                          height="{{ thumb.height }}"
                          
                          decoding="async"
-                         class="w-full h-full object-contain object-center p-2 transform group-hover:scale-105 transition-transform duration-700">
+                         class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
 {% else %}
                     <div
                         class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
