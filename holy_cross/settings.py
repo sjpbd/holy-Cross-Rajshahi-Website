@@ -172,12 +172,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Easy Thumbnails
 THUMBNAIL_ALIASES = {
     '': {
-        'small': {'size': (150, 150), 'crop': 'smart', 'quality': 80},
-        'medium': {'size': (400, 400), 'crop': 'smart', 'quality': 85},
+        'small': {'size': (150, 150), 'crop': False, 'quality': 85},
+        'medium': {'size': (400, 400), 'crop': False, 'quality': 85},
         'large': {'size': (800, 600), 'crop': False, 'quality': 90},
-        'teacher_grid': {'size': (400, 500), 'crop': 'smart', 'quality': 85},
-        'staff_grid': {'size': (300, 400), 'crop': 'smart', 'quality': 85},
-        'admin_profile': {'size': (200, 200), 'crop': 'smart', 'quality': 90},
+        'teacher_grid': {'size': (400, 500), 'crop': False, 'quality': 85},
+        'staff_grid': {'size': (300, 400), 'crop': False, 'quality': 85},
+        'admin_profile': {'size': (200, 200), 'crop': False, 'quality': 90},
         'slider': {'size': (1920, 800), 'crop': 'smart', 'quality': 80},
         'news_thumb': {'size': (600, 400), 'crop': 'smart', 'quality': 85},
         'gallery_thumb': {'size': (500, 500), 'crop': 'smart', 'quality': 80},

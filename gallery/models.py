@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
+from core.utils import convert_image_to_webp
+
 
 class Album(models.Model):
     """Album model representing folders and sub-folders"""
@@ -31,11 +33,14 @@ class Album(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        if self.cover_image:
+            convert_image_to_webp(self.cover_image)
         super().save(*args, **kwargs)
 
     @property
     def photo_count(self):
         return self.photos.count()
+
 
 class Photo(models.Model):
     """Photo model for individual images within an album"""
@@ -52,3 +57,9 @@ class Photo(models.Model):
 
     def __str__(self):
         return f"Photo {self.id} in {self.album.title}"
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            convert_image_to_webp(self.image)
+        super().save(*args, **kwargs)
+

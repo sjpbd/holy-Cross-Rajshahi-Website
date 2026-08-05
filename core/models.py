@@ -80,6 +80,11 @@ class SchoolInfo(models.Model):
     def save(self, *args, **kwargs):
         """Ensure only one instance exists (Singleton pattern)"""
         self.pk = 1
+        from core.utils import convert_image_to_webp
+        if self.principal_photo:
+            convert_image_to_webp(self.principal_photo)
+        if self.vice_principal_photo:
+            convert_image_to_webp(self.vice_principal_photo)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

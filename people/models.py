@@ -1,4 +1,5 @@
 from django.db import models
+from core.utils import convert_image_to_webp
 
 
 class Teacher(models.Model):
@@ -57,6 +58,8 @@ class Teacher(models.Model):
                 self.slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"
             else:
                 self.slug = base_slug
+        if self.photo:
+            convert_image_to_webp(self.photo)
         super().save(*args, **kwargs)
 
 
@@ -90,6 +93,11 @@ class Administration(models.Model):
     def __str__(self):
         return f"{self.name} - {self.role}"
 
+    def save(self, *args, **kwargs):
+        if self.photo:
+            convert_image_to_webp(self.photo)
+        super().save(*args, **kwargs)
+
 
 class Staff(models.Model):
     """General staff members"""
@@ -117,6 +125,11 @@ class Staff(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.designation}"
+
+    def save(self, *args, **kwargs):
+        if self.photo:
+            convert_image_to_webp(self.photo)
+        super().save(*args, **kwargs)
 
 
 class GoverningBodyMember(models.Model):
@@ -161,6 +174,12 @@ class GoverningBodyMember(models.Model):
     def __str__(self):
         return f"{self.name} - {self.get_role_display()}"
 
+    def save(self, *args, **kwargs):
+        if self.photo:
+            convert_image_to_webp(self.photo)
+        super().save(*args, **kwargs)
+
     @property
     def is_chairman(self):
         return self.role == 'chairman'
+
