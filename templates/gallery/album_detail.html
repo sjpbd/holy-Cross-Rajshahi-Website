@@ -313,9 +313,9 @@
             <h2 class="text-2xl font-bold text-primary mb-8 flex items-center gap-3">
                 <i class="fas fa-camera text-accent"></i> Photos ({{ photos.count }})
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
                 {% for photo in photos %}
-                <a href="{{ photo.image.url }}" class="photo-card glightbox block relative h-40 sm:h-44 md:h-48 rounded-xl overflow-hidden shadow-sm bg-gray-100 group" data-gallery="gallery1" data-title="{{ photo.caption|default:album.title }}" data-description="{{ photo.created_at|date:'F d, Y' }}">
+                <a href="{{ photo.image.url }}" class="photo-card glightbox block relative h-28 sm:h-32 md:h-36 lg:h-40 rounded-xl overflow-hidden shadow-sm bg-gray-100 group" data-gallery="gallery1" data-title="{{ photo.caption|default:album.title }}" data-description="{{ photo.created_at|date:'F d, Y' }}">
                     {% thumbnail photo.image "gallery_thumb" as thumb %}
                     <img loading="lazy" src="{{ thumb.url }}" 
                          alt="{{ photo.caption }}" 
@@ -323,11 +323,11 @@
                          height="{{ thumb.height }}"
                          decoding="async"
                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    <div class="photo-overlay absolute inset-0 flex flex-col justify-end p-3 text-white">
+                    <div class="photo-overlay absolute inset-0 flex flex-col justify-end p-2 text-white">
                         {% if photo.caption %}
-                        <p class="text-xs font-semibold line-clamp-1">{{ photo.caption }}</p>
+                        <p class="text-[11px] font-semibold line-clamp-1 leading-tight">{{ photo.caption }}</p>
                         {% endif %}
-                        <span class="text-[9px] uppercase font-bold tracking-widest text-white/70"><i class="fas fa-expand-alt mr-1"></i> View</span>
+                        <span class="text-[8px] uppercase font-bold tracking-widest text-white/80"><i class="fas fa-expand-alt mr-1"></i> View</span>
                     </div>
                 </a>
                 {% endfor %}
