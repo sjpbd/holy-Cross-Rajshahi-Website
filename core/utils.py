@@ -1,17 +1,59 @@
 import os
 from io import BytesIO
-from PIL import Image, ImageFilter, ImageStat
+from PIL import Image, ImageOps, ImageFilter, ImageStat
 from django.core.files.base import ContentFile
+
+
+def strip_blurred_borders(img):
+    """Detects and strips away artificial blurred/padded borders from previous generations."""
+    w, h = img.size
+    gray = img.convert('L')
+    edges = gray.filter(ImageFilter.FIND_EDGES)
+
+    row_stats = [ImageStat.Stat(edges.crop((0, y, w, y + 1))).mean[0] for y in range(h)]
+    col_stats = [ImageStat.Stat(edges.crop((x, 0, x + 1, h))).mean[0] for x in range(w)]
+
+    y1 = 0
+    for y in range(10, h - 10):
+        if row_stats[y] >= 1.0 and row_stats[y + 1] >= 1.0 and row_stats[y + 2] >= 1.0:
+            y1 = y
+            break
+
+    y2 = h
+    for y in range(h - 11, 10, -1):
+        if row_stats[y] >= 1.0 and row_stats[y - 1] >= 1.0 and row_stats[y - 2] >= 1.0:
+            y2 = y
+            break
+
+    x1 = 0
+    for x in range(10, w - 10):
+        if col_stats[x] >= 1.0 and col_stats[x + 1] >= 1.0 and col_stats[x + 2] >= 1.0:
+            x1 = x
+            break
+
+    x2 = w
+    for x in range(w - 11, 10, -1):
+        if col_stats[x] >= 1.0 and col_stats[x - 1] >= 1.0 and col_stats[x - 2] >= 1.0:
+            x2 = x
+            break
+
+    if (y2 - y1) < h * 0.3:
+        y1, y2 = 0, h
+    if (x2 - x1) < w * 0.3:
+        x1, x2 = 0, w
+
+    return img.crop((x1, y1, x2, y2))
 
 
 def process_image_to_pro_headshot(image_field, target_width=600, target_height=800, quality=92, force=False):
     """
-    Enterprise-Grade Pro Headshot Auto-Framing Algorithm:
-    1. Detects and strips away artificial blurred/padding borders if present.
-    2. Dynamically crops the subject into a crisp, perfectly framed 3:4 portrait headshot:
-       - For wide landscape photos: crops side backgrounds and zooms into the teacher's face & upper body.
-       - For tall portrait photos: anchors crop near top so head & face are perfectly positioned.
-    3. Resizes to 600x800 high-quality WebP format.
+    Enterprise Pro Auto-Headshot Algorithm:
+    1. ImageOps.exif_transpose: Fixes phone/camera EXIF rotation so photos are never sideways.
+    2. strip_blurred_borders: Removes legacy artificial blurred/padded borders.
+    3. Headroom-Anchored 3:4 Framing:
+       - For landscape: crops side background walls and zooms into subject center.
+       - For tall portrait: anchors crop with ~8% headroom so heads and hair are NEVER cut off.
+    4. Resizes to high-quality 600x800 WebP format.
     """
     if not image_field or not hasattr(image_field, 'name') or not image_field.name:
         return False
@@ -28,65 +70,33 @@ def process_image_to_pro_headshot(image_field, target_width=600, target_height=8
         image_field.open()
         img = Image.open(image_field)
 
+        # 1. EXIF Auto-Transpose (Fixes sideways / rotated mobile uploads)
+        img = ImageOps.exif_transpose(img)
+
         has_alpha = img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info)
         if has_alpha:
             img = img.convert('RGBA')
         else:
             img = img.convert('RGB')
 
-        w, h = img.size
-        gray = img.convert('L')
-        edges = gray.filter(ImageFilter.FIND_EDGES)
-
-        # Detect sharp inner bounds if image has artificial padded/blurred borders
-        row_stats = [ImageStat.Stat(edges.crop((0, y, w, y + 1))).mean[0] for y in range(h)]
-        col_stats = [ImageStat.Stat(edges.crop((x, 0, x + 1, h))).mean[0] for x in range(w)]
-
-        y1 = 0
-        for y in range(10, h - 10):
-            if row_stats[y] >= 1.0 and row_stats[y+1] >= 1.0 and row_stats[y+2] >= 1.0:
-                y1 = y
-                break
-
-        y2 = h
-        for y in range(h - 11, 10, -1):
-            if row_stats[y] >= 1.0 and row_stats[y-1] >= 1.0 and row_stats[y-2] >= 1.0:
-                y2 = y
-                break
-
-        x1 = 0
-        for x in range(10, w - 10):
-            if col_stats[x] >= 1.0 and col_stats[x+1] >= 1.0 and col_stats[x+2] >= 1.0:
-                x1 = x
-                break
-
-        x2 = w
-        for x in range(w - 11, 10, -1):
-            if col_stats[x] >= 1.0 and col_stats[x-1] >= 1.0 and col_stats[x-2] >= 1.0:
-                x2 = x
-                break
-
-        if (y2 - y1) < h * 0.3:
-            y1, y2 = 0, h
-        if (x2 - x1) < w * 0.3:
-            x1, x2 = 0, w
-
-        clean_img = img.crop((x1, y1, x2, y2))
+        # 2. Strip artificial blurred borders if present
+        clean_img = strip_blurred_borders(img)
         pw, ph = clean_img.size
-        aspect = pw / ph
         target_aspect = target_width / target_height  # 0.75
+        aspect = pw / ph
 
-        if 0.72 <= aspect <= 0.78:
+        # 3. Smart Framing
+        if 0.73 <= aspect <= 0.77:
             cropped = clean_img
         elif aspect > target_aspect:
-            # Landscape photo: Crop side backgrounds, zoom in on subject center
+            # Wide landscape photo: Crop side walls, zoom in on subject center
             crop_w = int(ph * target_aspect)
             offset_x = (pw - crop_w) // 2
             cropped = clean_img.crop((offset_x, 0, offset_x + crop_w, ph))
         else:
-            # Tall photo: Anchor crop near top (head/face focus)
+            # Tall portrait photo: Anchor with 8% headroom so forehead/hair is fully visible
             crop_h = int(pw / target_aspect)
-            offset_y = int((ph - crop_h) * 0.15)
+            offset_y = int((ph - crop_h) * 0.08)
             offset_y = max(0, min(offset_y, ph - crop_h))
             cropped = clean_img.crop((0, offset_y, pw, offset_y + crop_h))
 
