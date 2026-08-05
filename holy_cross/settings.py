@@ -180,7 +180,7 @@ THUMBNAIL_ALIASES = {
         'admin_profile': {'size': (400, 400), 'crop': False, 'quality': 90},
         'slider': {'size': (1920, 800), 'crop': 'smart', 'quality': 80},
         'news_thumb': {'size': (600, 400), 'crop': 'smart', 'quality': 85},
-        'gallery_thumb': {'size': (500, 500), 'crop': 'smart', 'quality': 80},
+        'gallery_thumb': {'size': (800, 800), 'crop': False, 'quality': 90},
     },
 }
 
