@@ -59,7 +59,8 @@ def auto_fix_orientation_and_borders(img):
 
 def process_image_to_pro_headshot(image_field, target_width=600, target_height=800, quality=95, force=False):
     """
-    Enterprise Pro Auto-Headshot Algorithm (v3):
+    Enterprise Pro Auto-Headshot Algorithm:
+    Used ONLY for Faculty, Leadership & Staff directory photos.
     1. Fixes sideways/rotated mobile photo uploads automatically.
     2. Strips legacy blurred top/bottom padding borders.
     3. Crops 3:4 aspect ratio with 5% headroom anchor so head, hair & forehead are NEVER cut off.
@@ -124,4 +125,43 @@ def process_image_to_pro_headshot(image_field, target_width=600, target_height=8
 
 
 def convert_image_to_webp(image_field, quality=95, force=False):
-    return process_image_to_pro_headshot(image_field, quality=quality, force=force)
+    """
+    Pure WebP Format Converter for Gallery Photos, Album Covers, Sliders, Notices, etc.
+    Converts any image file into WebP format while preserving 100% of its original resolution,
+    aspect ratio, and original photo contents with ZERO cropping or padding alterations.
+    """
+    if not image_field or not hasattr(image_field, 'name') or not image_field.name:
+        return False
+
+    filename = os.path.basename(image_field.name)
+    if not filename:
+        return False
+
+    name_without_ext, ext = os.path.splitext(filename)
+    if ext.lower() == '.webp' and not force:
+        return False
+
+    try:
+        image_field.open()
+        img = Image.open(image_field)
+        img = ImageOps.exif_transpose(img)
+
+        # Remove any legacy blurred borders if file was previously padded
+        img = auto_fix_orientation_and_borders(img)
+
+        has_alpha = img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info)
+        if has_alpha:
+            img = img.convert('RGBA')
+        else:
+            img = img.convert('RGB')
+
+        buffer = BytesIO()
+        img.save(buffer, format='WEBP', quality=quality, optimize=True)
+        buffer.seek(0)
+
+        new_filename = f"{name_without_ext}.webp" if ext.lower() != '.webp' else filename
+        image_field.save(new_filename, ContentFile(buffer.read()), save=False)
+        return True
+    except Exception as e:
+        print(f"Error converting image {image_field.name} to WebP: {e}")
+        return False

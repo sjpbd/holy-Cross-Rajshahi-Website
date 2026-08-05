@@ -10,20 +10,22 @@ from django.conf import settings
 from people.models import Teacher, Administration, Staff, GoverningBodyMember
 from core.models import SchoolInfo
 from gallery.models import Album, Photo
-from core.utils import convert_image_to_webp
+from core.utils import convert_image_to_webp, process_image_to_pro_headshot
 
-def process_model_images(model_cls, image_field_name):
+
+def process_model_images(model_cls, image_field_name, converter_fn=convert_image_to_webp):
     count = 0
     for obj in model_cls.objects.all():
         image_field = getattr(obj, image_field_name)
         if image_field and image_field.name:
-            if convert_image_to_webp(image_field, force=True):
+            if converter_fn(image_field, force=True):
                 obj.save(update_fields=[image_field_name])
                 print(f"Converted {model_cls.__name__} (ID: {obj.pk}) {image_field_name} -> {image_field.name}")
                 count += 1
             else:
                 print(f"Skipped {model_cls.__name__} (ID: {obj.pk}) {image_field_name} ({image_field.name})")
     return count
+
 
 def clean_cached_thumbnails():
     media_root = settings.MEDIA_ROOT
@@ -39,23 +41,25 @@ def clean_cached_thumbnails():
                     print(f"Could not remove {path}: {e}")
     print(f"Removed {removed} old thumbnail cache files.")
 
-def main():
-    print("Starting WebP studio canvas processing for people, administration, and gallery images...")
-    t_count = process_model_images(Teacher, 'photo')
-    a_count = process_model_images(Administration, 'photo')
-    s_count = process_model_images(Staff, 'photo')
-    g_count = process_model_images(GoverningBodyMember, 'photo')
 
-    album_count = process_model_images(Album, 'cover_image')
-    photo_count = process_model_images(Photo, 'image')
+def main():
+    print("Starting WebP conversion (Pro headshots for Faculty/Staff, pure WebP for Gallery)...")
+    t_count = process_model_images(Teacher, 'photo', process_image_to_pro_headshot)
+    a_count = process_model_images(Administration, 'photo', process_image_to_pro_headshot)
+    s_count = process_model_images(Staff, 'photo', process_image_to_pro_headshot)
+    g_count = process_model_images(GoverningBodyMember, 'photo', process_image_to_pro_headshot)
+
+    # Pure WebP format conversion for Gallery (0 cropping, 0 aspect ratio changes)
+    album_count = process_model_images(Album, 'cover_image', convert_image_to_webp)
+    photo_count = process_model_images(Photo, 'image', convert_image_to_webp)
 
     # SchoolInfo principal & vice principal
     info = SchoolInfo.load()
     info_updated = False
-    if info.principal_photo and convert_image_to_webp(info.principal_photo, force=True):
+    if info.principal_photo and process_image_to_pro_headshot(info.principal_photo, force=True):
         info_updated = True
         print(f"Converted SchoolInfo principal_photo -> {info.principal_photo.name}")
-    if info.vice_principal_photo and convert_image_to_webp(info.vice_principal_photo, force=True):
+    if info.vice_principal_photo and process_image_to_pro_headshot(info.vice_principal_photo, force=True):
         info_updated = True
         print(f"Converted SchoolInfo vice_principal_photo -> {info.vice_principal_photo.name}")
     if info_updated:
@@ -63,6 +67,7 @@ def main():
 
     clean_cached_thumbnails()
     print("WebP conversion completed successfully!")
+
 
 if __name__ == '__main__':
     main()

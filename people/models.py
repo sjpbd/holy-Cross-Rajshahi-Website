@@ -1,5 +1,5 @@
 from django.db import models
-from core.utils import convert_image_to_webp
+from core.utils import process_image_to_pro_headshot
 
 
 class Teacher(models.Model):
@@ -59,7 +59,7 @@ class Teacher(models.Model):
             else:
                 self.slug = base_slug
         if self.photo:
-            convert_image_to_webp(self.photo)
+            process_image_to_pro_headshot(self.photo)
         super().save(*args, **kwargs)
 
 
@@ -95,7 +95,7 @@ class Administration(models.Model):
 
     def save(self, *args, **kwargs):
         if self.photo:
-            convert_image_to_webp(self.photo)
+            process_image_to_pro_headshot(self.photo)
         super().save(*args, **kwargs)
 
 
@@ -128,7 +128,7 @@ class Staff(models.Model):
 
     def save(self, *args, **kwargs):
         if self.photo:
-            convert_image_to_webp(self.photo)
+            process_image_to_pro_headshot(self.photo)
         super().save(*args, **kwargs)
 
 
@@ -176,10 +176,11 @@ class GoverningBodyMember(models.Model):
 
     def save(self, *args, **kwargs):
         if self.photo:
-            convert_image_to_webp(self.photo)
+            process_image_to_pro_headshot(self.photo)
         super().save(*args, **kwargs)
 
     @property
     def is_chairman(self):
         return self.role == 'chairman'
+
 
