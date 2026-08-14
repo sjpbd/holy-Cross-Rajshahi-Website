@@ -203,6 +203,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # Django Summernote Configuration
 SUMMERNOTE_CONFIG = {
     'iframe': False,
+    'attachment_upload_to': 'uploads/content/%Y-%m-%d',
     'summernote': {
         'width': '100%',
         'height': '600',

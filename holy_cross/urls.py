@@ -64,7 +64,7 @@ urlpatterns = [
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path('summernote/', include('django_summernote.urls')),
+    path('editor/', include('django_summernote.urls')),
 ]
 
 # Serve media files during development

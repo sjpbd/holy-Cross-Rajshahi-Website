@@ -39,9 +39,25 @@ class NewsItem(models.Model):
         super().save(*args, **kwargs)
 
     def get_excerpt(self):
-        """Return excerpt or truncated content"""
-        if self.excerpt:
-            return self.excerpt
-        # Strip HTML tags and truncate
+        """Return clean plain-text excerpt or truncated content"""
+        import html
         from django.utils.html import strip_tags
-        return strip_tags(self.content)[:200] + "..."
+
+        raw_text = self.excerpt if self.excerpt and self.excerpt.strip() else self.content
+        if not raw_text:
+            return ""
+
+        # Strip HTML tags and unescape entities (e.g. &nbsp;, &amp;)
+        clean_text = strip_tags(raw_text)
+        clean_text = html.unescape(clean_text)
+        clean_text = " ".join(clean_text.split())
+
+        # If it came from self.excerpt and is non-empty, use it
+        if self.excerpt and self.excerpt.strip() and clean_text:
+            return clean_text
+
+        # If derived from content, truncate if necessary
+        if len(clean_text) > 200:
+            return clean_text[:200] + "..."
+        return clean_text
+

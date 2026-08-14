@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db import models
+from django import forms
 from .models import NewsItem
 from django_summernote.widgets import SummernoteWidget
 
@@ -12,9 +12,13 @@ class NewsItemAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content', 'excerpt']
     date_hierarchy = 'published_date'
     readonly_fields = ['slug', 'published_date', 'updated_at']
-    formfield_overrides = {
-        models.TextField: {'widget': SummernoteWidget}
-    }
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == 'content':
+            kwargs['widget'] = SummernoteWidget()
+        elif db_field.name == 'excerpt':
+            kwargs['widget'] = forms.Textarea(attrs={'rows': 3, 'class': 'vLargeTextField'})
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 
     prepopulated_fields = {}
