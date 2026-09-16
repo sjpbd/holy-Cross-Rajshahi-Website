@@ -10,6 +10,7 @@ document.addEventListener('alpine:init', function () {
             geo: {},
             addr: {
                 present: { division: '', zila: '', thana: '', line: '' },
+                permanent: { division: '', zila: '', thana: '', line: '' },
                 father: { division: '', zila: '', thana: '', line: '' },
                 mother: { division: '', zila: '', thana: '', line: '' }
             },
@@ -21,13 +22,13 @@ document.addEventListener('alpine:init', function () {
                 if (geoEl) this.geo = JSON.parse(geoEl.textContent);
                 if (stateEl) {
                     var state = JSON.parse(stateEl.textContent);
-                    ['present', 'father', 'mother'].forEach((key) => {
+                    ['present', 'permanent', 'father', 'mother'].forEach((key) => {
                         this.addr[key] = Object.assign(this.addr[key], state[key] || {});
                     });
                 }
                 this.currentPhoto = this.$el.getAttribute('data-photo') || '';
                 this.$nextTick(() => {
-                    ['present', 'father', 'mother'].forEach((key) => {
+                    ['present', 'permanent', 'father', 'mother'].forEach((key) => {
                         this.populateZila(key);
                         this.populateThana(key);
                     });

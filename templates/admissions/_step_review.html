@@ -28,6 +28,10 @@
                 <dt class="text-slate-500">Present address</dt>
                 <dd>{{ application.present_address }}</dd>
             </div>
+            <div>
+                <dt class="text-slate-500">Permanent address</dt>
+                <dd>{{ application.permanent_address }}</dd>
+            </div>
         </dl>
     </section>
     <section class="adm-section">
@@ -37,10 +41,10 @@
         </div>
         <dl class="space-y-2 text-sm">
             <div><dt class="text-slate-500">Father</dt><dd>{{ application.father_name }} · {{ application.father_mobile }}</dd></div>
-            <div><dt class="text-slate-500">Father’s address</dt><dd>{{ application.father_address }}</dd></div>
+            <div><dt class="text-slate-500">Father’s work address</dt><dd>{{ application.father_address }}</dd></div>
             <div><dt class="text-slate-500">Mother</dt><dd>{{ application.mother_name }} · {{ application.mother_mobile }}</dd></div>
-            <div><dt class="text-slate-500">Mother’s address</dt><dd>{{ application.mother_address }}</dd></div>
-            <div><dt class="text-slate-500">Email / income</dt><dd>{{ application.email }} · {{ application.family_income_yearly }} BDT / {{ application.earning_members }} earner{{ application.earning_members|pluralize }}</dd></div>
+            <div><dt class="text-slate-500">Mother’s work address</dt><dd>{{ application.mother_address }}</dd></div>
+            <div><dt class="text-slate-500">Email / income</dt><dd>{{ application.email }} · {{ application.get_family_income_yearly_display }} BDT / {{ application.earning_members }} earner{{ application.earning_members|pluralize }}</dd></div>
         </dl>
     </section>
     <section class="adm-section">

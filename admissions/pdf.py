@@ -77,6 +77,14 @@ def build_pdf_context(application):
         'form_year': application.session.year_prefix(),
         'results': results,
         'siblings': siblings,
+        'session_instructions': (application.session.instructions or '').strip(),
+        'print_instructions': [
+            'Print this form on A4 paper.',
+            'Attach a recent passport-size photograph (school dress, white background) in the box on the first page.',
+            'Student and parent information must match the Birth Certificate and National ID.',
+            'Bring the printed form and the admit card to the viva.',
+            'Arrive at the venue at least 15 minutes before the viva time.',
+        ],
         'answers': {
             'financial_capacity': _yn(application.financial_capacity),
             'agrees_uniform': _yn(application.agrees_uniform),

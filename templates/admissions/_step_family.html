@@ -19,11 +19,12 @@
         </div>
         <div class="adm-section-head mt-2">
             <div>
-                <h3 class="text-base">Father’s address</h3>
-                <p class="adm-hint">Copy from the student or mother if it is the same place.</p>
+                <h3 class="text-base">Father’s work address</h3>
+                <p class="adm-hint">Office, school, or business address. Copy if it matches another address on the form.</p>
             </div>
             <div class="adm-copy-row">
-                <button type="button" class="adm-chip" @click="copy('present', 'father')"><i class="fas fa-copy mr-1"></i> Same as student</button>
+                <button type="button" class="adm-chip" @click="copy('present', 'father')"><i class="fas fa-copy mr-1"></i> Same as present</button>
+                <button type="button" class="adm-chip" @click="copy('permanent', 'father')"><i class="fas fa-copy mr-1"></i> Same as permanent</button>
                 <button type="button" class="adm-chip" @click="copy('mother', 'father')"><i class="fas fa-copy mr-1"></i> Same as mother</button>
             </div>
         </div>
@@ -46,10 +47,11 @@
         </div>
         <div class="adm-section-head mt-2">
             <div>
-                <h3 class="text-base">Mother’s address</h3>
+                <h3 class="text-base">Mother’s work address</h3>
             </div>
             <div class="adm-copy-row">
-                <button type="button" class="adm-chip" @click="copy('present', 'mother')"><i class="fas fa-copy mr-1"></i> Same as student</button>
+                <button type="button" class="adm-chip" @click="copy('present', 'mother')"><i class="fas fa-copy mr-1"></i> Same as present</button>
+                <button type="button" class="adm-chip" @click="copy('permanent', 'mother')"><i class="fas fa-copy mr-1"></i> Same as permanent</button>
                 <button type="button" class="adm-chip" @click="copy('father', 'mother')"><i class="fas fa-copy mr-1"></i> Same as father</button>
             </div>
         </div>

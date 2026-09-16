@@ -119,6 +119,7 @@ def _can_visit_step(application, step):
 def _address_state(application):
     return {
         'present': application.geo_payload('present'),
+        'permanent': application.geo_payload('permanent'),
         'father': application.geo_payload('father'),
         'mother': application.geo_payload('mother'),
     }

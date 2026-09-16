@@ -110,7 +110,7 @@ class AdmissionSessionAdmin(admin.ModelAdmin):
 
 @admin.register(AdmissionClass)
 class AdmissionClassAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'fee_override']
+    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'fee_override']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'code']
 
@@ -155,7 +155,8 @@ class ApplicationAdmin(admin.ModelAdmin):
         'wizard_step', 'student_name_en', 'student_name_bn', 'date_of_birth', 'age_years',
         'age_months', 'birth_registration_no', 'nationality', 'blood_group', 'gender',
         'present_division', 'present_zila', 'present_thana', 'present_address_line',
-        'present_address', 'religion', 'photo', 'father_name', 'father_nid', 'father_occupation',
+        'present_address', 'permanent_division', 'permanent_zila', 'permanent_thana',
+        'permanent_address_line', 'permanent_address', 'religion', 'photo', 'father_name', 'father_nid', 'father_occupation',
         'father_designation', 'father_organization', 'father_mobile',
         'father_division', 'father_zila', 'father_thana', 'father_address_line', 'father_address',
         'mother_name', 'mother_nid', 'mother_occupation', 'mother_designation',
@@ -182,7 +183,9 @@ class ApplicationAdmin(admin.ModelAdmin):
                 'student_name_en', 'student_name_bn', 'date_of_birth', 'age_years', 'age_months',
                 'birth_registration_no', 'nationality', 'blood_group', 'gender', 'religion',
                 'present_division', 'present_zila', 'present_thana', 'present_address_line',
-                'present_address', 'photo',
+                'present_address',
+                'permanent_division', 'permanent_zila', 'permanent_thana', 'permanent_address_line',
+                'permanent_address', 'photo',
             ),
         }),
         ('Father', {

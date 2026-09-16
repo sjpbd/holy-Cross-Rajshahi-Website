@@ -79,13 +79,12 @@ def validate_geo_fields(cleaned, prefixes):
 
 
 class StudentStepForm(forms.ModelForm):
-    copy_to_father = forms.BooleanField(
+    copy_same_permanent = forms.BooleanField(
         required=False,
-        label="Use this address for father",
-    )
-    copy_to_mother = forms.BooleanField(
-        required=False,
-        label="Use this address for mother",
+        label='Permanent address is the same as present',
+        widget=forms.CheckboxInput(attrs={
+            '@change': "if ($event.target.checked) copy('present', 'permanent')",
+        }),
     )
 
     class Meta:
@@ -103,6 +102,10 @@ class StudentStepForm(forms.ModelForm):
             'present_zila',
             'present_thana',
             'present_address_line',
+            'permanent_division',
+            'permanent_zila',
+            'permanent_thana',
+            'permanent_address_line',
             'religion',
             'photo',
         ]
@@ -125,7 +128,17 @@ class StudentStepForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        bind_geo_fields(self, ['present'])
+        bind_geo_fields(self, ['present', 'permanent'])
+        copying = False
+        if self.data:
+            copying = self.data.get(self.add_prefix('copy_same_permanent')) in ('on', 'true', 'True', '1')
+        elif self.instance.pk:
+            present = self.instance.geo_payload('present')
+            permanent = self.instance.geo_payload('permanent')
+            copying = present == permanent and any(present.values())
+        if copying:
+            for name in ('permanent_division', 'permanent_zila', 'permanent_thana', 'permanent_address_line'):
+                self.fields[name].required = False
         self.fields['admit_class'].queryset = AdmissionClass.objects.filter(is_active=True)
         self.fields['admit_class'].required = True
         self.fields['student_name_en'].required = True
@@ -142,12 +155,9 @@ class StudentStepForm(forms.ModelForm):
         self.fields['student_name_bn'].widget.attrs['class'] += ' font-bengali'
         if self.instance.pk:
             present = self.instance.geo_payload('present')
-            father = self.instance.geo_payload('father')
-            mother = self.instance.geo_payload('mother')
-            if present == father and any(present.values()):
-                self.fields['copy_to_father'].initial = True
-            if present == mother and any(present.values()):
-                self.fields['copy_to_mother'].initial = True
+            permanent = self.instance.geo_payload('permanent')
+            if present == permanent and any(present.values()):
+                self.fields['copy_same_permanent'].initial = True
 
     def clean_birth_registration_no(self):
         value = (self.cleaned_data.get('birth_registration_no') or '').strip()
@@ -206,18 +216,19 @@ class StudentStepForm(forms.ModelForm):
                 raise ValidationError({
                     'birth_registration_no': 'An application with this birth registration number already exists for this session.',
                 })
-        geo_errors = validate_geo_fields(cleaned, ['present'])
+        prefixes = ['present']
+        if not cleaned.get('copy_same_permanent'):
+            prefixes.append('permanent')
+        geo_errors = validate_geo_fields(cleaned, prefixes)
         if geo_errors:
             raise ValidationError(geo_errors)
         return cleaned
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        if self.cleaned_data.get('copy_same_permanent'):
+            instance.copy_address('present', 'permanent')
         instance.sync_composed_addresses()
-        if self.cleaned_data.get('copy_to_father'):
-            instance.copy_address('present', 'father')
-        if self.cleaned_data.get('copy_to_mother'):
-            instance.copy_address('present', 'mother')
         if commit:
             instance.save()
         return instance
@@ -249,7 +260,7 @@ class FamilyStepForm(forms.ModelForm):
             'mother_organization': _text('Organization / business name'),
             'mother_mobile': _text('01XXXXXXXXX'),
             'email': forms.EmailInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Family email'}),
-            'family_income_yearly': _text('Yearly family income (BDT)'),
+            'family_income_yearly': _select(),
             'earning_members': _text('Total earning members'),
             'previous_school_name': _text('Previous school (if any)'),
         }
@@ -257,6 +268,9 @@ class FamilyStepForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         bind_geo_fields(self, ['father', 'mother'])
+        self.fields['family_income_yearly'].choices = [
+            ('', 'Select income range'),
+        ] + list(Application.FamilyIncome.choices)
         for name in (
             'father_name', 'father_nid', 'father_occupation', 'father_mobile',
             'mother_name', 'mother_nid', 'mother_occupation', 'mother_mobile',
@@ -283,10 +297,7 @@ class FamilyStepForm(forms.ModelForm):
         cleaned = super().clean()
         if not cleaned.get('father_mobile') and not cleaned.get('mother_mobile'):
             raise ValidationError('Please provide at least one parent mobile number.')
-        income = cleaned.get('family_income_yearly')
         members = cleaned.get('earning_members')
-        if income is not None and income < 0:
-            raise ValidationError({'family_income_yearly': 'Income cannot be negative.'})
         if members is not None and members < 0:
             raise ValidationError({'earning_members': 'Earning members cannot be negative.'})
         geo_errors = validate_geo_fields(cleaned, ['father', 'mother'])
@@ -498,7 +509,7 @@ class ResumeForm(forms.Form):
 class LookupForm(forms.Form):
     form_number = forms.CharField(
         label='Form number',
-        widget=_text('HCR-2026-00001'),
+        widget=_text('N-26-00001'),
     )
     father_mobile = forms.CharField(
         label="Father's mobile",

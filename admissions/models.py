@@ -114,6 +114,9 @@ class AdmissionSession(models.Model):
         digits = ''.join(ch for ch in self.academic_year if ch.isdigit())
         return digits[:4] if len(digits) >= 4 else str(timezone.localdate().year)
 
+    def year_yy(self):
+        return self.year_prefix()[-2:]
+
     @classmethod
     def get_open(cls):
         session = cls.objects.filter(is_open=True).first()
@@ -137,6 +140,11 @@ class AdmissionClass(models.Model):
         validators=[MinValueValidator(0)],
         help_text='Leave blank to use the session fee.',
     )
+    form_code = models.CharField(
+        max_length=8,
+        blank=True,
+        help_text='Prefix on form numbers, e.g. N for Nursery → N-26-00001.',
+    )
 
     class Meta:
         ordering = ['order', 'id']
@@ -145,6 +153,25 @@ class AdmissionClass(models.Model):
 
     def __str__(self):
         return self.name
+
+    def form_number_code(self):
+        raw = (self.form_code or '').strip()
+        if raw:
+            return raw.upper()
+        name = (self.name or '').strip()
+        aliases = {
+            'play': 'P',
+            'nursery': 'N',
+            'kg': 'KG',
+            'kindergarten': 'KG',
+        }
+        lowered = name.lower()
+        if lowered in aliases:
+            return aliases[lowered]
+        if lowered.startswith('class '):
+            return name.split(None, 1)[1].replace(' ', '').upper()
+        slug = (self.code or 'X').replace('-', '').upper()
+        return slug[:8]
 
 
 class BusStop(models.Model):
@@ -218,11 +245,15 @@ class VivaSlot(models.Model):
 
 
 class AdmissionSequence(models.Model):
-    year = models.CharField(max_length=4, unique=True)
+    year = models.CharField(max_length=4)
+    class_code = models.CharField(max_length=8, default='')
     last_number = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        unique_together = [('year', 'class_code')]
+
     def __str__(self):
-        return f'{self.year}: {self.last_number}'
+        return f'{self.class_code or "—"}-{self.year}: {self.last_number}'
 
 
 class Application(models.Model):
@@ -264,6 +295,21 @@ class Application(models.Model):
         CHRISTIANITY = 'christianity', 'Christianity'
         BUDDHISM = 'buddhism', 'Buddhism'
         OTHER = 'other', 'Other'
+
+    class FamilyIncome(models.TextChoices):
+        BELOW_6000 = 'below-6000', 'Below 6,000'
+        R_6_10 = '6000-10000', '6,000 – 10,000'
+        R_10_15 = '10000-15000', '10,000 – 15,000'
+        R_15_20 = '15000-20000', '15,000 – 20,000'
+        R_20_25 = '20000-25000', '20,000 – 25,000'
+        R_25_30 = '25000-30000', '25,000 – 30,000'
+        R_30_40 = '30000-40000', '30,000 – 40,000'
+        R_40_50 = '40000-50000', '40,000 – 50,000'
+        R_50_75 = '50000-75000', '50,000 – 75,000'
+        R_75_100 = '75000-100000', '75,000 – 100,000'
+        R_100_150 = '100000-150000', '100,000 – 150,000'
+        R_150_200 = '150000-200000', '150,000 – 200,000'
+        ABOVE_200 = 'above-200000', 'Above 200,000'
 
     session = models.ForeignKey(
         AdmissionSession,
@@ -308,6 +354,16 @@ class Application(models.Model):
         help_text='House, road, village or area',
     )
     present_address = models.TextField(blank=True, help_text='Composed full present address')
+    permanent_division = models.CharField('Permanent division', max_length=80, blank=True)
+    permanent_zila = models.CharField('Permanent zila', max_length=80, blank=True)
+    permanent_thana = models.CharField('Permanent thana', max_length=80, blank=True)
+    permanent_address_line = models.CharField(
+        'Permanent address',
+        max_length=300,
+        blank=True,
+        help_text='House, road, village or area',
+    )
+    permanent_address = models.TextField(blank=True, help_text='Composed full permanent address')
     religion = models.CharField(max_length=20, choices=Religion.choices, blank=True)
     photo = models.ImageField(
         upload_to=application_photo_path,
@@ -325,8 +381,8 @@ class Application(models.Model):
     father_division = models.CharField("Father's division", max_length=80, blank=True)
     father_zila = models.CharField("Father's zila", max_length=80, blank=True)
     father_thana = models.CharField("Father's thana", max_length=80, blank=True)
-    father_address_line = models.CharField("Father's address", max_length=300, blank=True)
-    father_address = models.TextField(blank=True, help_text='Composed full father address')
+    father_address_line = models.CharField("Father's work address", max_length=300, blank=True)
+    father_address = models.TextField(blank=True, help_text="Composed full father work address")
 
     mother_name = models.CharField(max_length=200, blank=True)
     mother_nid = models.CharField(max_length=20, blank=True)
@@ -337,14 +393,15 @@ class Application(models.Model):
     mother_division = models.CharField("Mother's division", max_length=80, blank=True)
     mother_zila = models.CharField("Mother's zila", max_length=80, blank=True)
     mother_thana = models.CharField("Mother's thana", max_length=80, blank=True)
-    mother_address_line = models.CharField("Mother's address", max_length=300, blank=True)
-    mother_address = models.TextField(blank=True, help_text='Composed full mother address')
+    mother_address_line = models.CharField("Mother's work address", max_length=300, blank=True)
+    mother_address = models.TextField(blank=True, help_text="Composed full mother work address")
 
     email = models.EmailField(blank=True)
-    family_income_yearly = models.PositiveIntegerField(
+    family_income_yearly = models.CharField(
         'Family income (yearly, BDT)',
+        max_length=32,
         blank=True,
-        null=True,
+        choices=FamilyIncome.choices,
     )
     earning_members = models.PositiveSmallIntegerField(blank=True, null=True)
     previous_school_name = models.CharField(max_length=200, blank=True)
@@ -463,6 +520,9 @@ class Application(models.Model):
         from .geo import compose
         self.present_address = compose(
             self.present_division, self.present_zila, self.present_thana, self.present_address_line,
+        )
+        self.permanent_address = compose(
+            self.permanent_division, self.permanent_zila, self.permanent_thana, self.permanent_address_line,
         )
         self.father_address = compose(
             self.father_division, self.father_zila, self.father_thana, self.father_address_line,

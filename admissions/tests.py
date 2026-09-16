@@ -94,6 +94,10 @@ class AdmissionBaseTestCase(TestCase):
             'present_zila': 'Rajshahi',
             'present_thana': 'Boalia',
             'present_address_line': 'House 12, Sagorpara',
+            'permanent_division': 'Rajshahi',
+            'permanent_zila': 'Rajshahi',
+            'permanent_thana': 'Boalia',
+            'permanent_address_line': 'House 12, Sagorpara',
             'religion': Application.Religion.ISLAM,
             'father_name': 'Karim Ali',
             'father_nid': '1234567890',
@@ -114,7 +118,7 @@ class AdmissionBaseTestCase(TestCase):
             'mother_thana': 'Boalia',
             'mother_address_line': 'House 12, Sagorpara',
             'email': 'parent@example.com',
-            'family_income_yearly': 500000,
+            'family_income_yearly': Application.FamilyIncome.ABOVE_200,
             'earning_members': 1,
             'agrees_uniform': True,
             'agrees_rules': True,
@@ -147,6 +151,7 @@ class AgeAndDuplicateTests(AdmissionBaseTestCase):
             'present_zila': 'Rajshahi',
             'present_thana': 'Boalia',
             'present_address_line': 'House 1',
+            'copy_same_permanent': 'on',
             'religion': 'islam',
             'photo': photo,
         })
@@ -170,6 +175,7 @@ class AgeAndDuplicateTests(AdmissionBaseTestCase):
             'present_zila': 'Rajshahi',
             'present_thana': 'Boalia',
             'present_address_line': 'House 2',
+            'copy_same_permanent': 'on',
             'religion': 'islam',
             'photo': photo,
         })
@@ -207,8 +213,15 @@ class SlotTests(AdmissionBaseTestCase):
         first = assign_form_number(app)
         second = assign_form_number(app)
         self.assertEqual(first, second)
-        self.assertTrue(first.startswith('HCR-2026-'))
-        self.assertEqual(AdmissionSequence.objects.get(year='2026').last_number, 1)
+        self.assertTrue(first.startswith('1-26-'))
+        self.assertEqual(AdmissionSequence.objects.get(year='2026', class_code='1').last_number, 1)
+
+    def test_nursery_form_number_format(self):
+        nursery = AdmissionClass.objects.create(
+            name='Nursery', code='n-test', form_code='N', is_active=True,
+        )
+        app = self.make_application(admit_class=nursery, birth_registration_no='19901234567890911')
+        self.assertEqual(assign_form_number(app), 'N-26-00001')
 
 
 class PaymentPdfEmailTests(AdmissionBaseTestCase):
@@ -328,6 +341,7 @@ class WizardFlowTests(AdmissionBaseTestCase):
             'present_zila': 'Rajshahi',
             'present_thana': 'Boalia',
             'present_address_line': 'House 12, Sagorpara',
+            'copy_same_permanent': 'on',
             'religion': 'islam',
             'photo': photo,
         })
@@ -358,7 +372,7 @@ class WizardFlowTests(AdmissionBaseTestCase):
             'mother_thana': 'Boalia',
             'mother_address_line': 'House 12, Sagorpara',
             'email': 'parent@example.com',
-            'family_income_yearly': '400000',
+            'family_income_yearly': Application.FamilyIncome.ABOVE_200,
             'earning_members': '1',
             'previous_school_name': '',
             'results-TOTAL_FORMS': '1',
@@ -456,13 +470,14 @@ class GeoAddressTests(AdmissionBaseTestCase):
             'present_zila': 'Rajshahi',
             'present_thana': 'Gulshan',
             'present_address_line': 'House 12',
+            'copy_same_permanent': 'on',
             'religion': 'islam',
             'photo': photo,
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'thana')
 
-    def test_copy_present_to_parents(self):
+    def test_copy_present_to_permanent(self):
         photo = make_photo_file()
         self.client.get(reverse('admissions:apply'))
         response = self.client.post(reverse('admissions:apply') + '?step=1', {
@@ -478,16 +493,15 @@ class GeoAddressTests(AdmissionBaseTestCase):
             'present_zila': 'Rajshahi',
             'present_thana': 'Boalia',
             'present_address_line': 'House 12, Sagorpara',
-            'copy_to_father': 'on',
-            'copy_to_mother': 'on',
+            'copy_same_permanent': 'on',
             'religion': 'islam',
             'photo': photo,
         })
         self.assertEqual(response.status_code, 302)
         app = Application.objects.get(birth_registration_no='19901234567890902')
-        self.assertEqual(app.father_thana, 'Boalia')
-        self.assertEqual(app.mother_division, 'Rajshahi')
-        self.assertEqual(app.father_address, app.present_address)
+        self.assertEqual(app.permanent_thana, 'Boalia')
+        self.assertEqual(app.permanent_division, 'Rajshahi')
+        self.assertEqual(app.permanent_address, app.present_address)
 
 
 class SiblingFormTests(AdmissionBaseTestCase):
@@ -547,7 +561,7 @@ class PreviousResultTests(AdmissionBaseTestCase):
             'mother_thana': 'Boalia',
             'mother_address_line': 'House 12, Sagorpara',
             'email': 'parent@example.com',
-            'family_income_yearly': '400000',
+            'family_income_yearly': Application.FamilyIncome.ABOVE_200,
             'earning_members': '1',
             'previous_school_name': 'Rajshahi Model School',
             'results-TOTAL_FORMS': '1',
@@ -590,20 +604,29 @@ class PdfTemplateTests(AdmissionBaseTestCase):
         html = render_to_string('admissions/pdf/application.html', build_pdf_context(app))
         self.assertIn('Admission Form', html)
         self.assertIn('Admit Card', html)
+        self.assertIn('Student Information', html)
+        self.assertIn('Family Information', html)
+        self.assertIn('Others Information', html)
+        self.assertIn('Bus Information', html)
+        self.assertIn('Declaration', html)
+        self.assertIn('Viva Time', html)
+        self.assertIn('Instructions', html)
         self.assertIn('Name of Student in English', html)
         self.assertIn('RAHIM ALI', html)
         self.assertIn('রহিম আলী', html)
         self.assertIn('Father’s Name in English', html)
         self.assertIn('Mother’s Name in English', html)
         self.assertIn('Present Address', html)
-        self.assertIn('Father’s Address', html)
-        self.assertIn('Mother’s Address', html)
+        self.assertIn('Permanent Address', html)
+        self.assertIn('Father’s Work Address', html)
+        self.assertIn('Mother’s Work Address', html)
         self.assertIn('Birth Registration No.', html)
-        self.assertIn('Previous class results', html)
+        self.assertIn('Previous class', html)
         self.assertIn('Amina Ali', html)
         self.assertIn('Holy Cross School', html)
         self.assertIn('Hard-copy photograph', html)
-        self.assertNotIn('Birth Certificate', html)
+        self.assertIn('Uploaded photo', html)
+        self.assertIn('Student photograph', html)
         self.assertNotIn('BANDURA', html)
         pdf = render_pdf_bytes(app)
         self.assertTrue(pdf.startswith(b'%PDF'))

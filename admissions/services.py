@@ -145,14 +145,17 @@ def assign_form_number(application):
     if application.form_number:
         return application.form_number
     year = application.session.year_prefix()
+    yy = application.session.year_yy()
+    class_code = application.admit_class.form_number_code() if application.admit_class_id else 'X'
     with transaction.atomic():
         sequence, _created = AdmissionSequence.objects.get_or_create(
             year=year,
+            class_code=class_code,
             defaults={'last_number': 0},
         )
         AdmissionSequence.objects.filter(pk=sequence.pk).update(last_number=F('last_number') + 1)
         sequence.refresh_from_db()
-        application.form_number = f'HCR-{year}-{sequence.last_number:05d}'
+        application.form_number = f'{class_code}-{yy}-{sequence.last_number:05d}'
         application.save(update_fields=['form_number', 'updated_at'])
     return application.form_number
 

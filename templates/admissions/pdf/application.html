@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <style>
-    @page { size: A4; margin: 8mm 10mm 8mm 10mm; }
+    @page {
+        size: A4;
+        margin: 12mm 12mm 16mm 12mm;
+        @bottom-center {
+            content: "Holy Cross School & College, Rajshahi  ·  Page " counter(page);
+            font-size: 9px;
+            color: #555;
+        }
+    }
     {% if font_regular %}
     @font-face { font-family: 'NotoSans'; src: url('{{ font_regular }}'); }
     {% endif %}
@@ -17,88 +25,96 @@
     body {
         font-family: 'NotoSans', 'DejaVu Sans', sans-serif;
         color: #111;
-        font-size: 9.4px;
-        line-height: 1.25;
+        font-size: 12px;
+        line-height: 1.4;
         margin: 0;
     }
     .bn { font-family: 'NotoBengali', 'NotoSans', sans-serif; }
     table { border-collapse: collapse; }
-    .banner { width: 100%; margin-bottom: 4px; }
+    .banner { width: 100%; margin-bottom: 10px; }
     .banner td { vertical-align: top; }
     .col-left { width: 22%; }
-    .col-center { width: 56%; text-align: center; padding: 0 6px; }
+    .col-center { width: 56%; text-align: center; padding: 0 10px; }
     .col-right { width: 22%; text-align: right; }
-    .form-no { padding: 0 0 6px; }
-    .form-no .cap { font-size: 8px; font-style: italic; }
-    .form-no .num { font-size: 12px; font-weight: 700; margin-top: 2px; letter-spacing: .2px; }
-    .school { font-size: 15.5px; font-weight: 700; letter-spacing: .45px; text-transform: uppercase; }
-    .addr { font-size: 8.4px; margin-top: 1px; }
+    .logo { height: 72px; width: auto; display: block; margin-bottom: 8px; }
+    .col-left .photo-wrap { margin-left: 0; }
+    .col-left .photo, .col-left .photo img { width: 92px; height: 114px; }
+    .school { font-size: 20px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; line-height: 1.2; }
+    .addr { font-size: 11px; margin-top: 3px; color: #222; }
     .badge {
         display: inline-block;
-        border: 1.2px solid #111;
-        padding: 2px 11px;
+        border: 1.4px solid #111;
+        padding: 3px 12px;
         font-weight: 700;
-        font-size: 10px;
-        margin: 5px 0 3px;
+        font-size: 12.5px;
+        margin: 7px 0 4px;
     }
-    .klass { font-size: 10.5px; font-style: italic; margin: 2px 0 4px; }
-    .logo { height: 40px; margin-top: 2px; }
-    .photo-wrap { width: 92px; }
-    .col-right .photo-wrap { margin-left: auto; }
+    .klass { font-size: 13px; margin: 2px 0; }
+    .form-no { font-size: 13.5px; margin-top: 4px; }
+    .form-no strong { font-size: 15px; }
+    .photo-wrap { width: 110px; margin-left: auto; }
     .photo {
-        width: 92px;
-        height: 112px;
-        border: 1.35px solid #111;
+        width: 110px;
+        height: 136px;
+        border: 1.4px solid #111;
         overflow: hidden;
         background: #fff;
     }
-    .photo img { width: 92px; height: 112px; object-fit: cover; display: block; }
+    .photo img { width: 110px; height: 136px; object-fit: cover; display: block; }
     .photo.placeholder {
-        padding-top: 32px;
+        padding: 28px 6px 0;
         text-align: center;
-        font-size: 6.4px;
+        font-size: 8.5px;
         font-style: italic;
-        color: #555;
-        line-height: 1.25;
+        color: #444;
+        line-height: 1.35;
     }
-    .photo-wrap .ph-cap {
-        font-size: 6.3px;
-        line-height: 1.2;
-        padding-top: 3px;
-        font-style: italic;
-        text-align: center;
+    .ph-cap { font-size: 8.5px; font-style: italic; text-align: center; padding-top: 4px; }
+    .section { margin: 16px 0 8px; }
+    .keep { page-break-inside: avoid; }
+    .section h2 {
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #1e3a8a;
+        border-bottom: 2.2px solid #1e3a8a;
+        padding: 0 0 4px;
+        margin: 0 0 10px;
+        letter-spacing: .2px;
     }
-    .admit .photo { height: 96px; }
-    .admit .photo img { width: 92px; height: 96px; }
+    .section h3 {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #1c2a4e;
+        margin: 10px 0 6px;
+    }
     table.form { width: 100%; }
-    table.form td { vertical-align: bottom; padding: 4px 6px 2px 0; }
-    .lbl { font-style: italic; font-size: 8.6px; white-space: nowrap; width: 1%; padding-right: 8px !important; color: #222; }
-    .val { border-bottom: 0.75px solid #222; font-weight: 700; font-size: 10px; min-width: 28px; }
-    .val-empty { min-height: 12px; }
-    .split td { padding-right: 8px; }
-    .boxes { width: 100%; margin: 7px 0 5px; }
-    .box { min-height: 36px; padding: 2px 4px 4px 0; vertical-align: top; }
-    .box .cap { font-size: 8px; font-style: italic; margin-bottom: 3px; }
-    .box .body { font-size: 9.2px; font-weight: 700; line-height: 1.35; }
-    .sib { width: 100%; margin: 2px 0 4px; }
-    .sib td { padding: 2px 4px 1px 0; }
-    .num { width: 14px; font-style: italic; }
-    .principal { margin-top: 10px; padding: 16px 8px 4px 0; }
-    .principal .sign-space { height: 22px; width: 150px; }
-    .principal img { height: 32px; display: block; margin-bottom: 4px; }
-    .muted { font-size: 8px; color: #333; font-style: italic; }
-    .decls { width: 100%; margin-top: 4px; }
-    .decls td { font-size: 8.2px; padding: 1px 8px 1px 0; }
-    .admit {
-        margin-top: 16px;
-        padding: 12px 2px 2px;
-        border-top: 1.8px dashed #444;
-        page-break-inside: avoid;
+    table.form td { vertical-align: bottom; padding: 6px 8px 4px 0; }
+    .lbl { font-style: italic; font-size: 11px; white-space: nowrap; width: 1%; padding-right: 8px !important; color: #222; }
+    .val { border-bottom: 0.9px solid #222; font-weight: 700; font-size: 12.5px; min-width: 36px; }
+    .results { width: 100%; margin: 4px 0 6px; border: 0.8px solid #c5cdd8; }
+    .results th, .results td { border: 0.8px solid #c5cdd8; padding: 6px 8px; text-align: left; font-size: 12px; }
+    .results th { background: #eef2ff; color: #1e3a8a; font-size: 11px; }
+    .yesno { display: inline-block; min-width: 36px; font-weight: 800; }
+    .decl-table { width: 100%; }
+    .decl-table td { padding: 7px 10px 7px 0; font-size: 12px; vertical-align: top; }
+    .viva {
+        border: 1.4px solid #1e3a8a;
+        padding: 10px 12px 6px;
+        background: #f7f9ff;
     }
-    .admit .banner { margin-top: 4px; margin-bottom: 8px; }
-    .admit table.form td { padding-top: 5px; padding-bottom: 3px; }
-    .admit-meta { font-size: 8.2px; margin-top: 8px; }
-    .cut { text-align: center; font-size: 7px; color: #666; letter-spacing: 1px; margin: 0 0 6px; }
+    .steps { margin: 0; padding-left: 18px; }
+    .steps li { margin: 5px 0; font-size: 12px; }
+    .principal { margin-top: 18px; padding: 28px 8px 4px 0; }
+    .principal .sign-space { height: 28px; width: 170px; }
+    .principal img { height: 40px; display: block; margin-bottom: 4px; }
+    .muted { font-size: 11px; color: #333; font-style: italic; }
+    .admit {
+        page-break-before: always;
+        padding-top: 4px;
+    }
+    .admit .banner { margin-bottom: 14px; }
+    .admit table.form td { padding-top: 8px; padding-bottom: 6px; }
+    .admit-title { font-size: 13px; letter-spacing: 2px; font-weight: 800; color: #1e3a8a; margin: 0 0 10px; text-align: center; }
 </style>
 </head>
 <body>
@@ -106,10 +122,7 @@
 <table class="banner">
     <tr>
         <td class="col-left">
-            <div class="form-no">
-                <div class="cap">Form Number:</div>
-                <div class="num">{{ application.form_number }}</div>
-            </div>
+            {% if logo_uri %}<img class="logo" src="{{ logo_uri }}" alt="Logo">{% endif %}
             <div class="photo-wrap">
                 <div class="photo">
                     {% if photo_uri %}<img src="{{ photo_uri }}" alt="Photo">{% endif %}
@@ -128,227 +141,270 @@
             </div>
             <div class="badge">Admission Form — {{ form_year }}</div>
             <div class="klass">Admission for Class: <strong>{{ application.admit_class.name|default:"" }}</strong></div>
-            {% if logo_uri %}<img class="logo" src="{{ logo_uri }}" alt="Logo">{% endif %}
+            <div class="form-no">Form Number: <strong>{{ application.form_number }}</strong></div>
         </td>
         <td class="col-right">
             <div class="photo-wrap">
-                <div class="photo placeholder">Attach hard-copy photo<br>Passport size<br>School dress<br>White background</div>
+                <div class="photo placeholder">Attach hard-copy photo<br><br>Passport size<br>School dress<br>White background</div>
                 <div class="ph-cap">Hard-copy photograph</div>
             </div>
         </td>
     </tr>
 </table>
 
-<table class="form">
-    <tr>
-        <td class="lbl">Name of Student in English (Capital Letter)</td>
-        <td class="val" colspan="5">{{ application.student_name_en|upper }}</td>
-    </tr>
-    <tr>
-        <td class="lbl">(In Bengali)</td>
-        <td class="val bn" colspan="5">{{ application.student_name_bn }}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">Date of Birth:</td>
-        <td class="lbl">Day</td>
-        <td class="val">{{ application.date_of_birth|date:"d" }}</td>
-        <td class="lbl">Month</td>
-        <td class="val">{{ application.date_of_birth|date:"F" }}</td>
-        <td class="lbl">Year</td>
-        <td class="val">{{ application.date_of_birth|date:"Y" }}</td>
-        <td class="lbl">Age</td>
-        <td class="val">{% if application.age_years != None %}{{ application.age_years }}y{% if application.age_months %} {{ application.age_months }}m{% endif %}{% endif %}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">Birth Registration No.</td>
-        <td class="val">{{ application.birth_registration_no }}</td>
-        <td class="lbl">Nationality</td>
-        <td class="val">{{ application.nationality }}</td>
-        <td class="lbl">Gender</td>
-        <td class="val">{{ application.get_gender_display }}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">Religion</td>
-        <td class="val">{{ application.get_religion_display }}</td>
-        <td class="lbl">Blood Group</td>
-        <td class="val">{{ application.blood_group }}</td>
-        <td class="lbl">Email</td>
-        <td class="val">{{ application.email }}</td>
-    </tr>
-</table>
+<div class="section">
+    <h2>Student Information</h2>
+    <table class="form">
+        <tr>
+            <td class="lbl">Name of Student in English (Capital Letter)</td>
+            <td class="val" colspan="5">{{ application.student_name_en|upper }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Name of Student (Bengali)</td>
+            <td class="val bn" colspan="5">{{ application.student_name_bn }}</td>
+        </tr>
+    </table>
+    <table class="form">
+        <tr>
+            <td class="lbl">Date of Birth</td>
+            <td class="lbl">Day</td>
+            <td class="val">{{ application.date_of_birth|date:"d" }}</td>
+            <td class="lbl">Month</td>
+            <td class="val">{{ application.date_of_birth|date:"F" }}</td>
+            <td class="lbl">Year</td>
+            <td class="val">{{ application.date_of_birth|date:"Y" }}</td>
+            <td class="lbl">Age</td>
+            <td class="val">{% if application.age_years != None %}{{ application.age_years }} years{% if application.age_months %} {{ application.age_months }} months{% endif %}{% endif %}</td>
+        </tr>
+    </table>
+    <table class="form">
+        <tr>
+            <td class="lbl">Birth Registration No.</td>
+            <td class="val">{{ application.birth_registration_no }}</td>
+            <td class="lbl">Nationality</td>
+            <td class="val">{{ application.nationality }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Gender</td>
+            <td class="val">{{ application.get_gender_display }}</td>
+            <td class="lbl">Religion</td>
+            <td class="val">{{ application.get_religion_display }}</td>
+            <td class="lbl">Blood Group</td>
+            <td class="val">{{ application.blood_group }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Present Address</td>
+            <td class="val" colspan="5">{{ application.present_address }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Permanent Address</td>
+            <td class="val" colspan="5">{{ application.permanent_address }}</td>
+        </tr>
+    </table>
+</div>
 
-<table class="form">
-    <tr>
-        <td class="lbl">Father’s Name in English (Capital Letter)</td>
-        <td class="val" colspan="5">{{ application.father_name|upper }}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">National ID Number</td>
-        <td class="val">{{ application.father_nid }}</td>
-        <td class="lbl">Mobile Number</td>
-        <td class="val">{{ application.father_mobile }}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">Occupation</td>
-        <td class="val">{{ application.father_occupation }}</td>
-        <td class="lbl">Designation</td>
-        <td class="val">{{ application.father_designation }}</td>
-        <td class="lbl">Yearly Family Income</td>
-        <td class="val">{% if application.family_income_yearly %}BDT {{ application.family_income_yearly }}{% endif %}</td>
-    </tr>
-</table>
-<table class="form">
-    <tr>
-        <td class="lbl">Organization / Business</td>
-        <td class="val">{{ application.father_organization }}</td>
-        <td class="lbl">Earning members</td>
-        <td class="val" style="width:70px">{{ application.earning_members }}</td>
-    </tr>
-</table>
+<div class="section">
+    <h2>Family Information</h2>
+    <h3>Father</h3>
+    <table class="form">
+        <tr>
+            <td class="lbl">Father’s Name in English (Capital Letter)</td>
+            <td class="val" colspan="5">{{ application.father_name|upper }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">National ID Number</td>
+            <td class="val">{{ application.father_nid }}</td>
+            <td class="lbl">Mobile Number</td>
+            <td class="val">{{ application.father_mobile }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Occupation</td>
+            <td class="val">{{ application.father_occupation }}</td>
+            <td class="lbl">Designation</td>
+            <td class="val">{{ application.father_designation }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Organization / Business</td>
+            <td class="val" colspan="3">{{ application.father_organization }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Father’s Work Address</td>
+            <td class="val" colspan="5">{{ application.father_address }}</td>
+        </tr>
+    </table>
 
-<table class="form">
-    <tr>
-        <td class="lbl">Mother’s Name in English (Capital Letter)</td>
-        <td class="val" colspan="5">{{ application.mother_name|upper }}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">Occupation</td>
-        <td class="val">{{ application.mother_occupation }}</td>
-        <td class="lbl">Designation</td>
-        <td class="val">{{ application.mother_designation }}</td>
-        <td class="lbl">Mobile Number</td>
-        <td class="val">{{ application.mother_mobile }}</td>
-    </tr>
-</table>
-<table class="form split">
-    <tr>
-        <td class="lbl">National ID Number</td>
-        <td class="val">{{ application.mother_nid }}</td>
-        <td class="lbl">Organization / Business</td>
-        <td class="val">{{ application.mother_organization }}</td>
-    </tr>
-</table>
+    <h3>Mother</h3>
+    <table class="form">
+        <tr>
+            <td class="lbl">Mother’s Name in English (Capital Letter)</td>
+            <td class="val" colspan="5">{{ application.mother_name|upper }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">National ID Number</td>
+            <td class="val">{{ application.mother_nid }}</td>
+            <td class="lbl">Mobile Number</td>
+            <td class="val">{{ application.mother_mobile }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Occupation</td>
+            <td class="val">{{ application.mother_occupation }}</td>
+            <td class="lbl">Designation</td>
+            <td class="val">{{ application.mother_designation }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Organization / Business</td>
+            <td class="val" colspan="3">{{ application.mother_organization }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Mother’s Work Address</td>
+            <td class="val" colspan="5">{{ application.mother_address }}</td>
+        </tr>
+    </table>
 
-<table class="form">
-    <tr>
-        <td class="lbl">Name of the Previous School</td>
-        <td class="val">{{ application.previous_school_name }}</td>
-        <td class="lbl">School Bus</td>
-        <td class="val">{{ answers.needs_bus }}{% if application.needs_bus and application.bus_stop %} — {{ application.bus_stop }}{% endif %}</td>
-    </tr>
-    <tr>
-        <td class="lbl">Previous class results</td>
-        <td class="val" colspan="3">
-            {% for r in results %}{{ r.previous_class }}{% if r.year %} ({{ r.year }}){% endif %}{% if r.result %}: {{ r.result }}{% endif %}{% if not forloop.last %}; {% endif %}{% endfor %}
-        </td>
-    </tr>
-</table>
+    <h3>Household</h3>
+    <table class="form">
+        <tr>
+            <td class="lbl">Email</td>
+            <td class="val">{{ application.email }}</td>
+            <td class="lbl">Yearly Family Income</td>
+            <td class="val">{% if application.family_income_yearly %}BDT {{ application.get_family_income_yearly_display }}{% endif %}</td>
+            <td class="lbl">Earning members</td>
+            <td class="val">{{ application.earning_members }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Other child in this school</td>
+            <td class="val" colspan="5">{{ answers.has_other_child }}</td>
+        </tr>
+    </table>
+    <table class="form">
+        {% for s in siblings %}
+        <tr>
+            <td class="lbl">{{ forloop.counter }}.</td>
+            <td class="lbl">Child’s name</td>
+            <td class="val">{{ s.name }}</td>
+            <td class="lbl">Class</td>
+            <td class="val">{{ s.class_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
-<table class="boxes">
-    <tr>
-        <td class="box" style="width:49%">
-            <div class="cap">Father’s workplace</div>
-            <div class="body">
-                {{ application.father_occupation }}{% if application.father_designation %} · {{ application.father_designation }}{% endif %}<br>
-                {{ application.father_organization }}
-            </div>
-        </td>
-        <td style="width:2%"></td>
-        <td class="box" style="width:49%">
-            <div class="cap">Mother’s workplace</div>
-            <div class="body">
-                {{ application.mother_occupation }}{% if application.mother_designation %} · {{ application.mother_designation }}{% endif %}<br>
-                {{ application.mother_organization }}
-            </div>
-        </td>
-    </tr>
-</table>
+<div class="section keep">
+    <h2>Others Information</h2>
+    <table class="form">
+        <tr>
+            <td class="lbl">Name of the Previous School</td>
+            <td class="val" colspan="5">{{ application.previous_school_name }}</td>
+        </tr>
+    </table>
+    <table class="results">
+        <tr>
+            <th>Previous class</th>
+            <th>Year</th>
+            <th>Result</th>
+        </tr>
+        {% for r in results %}
+        <tr>
+            <td>{{ r.previous_class }}</td>
+            <td>{{ r.year }}</td>
+            <td>{{ r.result }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">—</td></tr>
+        {% endfor %}
+    </table>
+</div>
 
-<table class="form">
-    <tr>
-        <td class="lbl" style="white-space:normal; width:auto">If any child is studying here (Name &amp; Class)</td>
-        <td class="lbl">Has other child:</td>
-        <td class="val" style="width:50px">{{ answers.has_other_child }}</td>
-    </tr>
-</table>
-<table class="sib">
-    {% for s in siblings %}
-    <tr>
-        <td class="num">{{ forloop.counter }}.</td>
-        <td class="lbl">Name</td>
-        <td class="val">{{ s.name }}</td>
-        <td class="lbl">Class</td>
-        <td class="val" style="width:28%">{{ s.class_name }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="section keep">
+    <h2>Bus Information</h2>
+    <table class="form">
+        <tr>
+            <td class="lbl">School bus required</td>
+            <td class="val">{{ answers.needs_bus }}</td>
+            <td class="lbl">Bus stop</td>
+            <td class="val">{% if application.needs_bus %}{{ application.bus_stop }}{% else %}—{% endif %}</td>
+        </tr>
+    </table>
+</div>
 
-<table class="form">
-    <tr>
-        <td class="lbl">Present Address</td>
-        <td class="val">{{ application.present_address }}</td>
-    </tr>
-    <tr>
-        <td class="lbl">Father’s Address</td>
-        <td class="val">{{ application.father_address }}</td>
-    </tr>
-    <tr>
-        <td class="lbl">Mother’s Address</td>
-        <td class="val">{{ application.mother_address }}</td>
-    </tr>
-</table>
+<div class="section keep">
+    <h2>Declaration</h2>
+    <table class="decl-table">
+        <tr>
+            <td>আর্থিক সামর্থ্য আছে কি / না?</td>
+            <td><span class="yesno">{{ answers.financial_capacity }}</span></td>
+        </tr>
+        <tr>
+            <td>Uniform পরিধান করতে পারবে কি না?</td>
+            <td><span class="yesno">{{ answers.agrees_uniform }}</span></td>
+        </tr>
+        <tr>
+            <td>স্কুলের সকল নিয়ম মেনে চলতে পারবে কি না?</td>
+            <td><span class="yesno">{{ answers.agrees_rules }}</span></td>
+        </tr>
+        <tr>
+            <td>All information given in this form is correct</td>
+            <td><span class="yesno">{{ answers.info_correct }}</span></td>
+        </tr>
+    </table>
+    <div class="principal">
+        {% if signature_uri %}<img src="{{ signature_uri }}" alt="Signature">{% else %}<div class="sign-space"></div>{% endif %}
+        <div class="muted">Principal</div>
+    </div>
+</div>
 
-<table class="decls">
-    <tr>
-        <td>আর্থিক সামর্থ্য আছে কি / না? <strong>{{ answers.financial_capacity }}</strong></td>
-        <td>Uniform পরিধান করতে পারবে কি না? <strong>{{ answers.agrees_uniform }}</strong></td>
-    </tr>
-    <tr>
-        <td>স্কুলের সকল নিয়ম মেনে চলতে পারবে কি না? <strong>{{ answers.agrees_rules }}</strong></td>
-        <td>All information is correct: <strong>{{ answers.info_correct }}</strong></td>
-    </tr>
-</table>
+<div class="section keep">
+    <h2>Viva Time</h2>
+    <div class="viva">
+        <table class="form">
+            <tr>
+                <td class="lbl">Viva date</td>
+                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.date|date:"l, d F Y" }}{% endif %}</td>
+                <td class="lbl">Time</td>
+                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.start_time|time:"g:i A" }} – {{ application.viva_slot.end_time|time:"g:i A" }}{% endif %}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Venue</td>
+                <td class="val" colspan="3">{{ application.session.viva_venue }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
 
-<div class="principal">
-    {% if signature_uri %}<img src="{{ signature_uri }}" alt="Signature">{% else %}<div class="sign-space"></div>{% endif %}
-    <div class="muted">Principal</div>
+<div class="section keep">
+    <h2>Instructions</h2>
+    <ol class="steps">
+        {% for item in print_instructions %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ol>
+    {% if session_instructions %}
+    <p style="margin: 10px 0 0; font-size: 12px;">{{ session_instructions|linebreaksbr }}</p>
+    {% endif %}
 </div>
 
 <div class="admit">
-    <div class="cut">ADMIT CARD</div>
+    <div class="admit-title">ADMIT CARD</div>
     <table class="banner">
         <tr>
             <td class="col-left">
-                <div class="form-no">
-                    <div class="cap">Form Number:</div>
-                    <div class="num">{{ application.form_number }}</div>
-                </div>
+                {% if logo_uri %}<img class="logo" src="{{ logo_uri }}" alt="Logo">{% endif %}
             </td>
             <td class="col-center">
-                <div class="school" style="font-size:13.5px">Holy Cross School &amp; College</div>
+                <div class="school" style="font-size:18px">Holy Cross School &amp; College</div>
                 <div class="addr">
                     {% if school.address %}{{ school.address }}{% if school.city and school.city not in school.address %}, {{ school.city }}{% endif %}{% else %}Rajshahi{% endif %}
                 </div>
                 <div class="badge">Admit Card — {{ form_year }}</div>
                 <div class="klass">Admission for Class: <strong>{{ application.admit_class.name|default:"" }}</strong></div>
-                {% if logo_uri %}<img class="logo" src="{{ logo_uri }}" alt="Logo" style="height:36px">{% endif %}
+                <div class="form-no">Form Number: <strong>{{ application.form_number }}</strong></div>
             </td>
             <td class="col-right">
                 <div class="photo-wrap">
-                    <div class="photo placeholder">Attach hard-copy photo<br>Passport size</div>
-                    <div class="ph-cap">Hard-copy photograph</div>
+                    <div class="photo">
+                        {% if photo_uri %}<img src="{{ photo_uri }}" alt="Photo">{% endif %}
+                    </div>
+                    <div class="ph-cap">Student photograph</div>
                 </div>
             </td>
         </tr>
@@ -366,30 +422,34 @@
             <td class="lbl">Mother’s Name in English (Capital Letter)</td>
             <td class="val">{{ application.mother_name|upper }}</td>
         </tr>
-    </table>
-    <table class="form split">
         <tr>
             <td class="lbl">Contact Number</td>
             <td class="val">{{ application.contact_number }}</td>
-            <td class="lbl">Viva Date</td>
-            <td class="val">{% if application.viva_slot %}{{ application.viva_slot.date|date:"d F Y" }}{% endif %}</td>
-        </tr>
-        <tr>
-            <td class="lbl">Viva Time</td>
-            <td class="val">{% if application.viva_slot %}{{ application.viva_slot.start_time|time:"g:i A" }} – {{ application.viva_slot.end_time|time:"g:i A" }}{% endif %}</td>
-            <td class="lbl">Venue</td>
-            <td class="val">{{ application.session.viva_venue }}</td>
         </tr>
     </table>
-    <table class="form" style="margin-top:4px">
+    <div class="viva" style="margin-top:12px">
+        <table class="form">
+            <tr>
+                <td class="lbl">Viva date</td>
+                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.date|date:"l, d F Y" }}{% endif %}</td>
+                <td class="lbl">Time</td>
+                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.start_time|time:"g:i A" }} – {{ application.viva_slot.end_time|time:"g:i A" }}{% endif %}</td>
+            </tr>
+            <tr>
+                <td class="lbl">Venue</td>
+                <td class="val" colspan="3">{{ application.session.viva_venue }}</td>
+            </tr>
+        </table>
+    </div>
+    <table class="form" style="margin-top:16px">
         <tr>
-            <td class="principal" style="margin:0; width:40%; padding-top: 18px;">
-                {% if signature_uri %}<img src="{{ signature_uri }}" alt="Signature" style="height:28px">{% else %}<div class="sign-space"></div>{% endif %}
+            <td class="principal" style="margin:0; width:42%; padding-top: 22px;">
+                {% if signature_uri %}<img src="{{ signature_uri }}" alt="Signature" style="height:36px">{% else %}<div class="sign-space"></div>{% endif %}
                 <div class="muted">Principal</div>
             </td>
-            <td class="admit-meta" style="text-align:right; vertical-align:bottom">
+            <td style="text-align:right; vertical-align:bottom; font-size:11px; color:#333;">
                 {% if application.paid_at %}Submitted: {{ application.paid_at|date:"d F Y" }}<br>{% endif %}
-                Please print this form and bring it to the viva. Attach a hard-copy passport photograph if required.
+                Bring this admit card to the viva.
             </td>
         </tr>
     </table>

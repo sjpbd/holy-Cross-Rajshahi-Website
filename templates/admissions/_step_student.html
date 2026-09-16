@@ -69,22 +69,23 @@
             </div>
         </div>
         {% include 'admissions/_address_block.html' with prefix='present' division_field=form.present_division zila_field=form.present_zila thana_field=form.present_thana line_field=form.present_address_line %}
-        <div class="grid md:grid-cols-2 gap-3 mt-4">
-            <label class="adm-check">
-                {{ form.copy_to_father }}
-                <span>
-                    <strong>Copy to father’s address</strong>
-                    <span class="block text-xs text-slate-500 font-normal">You can still change it on the next step.</span>
-                </span>
-            </label>
-            <label class="adm-check">
-                {{ form.copy_to_mother }}
-                <span>
-                    <strong>Copy to mother’s address</strong>
-                    <span class="block text-xs text-slate-500 font-normal">Use this if both parents live at the same place.</span>
-                </span>
-            </label>
+    </section>
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Permanent address</h3>
+                <p class="adm-hint">Use the family’s lasting home address if it is different from present.</p>
+            </div>
         </div>
+        <label class="adm-check mb-4">
+            {{ form.copy_same_permanent }}
+            <span>
+                <strong>Same as present address</strong>
+                <span class="block text-xs text-slate-500 font-normal">Copies Division, Zila, Thana, and the house line.</span>
+            </span>
+        </label>
+        {% include 'admissions/_address_block.html' with prefix='permanent' division_field=form.permanent_division zila_field=form.permanent_zila thana_field=form.permanent_thana line_field=form.permanent_address_line %}
     </section>
 
     {% include 'admissions/_wizard_nav.html' %}
