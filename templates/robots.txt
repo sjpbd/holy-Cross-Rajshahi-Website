@@ -2,5 +2,13 @@ User-agent: *
 Disallow: /admin/
 Disallow: /static/
 Disallow: /media/
+Disallow: /admission/apply
+Disallow: /admission/payment
+Disallow: /admission/form
+Disallow: /admission/continue
+Disallow: /admission/lookup
+
+Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+
 
 Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml

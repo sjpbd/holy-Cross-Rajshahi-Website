@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'contact',
     'seo',
     'gallery',
+    'admissions.apps.AdmissionsConfig',
     'django_cleanup.apps.CleanupConfig',
 ]
 
@@ -64,7 +65,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',
+    'holy_cross.middleware.SelectiveUpdateCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,7 +73,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    'holy_cross.middleware.SelectiveFetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'holy_cross.urls'
@@ -92,6 +93,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.school_info_context',
                 'seo.context_processors.seo_context',
+                'admissions.context_processors.admission_context',
             ],
         },
     },
@@ -186,10 +188,6 @@ THUMBNAIL_ALIASES = {
 
 # Email Configuration
 # ------------------------------------------------------------------------------
-# For development, you can use the console backend to view emails in the terminal:
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# For production, use SMTP settings:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP host
 EMAIL_PORT = 587
@@ -197,6 +195,12 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your email
 EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your email password or app password
 DEFAULT_FROM_EMAIL = 'Holy Cross School <your-email@gmail.com>'
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 

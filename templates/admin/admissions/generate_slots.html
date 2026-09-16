@@ -1,0 +1,11 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>{{ title }}</h1>
+<p>Default times from this session (same every selected weekday):</p>
+<pre>{{ default_times }}</pre>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create slots" class="default">
+</form>
+{% endblock %}

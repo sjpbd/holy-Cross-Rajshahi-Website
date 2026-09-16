@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+{% include 'admissions/_admission_css.html' %}
+<script>
+document.addEventListener('alpine:init', function () {
+    Alpine.data('admissionAddresses', function () {
+        return {
+            geo: {},
+            addr: {
+                present: { division: '', zila: '', thana: '', line: '' },
+                father: { division: '', zila: '', thana: '', line: '' },
+                mother: { division: '', zila: '', thana: '', line: '' }
+            },
+            currentPhoto: '',
+            previewUrl: '',
+            init() {
+                var geoEl = document.getElementById('bd-geo-data');
+                var stateEl = document.getElementById('address-state');
+                if (geoEl) this.geo = JSON.parse(geoEl.textContent);
+                if (stateEl) {
+                    var state = JSON.parse(stateEl.textContent);
+                    ['present', 'father', 'mother'].forEach((key) => {
+                        this.addr[key] = Object.assign(this.addr[key], state[key] || {});
+                    });
+                }
+                this.currentPhoto = this.$el.getAttribute('data-photo') || '';
+                this.$nextTick(() => {
+                    ['present', 'father', 'mother'].forEach((key) => {
+                        this.populateZila(key);
+                        this.populateThana(key);
+                    });
+                });
+            },
+            zilas(prefix) {
+                var division = this.addr[prefix] && this.addr[prefix].division;
+                if (!division || !this.geo[division]) return [];
+                return Object.keys(this.geo[division]).sort();
+            },
+            thanas(prefix) {
+                var division = this.addr[prefix] && this.addr[prefix].division;
+                var zila = this.addr[prefix] && this.addr[prefix].zila;
+                if (!division || !zila || !this.geo[division] || !this.geo[division][zila]) return [];
+                return this.geo[division][zila].slice();
+            },
+            fillSelect(el, items, selected, placeholder) {
+                if (!el) return selected || '';
+                var value = items.indexOf(selected) >= 0 ? selected : '';
+                el.innerHTML = '<option value="">' + placeholder + '</option>' +
+                    items.map(function (name) {
+                        return '<option value="' + name + '">' + name + '</option>';
+                    }).join('');
+                el.value = value;
+                return value;
+            },
+            populateZila(prefix) {
+                var el = this.$refs[prefix + 'Zila'];
+                if (!el) return;
+                this.addr[prefix].zila = this.fillSelect(
+                    el,
+                    this.zilas(prefix),
+                    this.addr[prefix].zila,
+                    'Select zila'
+                );
+            },
+            populateThana(prefix) {
+                var el = this.$refs[prefix + 'Thana'];
+                if (!el) return;
+                this.addr[prefix].thana = this.fillSelect(
+                    el,
+                    this.thanas(prefix),
+                    this.addr[prefix].thana,
+                    'Select thana'
+                );
+            },
+            onDivision(prefix) {
+                this.addr[prefix].zila = '';
+                this.addr[prefix].thana = '';
+                this.populateZila(prefix);
+                this.populateThana(prefix);
+            },
+            onZila(prefix) {
+                this.addr[prefix].thana = '';
+                this.populateThana(prefix);
+            },
+            copy(from, to) {
+                this.addr[to].division = this.addr[from].division;
+                this.addr[to].zila = this.addr[from].zila;
+                this.addr[to].thana = this.addr[from].thana;
+                this.addr[to].line = this.addr[from].line;
+                this.populateZila(to);
+                this.populateThana(to);
+            },
+            preview(prefix) {
+                var block = this.addr[prefix] || {};
+                return [block.line, block.thana, block.zila, block.division].filter(Boolean).join(', ');
+            },
+            onPhoto(event) {
+                var file = event.target.files && event.target.files[0];
+                if (!file) return;
+                if (this.previewUrl) URL.revokeObjectURL(this.previewUrl);
+                this.previewUrl = URL.createObjectURL(file);
+            }
+        };
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+{{ bd_geo|json_script:"bd-geo-data" }}
+{{ address_state|json_script:"address-state" }}
+<section class="adm-hero pt-32 pb-12">
+    <div class="container mx-auto px-4 relative z-10 adm-shell">
+        <nav class="breadcrumb mb-4" style="color: white !important;">
+            <div class="breadcrumb-item"><a href="{% url 'home' %}" style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item"><a href="{% url 'admissions:landing' %}" style="color: white !important;">Admission</a></div>
+            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Apply</div>
+        </nav>
+        <p class="adm-kicker"><i class="fas fa-file-pen"></i> {{ session.name }}</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold mt-2">Admission application</h1>
+        <p class="text-blue-100 mt-3 max-w-2xl">Complete each step. Your progress is saved on this device so you can come back if you need to.</p>
+    </div>
+</section>
+
+<section class="adm-page py-10">
+    <div class="container mx-auto px-4 adm-shell">
+        {% include 'admissions/_messages.html' %}
+
+        <div class="adm-card p-5 md:p-8">
+            <div class="adm-stepper mb-4">
+                {% for num, label in step_labels.items %}
+                    {% if num <= application.wizard_step or num <= step %}
+                    <a href="?step={{ num }}" class="adm-step {% if step == num %}is-active{% elif step > num %}is-done{% endif %}">
+                        <span class="adm-dot">{% if step > num %}<i class="fas fa-check text-xs"></i>{% else %}{{ num }}{% endif %}</span>
+                        <div class="adm-step-label">{{ label }}</div>
+                    </a>
+                    {% else %}
+                    <div class="adm-step">
+                        <span class="adm-dot">{{ num }}</span>
+                        <div class="adm-step-label">{{ label }}</div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="adm-progress mb-6"><span style="width: {% widthratio step 6 100 %}%"></span></div>
+            <div class="mb-6">
+                <p class="text-xs font-bold uppercase tracking-wider text-accent-dark">Step {{ step }} of 6</p>
+                <h2 class="text-2xl font-extrabold text-primary">{{ step_label }}</h2>
+                {% if step_hint %}<p class="text-slate-500 mt-1">{{ step_hint }}</p>{% endif %}
+            </div>
+
+            {% if step == 1 %}
+                {% include 'admissions/_step_student.html' %}
+            {% elif step == 2 %}
+                {% include 'admissions/_step_family.html' %}
+            {% elif step == 3 %}
+                {% include 'admissions/_step_others.html' %}
+            {% elif step == 4 %}
+                {% include 'admissions/_step_declarations.html' %}
+            {% elif step == 5 %}
+                {% include 'admissions/_step_slot.html' %}
+            {% elif step == 6 %}
+                {% include 'admissions/_step_review.html' %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

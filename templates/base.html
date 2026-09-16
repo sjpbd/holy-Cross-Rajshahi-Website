@@ -214,7 +214,13 @@
 
             <!-- RIGHT: CTA + close -->
             <div class="adm-right">
-                {% if admission_banner.attachment_url %}
+                {% if admission_session_open %}
+                <a href="{% url 'admissions:landing' %}"
+                   class="adm-cta {% if admission_banner.is_blinking %}adm-cta-shake{% endif %}">
+                    <i class="fas fa-file-signature"></i>
+                    <span>Apply Now</span>
+                </a>
+                {% elif admission_banner.attachment_url %}
                 <a href="{{ admission_banner.attachment_url }}"
                    target="_blank" rel="noopener"
                    class="adm-cta {% if admission_banner.is_blinking %}adm-cta-shake{% endif %}">

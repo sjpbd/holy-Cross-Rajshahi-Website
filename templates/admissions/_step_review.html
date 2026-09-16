@@ -1,0 +1,87 @@
+<div class="flex flex-col md:flex-row gap-6 mb-8">
+    {% if application.photo %}
+    <img src="{{ application.photo.url }}" alt="Student photo" class="h-36 w-28 object-cover rounded-xl border border-primary/20">
+    {% endif %}
+    <div class="flex-1">
+        <p class="text-xs font-bold uppercase tracking-wider text-accent-dark">Applicant</p>
+        <h3 class="text-2xl font-extrabold text-primary">{{ application.student_name_en }}</h3>
+        <p class="font-bengali text-slate-600">{{ application.student_name_bn }}</p>
+        <p class="text-sm text-slate-500 mt-2">
+            {{ application.admit_class }}
+            · {{ application.get_gender_display }}
+            · {{ application.date_of_birth|date:"d M Y" }}
+            ({{ application.age_years }}y {{ application.age_months }}m)
+        </p>
+    </div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-4 mb-6">
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <h3 class="text-base">Student</h3>
+            <a class="adm-chip" href="?step=1">Edit</a>
+        </div>
+        <dl class="space-y-2 text-sm">
+            <div><dt class="text-slate-500">Birth registration</dt><dd class="font-semibold">{{ application.birth_registration_no }}</dd></div>
+            <div><dt class="text-slate-500">Nationality / blood / religion</dt><dd>{{ application.nationality }} · {{ application.blood_group }} · {{ application.get_religion_display }}</dd></div>
+            <div>
+                <dt class="text-slate-500">Present address</dt>
+                <dd>{{ application.present_address }}</dd>
+            </div>
+        </dl>
+    </section>
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <h3 class="text-base">Family</h3>
+            <a class="adm-chip" href="?step=2">Edit</a>
+        </div>
+        <dl class="space-y-2 text-sm">
+            <div><dt class="text-slate-500">Father</dt><dd>{{ application.father_name }} · {{ application.father_mobile }}</dd></div>
+            <div><dt class="text-slate-500">Father’s address</dt><dd>{{ application.father_address }}</dd></div>
+            <div><dt class="text-slate-500">Mother</dt><dd>{{ application.mother_name }} · {{ application.mother_mobile }}</dd></div>
+            <div><dt class="text-slate-500">Mother’s address</dt><dd>{{ application.mother_address }}</dd></div>
+            <div><dt class="text-slate-500">Email / income</dt><dd>{{ application.email }} · {{ application.family_income_yearly }} BDT / {{ application.earning_members }} earner{{ application.earning_members|pluralize }}</dd></div>
+        </dl>
+    </section>
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <h3 class="text-base">Others</h3>
+            <a class="adm-chip" href="?step=3">Edit</a>
+        </div>
+        <p class="text-sm">Bus: {% if application.needs_bus %}Yes — {{ application.bus_stop }}{% else %}No{% endif %}</p>
+        <p class="text-sm mt-2">Siblings in this school:
+            {% if application.has_other_child %}
+                {% for s in application.siblings.all %}{{ s.name }} ({{ s.class_name }}){% if not forloop.last %}; {% endif %}{% empty %}Yes{% endfor %}
+            {% else %}No{% endif %}
+        </p>
+    </section>
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <h3 class="text-base">Viva</h3>
+            <a class="adm-chip" href="?step=5">Change slot</a>
+        </div>
+        {% if application.viva_slot %}
+        <p class="font-semibold text-primary">{{ application.viva_slot.date|date:"l, d M Y" }}</p>
+        <p class="text-sm text-slate-600">{{ application.viva_slot.start_time|time:"g:i A" }}–{{ application.viva_slot.end_time|time:"g:i A" }}</p>
+        <p class="text-sm text-slate-500 mt-1">{{ application.session.viva_venue }}</p>
+        {% else %}
+        <p class="text-red-600 text-sm">No viva slot selected.</p>
+        {% endif %}
+    </section>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="rounded-2xl bg-primary text-white p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <p class="text-blue-100 text-sm">Application fee</p>
+            <p class="text-3xl font-extrabold">BDT {{ application.fee_amount }}</p>
+            <p class="text-xs text-blue-100 mt-1">Seat held until {{ application.slot_held_until|date:"g:i A, d M" }}.</p>
+        </div>
+        <button type="submit" class="btn btn-accent">
+            Proceed to payment
+            <i class="fas fa-lock ml-2 text-xs"></i>
+        </button>
+    </div>
+</form>
+<p class="mt-3"><a class="adm-ghost px-0" href="?step=5">Back to viva slot</a></p>

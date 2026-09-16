@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+{% include 'admissions/_admission_css.html' %}
+{% endblock %}
+{% block content %}
+<section class="adm-hero pt-32 pb-12">
+    <div class="container mx-auto px-4 adm-shell relative z-10">
+        <p class="adm-kicker"><i class="fas fa-circle-check"></i> Payment received</p>
+        <h1 class="text-4xl md:text-5xl font-extrabold mt-2">Application submitted</h1>
+        <p class="text-accent-light text-2xl mt-3 font-bold">{{ application.form_number }}</p>
+    </div>
+</section>
+<section class="adm-page py-12">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="adm-card p-8">
+            <p class="text-slate-700 mb-4">
+                Thank you, <strong>{{ application.student_name_en }}</strong>
+                <span class="font-bengali">({{ application.student_name_bn }})</span>.
+            </p>
+            {% if application.viva_slot %}
+            <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-4 mb-5">
+                <p class="text-xs font-bold uppercase tracking-wider text-indigo-400">Viva</p>
+                <p class="font-bold text-primary">{{ application.viva_slot.date|date:"l, d M Y" }}</p>
+                <p class="text-sm text-slate-600">
+                    {{ application.viva_slot.start_time|time:"g:i A" }}–{{ application.viva_slot.end_time|time:"g:i A" }}
+                    · {{ application.session.viva_venue }}
+                </p>
+            </div>
+            {% endif %}
+            {% if email_sent %}
+            <p class="rounded-xl bg-emerald-50 text-emerald-800 px-4 py-3 mb-6 border border-emerald-100">
+                A confirmation email with the form PDF was sent to {{ application.email }}.
+            </p>
+            {% elif email_error %}
+            <p class="rounded-xl bg-amber-50 text-amber-900 px-4 py-3 mb-6 border border-amber-100">
+                The confirmation email could not be sent. Please download the PDF below, or contact the office with your form number.
+            </p>
+            {% endif %}
+            <ol class="adm-howto mb-6">
+                <li class="adm-howto-item"><span class="adm-num">1</span><p>Download and print the application PDF.</p></li>
+                <li class="adm-howto-item"><span class="adm-num">2</span><p>Attach a hard-copy passport photograph where marked.</p></li>
+                <li class="adm-howto-item"><span class="adm-num">3</span><p>Bring the form and admit card to the viva.</p></li>
+            </ol>
+            {% if application.form_pdf %}
+            <a href="{% url 'admissions:pdf_download' application.access_token %}" class="btn btn-primary">
+                <i class="fas fa-file-pdf mr-2"></i>Download form PDF
+            </a>
+            {% endif %}
+            <p class="text-sm text-slate-500 mt-6">
+                To reprint later, use Form No. plus father’s mobile on the
+                <a class="text-primary underline" href="{% url 'admissions:lookup' %}">lookup page</a>.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

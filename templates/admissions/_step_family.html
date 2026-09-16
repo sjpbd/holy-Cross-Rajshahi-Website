@@ -1,0 +1,109 @@
+<form method="post" id="familyForm" x-data="admissionAddresses">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Father</h3>
+                <p class="adm-hint">NID and a mobile number are required.</p>
+            </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-x-4">
+            {% include 'admissions/_field.html' with field=form.father_name %}
+            {% include 'admissions/_field.html' with field=form.father_nid %}
+            {% include 'admissions/_field.html' with field=form.father_occupation %}
+            {% include 'admissions/_field.html' with field=form.father_designation %}
+            {% include 'admissions/_field.html' with field=form.father_organization %}
+            {% include 'admissions/_field.html' with field=form.father_mobile %}
+        </div>
+        <div class="adm-section-head mt-2">
+            <div>
+                <h3 class="text-base">Father’s address</h3>
+                <p class="adm-hint">Copy from the student or mother if it is the same place.</p>
+            </div>
+            <div class="adm-copy-row">
+                <button type="button" class="adm-chip" @click="copy('present', 'father')"><i class="fas fa-copy mr-1"></i> Same as student</button>
+                <button type="button" class="adm-chip" @click="copy('mother', 'father')"><i class="fas fa-copy mr-1"></i> Same as mother</button>
+            </div>
+        </div>
+        {% include 'admissions/_address_block.html' with prefix='father' division_field=form.father_division zila_field=form.father_zila thana_field=form.father_thana line_field=form.father_address_line %}
+    </section>
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Mother</h3>
+            </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-x-4">
+            {% include 'admissions/_field.html' with field=form.mother_name %}
+            {% include 'admissions/_field.html' with field=form.mother_nid %}
+            {% include 'admissions/_field.html' with field=form.mother_occupation %}
+            {% include 'admissions/_field.html' with field=form.mother_designation %}
+            {% include 'admissions/_field.html' with field=form.mother_organization %}
+            {% include 'admissions/_field.html' with field=form.mother_mobile %}
+        </div>
+        <div class="adm-section-head mt-2">
+            <div>
+                <h3 class="text-base">Mother’s address</h3>
+            </div>
+            <div class="adm-copy-row">
+                <button type="button" class="adm-chip" @click="copy('present', 'mother')"><i class="fas fa-copy mr-1"></i> Same as student</button>
+                <button type="button" class="adm-chip" @click="copy('father', 'mother')"><i class="fas fa-copy mr-1"></i> Same as father</button>
+            </div>
+        </div>
+        {% include 'admissions/_address_block.html' with prefix='mother' division_field=form.mother_division zila_field=form.mother_zila thana_field=form.mother_thana line_field=form.mother_address_line %}
+    </section>
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Family &amp; previous school</h3>
+            </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-x-4">
+            {% include 'admissions/_field.html' with field=form.email %}
+            {% include 'admissions/_field.html' with field=form.family_income_yearly %}
+            {% include 'admissions/_field.html' with field=form.earning_members %}
+            {% include 'admissions/_field.html' with field=form.previous_school_name %}
+        </div>
+        <div class="mt-2">
+            <h4 class="font-bold text-primary">Previous class results</h4>
+            <p class="adm-hint mb-3">Optional. Add a class, year, and result if you have them. You can skip this section.</p>
+            {{ result_formset.management_form }}
+            <div id="result-rows" class="space-y-3">
+                {% for f in result_formset %}
+                    {% include 'admissions/_result_row.html' with f=f %}
+                {% endfor %}
+            </div>
+            <template id="result-empty">
+                {% include 'admissions/_result_row.html' with f=result_formset.empty_form %}
+            </template>
+            <button type="button" id="add-result" class="btn btn-outline text-sm mt-3">
+                <i class="fas fa-plus mr-2"></i>Add another result
+            </button>
+        </div>
+    </section>
+
+    {% include 'admissions/_wizard_nav.html' %}
+</form>
+<script>
+(function() {
+    var container = document.getElementById('result-rows');
+    var addBtn = document.getElementById('add-result');
+    var total = document.getElementById('id_results-TOTAL_FORMS');
+    var tmpl = document.getElementById('result-empty');
+    if (!addBtn || !container || !total || !tmpl) return;
+    addBtn.addEventListener('click', function() {
+        var index = parseInt(total.value, 10);
+        if (isNaN(index)) index = 0;
+        var html = tmpl.innerHTML.replace(/__prefix__/g, String(index));
+        var wrap = document.createElement('div');
+        wrap.innerHTML = html.trim();
+        var row = wrap.querySelector('.result-row') || wrap.firstElementChild;
+        if (row) container.appendChild(row);
+        total.value = String(index + 1);
+    });
+})();
+</script>

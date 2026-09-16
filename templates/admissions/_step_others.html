@@ -1,0 +1,88 @@
+<form method="post" id="othersForm">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">School bus</h3>
+                <p class="adm-hint">Choose a stop only if the student needs school transport.</p>
+            </div>
+        </div>
+        {% include 'admissions/_field.html' with field=form.needs_bus %}
+        <div id="busStopWrap" class="{% if not form.needs_bus.value %}hidden{% endif %}">
+            {% include 'admissions/_field.html' with field=form.bus_stop %}
+        </div>
+    </section>
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Siblings in this school</h3>
+                <p class="adm-hint">If yes, add each child who currently studies here. You can add more than one.</p>
+            </div>
+        </div>
+        {% include 'admissions/_field.html' with field=form.has_other_child %}
+        <div id="siblingWrap" class="{% if not form.has_other_child.value %}hidden{% endif %}">
+            {{ sibling_formset.management_form }}
+            <div id="sibling-rows" class="space-y-3 mb-3">
+                {% for f in sibling_formset %}
+                    {% include 'admissions/_sibling_row.html' with f=f %}
+                {% endfor %}
+            </div>
+            <template id="sibling-empty">
+                {% include 'admissions/_sibling_row.html' with f=sibling_formset.empty_form %}
+            </template>
+            <button type="button" id="add-sibling" class="btn btn-outline text-sm">
+                <i class="fas fa-plus mr-2"></i>Add another child
+            </button>
+        </div>
+    </section>
+
+    {% include 'admissions/_wizard_nav.html' %}
+</form>
+<script>
+(function() {
+    function toggle(name, wrapId) {
+        var wrap = document.getElementById(wrapId);
+        var inputs = document.querySelectorAll('input[name="' + name + '"]');
+        function sync() {
+            var checked = document.querySelector('input[name="' + name + '"]:checked');
+            var on = checked && (checked.value === 'True' || checked.value === 'true');
+            if (wrap) wrap.classList.toggle('hidden', !on);
+        }
+        inputs.forEach(function(el) { el.addEventListener('change', sync); });
+        sync();
+    }
+    toggle('needs_bus', 'busStopWrap');
+    toggle('has_other_child', 'siblingWrap');
+
+    var container = document.getElementById('sibling-rows');
+    var addBtn = document.getElementById('add-sibling');
+    var total = document.getElementById('id_siblings-TOTAL_FORMS');
+    var tmpl = document.getElementById('sibling-empty');
+    if (addBtn && container && total && tmpl) {
+        addBtn.addEventListener('click', function() {
+            var index = parseInt(total.value, 10);
+            if (isNaN(index)) index = 0;
+            var html = tmpl.innerHTML.replace(/__prefix__/g, String(index));
+            var wrap = document.createElement('div');
+            wrap.innerHTML = html.trim();
+            var row = wrap.querySelector('.sibling-row') || wrap.firstElementChild;
+            if (row) container.appendChild(row);
+            total.value = String(index + 1);
+        });
+    }
+    window.removeSiblingRow = function(btn) {
+        var row = btn.closest('.sibling-row');
+        if (!row) return;
+        var del = row.querySelector('.sibling-delete input[type="checkbox"]');
+        if (del) {
+            del.checked = true;
+            row.style.display = 'none';
+            return;
+        }
+        row.remove();
+    };
+})();
+</script>

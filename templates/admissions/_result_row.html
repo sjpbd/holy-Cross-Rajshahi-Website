@@ -1,0 +1,8 @@
+<div class="result-row rounded-xl border border-slate-200 bg-white p-3 md:px-4 md:pt-3 md:pb-1">
+    {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+    <div class="grid md:grid-cols-3 gap-x-4">
+        {% include 'admissions/_field.html' with field=f.previous_class %}
+        {% include 'admissions/_field.html' with field=f.year %}
+        {% include 'admissions/_field.html' with field=f.result %}
+    </div>
+</div>

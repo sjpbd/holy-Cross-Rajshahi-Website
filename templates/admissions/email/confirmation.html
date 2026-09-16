@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: Georgia, serif; color: #1c2a4e; line-height: 1.5;">
+<p>Dear Parent / Guardian,</p>
+<p>Thank you. The admission application for <strong>{{ application.student_name_en }}</strong> has been received.</p>
+<p>
+    Form number: <strong>{{ application.form_number }}</strong><br>
+    Class: {{ application.admit_class.name }}<br>
+    {% if application.viva_slot %}
+    Viva: {{ application.viva_slot.date }} {{ application.viva_slot.start_time }}–{{ application.viva_slot.end_time }}<br>
+    Venue: {{ application.session.viva_venue }}
+    {% endif %}
+</p>
+<p>Please print the attached PDF and bring it to the viva. Attach a hard-copy passport photograph where indicated.</p>
+{% if download_url %}
+<p>You may also download the form here (keep this email private):<br>
+<a href="{{ download_url }}">{{ download_url }}</a></p>
+{% endif %}
+<p>To reprint later, use the form number and father's mobile on the school website lookup page.</p>
+<p>Holy Cross School &amp; College, Rajshahi</p>
+</body>
+</html>

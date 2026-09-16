@@ -1,0 +1,13 @@
+<div class="sibling-row border border-slate-200 rounded-xl p-3 bg-white">
+    {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+    {% if f.DELETE %}<div class="sr-only sibling-delete">{{ f.DELETE }}</div>{% endif %}
+    <div class="grid md:grid-cols-2 gap-3 items-end">
+        <div>{% include 'admissions/_field.html' with field=f.name %}</div>
+        <div class="flex gap-3 items-end">
+            <div class="flex-1">{% include 'admissions/_field.html' with field=f.class_name %}</div>
+            <button type="button" class="adm-chip mb-4 shrink-0 sibling-remove" onclick="window.removeSiblingRow(this)">
+                Remove
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,110 @@
+<form method="post" enctype="multipart/form-data" x-data="admissionAddresses" data-photo="{% if application.photo %}{{ application.photo.url }}{% endif %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <section class="adm-section">
+                <div class="adm-section-head">
+                    <div>
+                        <h3 class="text-lg">Student details</h3>
+                        <p class="adm-hint">Use the name as it appears on the birth registration.</p>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-x-4">
+                    {% include 'admissions/_field.html' with field=form.admit_class %}
+                    {% include 'admissions/_field.html' with field=form.gender %}
+                    {% include 'admissions/_field.html' with field=form.student_name_en %}
+                    {% include 'admissions/_field.html' with field=form.student_name_bn %}
+                    {% include 'admissions/_field.html' with field=form.date_of_birth %}
+                    <div class="adm-field">
+                        <label>Age (automatic)</label>
+                        <p class="adm-control bg-slate-50 text-slate-700" id="ageDisplay">
+                            {% if application.age_years is not None %}
+                                {{ application.age_years }} years
+                                {% if application.age_months %} {{ application.age_months }} months{% endif %}
+                                as of {{ session.age_as_of_date|date:"d M Y" }}
+                            {% else %}
+                                Select date of birth
+                            {% endif %}
+                        </p>
+                        <p class="adm-hint">Calculated as of {{ session.age_as_of_date|date:"d M Y" }}.</p>
+                    </div>
+                    {% include 'admissions/_field.html' with field=form.birth_registration_no %}
+                    {% include 'admissions/_field.html' with field=form.nationality %}
+                    {% include 'admissions/_field.html' with field=form.blood_group %}
+                    {% include 'admissions/_field.html' with field=form.religion %}
+                </div>
+            </section>
+        </div>
+
+        <div>
+            <section class="adm-section h-full">
+                <div class="adm-section-head">
+                    <div>
+                        <h3 class="text-lg">Passport photo</h3>
+                        <p class="adm-hint">JPG or PNG, recent, face clearly visible.</p>
+                    </div>
+                </div>
+                <label class="adm-photo cursor-pointer">
+                    {{ form.photo }}
+                    <img x-cloak x-show="previewUrl || currentPhoto" :src="previewUrl || currentPhoto" alt="Student photo preview">
+                    <div x-show="!previewUrl && !currentPhoto">
+                        <i class="fas fa-camera text-2xl text-primary mb-2"></i>
+                        <p class="font-semibold text-primary">Upload photo</p>
+                        <p class="text-xs text-slate-500 mt-1">Tap to choose a JPG or PNG</p>
+                    </div>
+                    <p class="text-xs text-slate-500" x-show="previewUrl || currentPhoto">Tap to replace the photo</p>
+                </label>
+                {{ form.photo.errors }}
+            </section>
+        </div>
+    </div>
+
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Present address</h3>
+                <p class="adm-hint">Choose Division, then Zila, then Thana. Add the house or road on the last line.</p>
+            </div>
+        </div>
+        {% include 'admissions/_address_block.html' with prefix='present' division_field=form.present_division zila_field=form.present_zila thana_field=form.present_thana line_field=form.present_address_line %}
+        <div class="grid md:grid-cols-2 gap-3 mt-4">
+            <label class="adm-check">
+                {{ form.copy_to_father }}
+                <span>
+                    <strong>Copy to father’s address</strong>
+                    <span class="block text-xs text-slate-500 font-normal">You can still change it on the next step.</span>
+                </span>
+            </label>
+            <label class="adm-check">
+                {{ form.copy_to_mother }}
+                <span>
+                    <strong>Copy to mother’s address</strong>
+                    <span class="block text-xs text-slate-500 font-normal">Use this if both parents live at the same place.</span>
+                </span>
+            </label>
+        </div>
+    </section>
+
+    {% include 'admissions/_wizard_nav.html' %}
+</form>
+<script>
+(function() {
+    var dob = document.getElementById('id_date_of_birth');
+    var out = document.getElementById('ageDisplay');
+    var asOf = '{{ session.age_as_of_date|date:"Y-m-d" }}';
+    function calc() {
+        if (!dob || !dob.value || !out) return;
+        var b = new Date(dob.value + 'T00:00:00');
+        var a = new Date(asOf + 'T00:00:00');
+        var years = a.getFullYear() - b.getFullYear();
+        var months = a.getMonth() - b.getMonth();
+        if (a.getDate() < b.getDate()) months -= 1;
+        if (months < 0) { years -= 1; months += 12; }
+        if (years < 0) years = 0;
+        out.textContent = years + ' years' + (months ? ' ' + months + ' months' : '') + ' as of {{ session.age_as_of_date|date:"d M Y" }}';
+    }
+    if (dob) dob.addEventListener('change', calc);
+})();
+</script>

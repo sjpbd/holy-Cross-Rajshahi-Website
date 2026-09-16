@@ -11,7 +11,8 @@ class StaticViewSitemap(sitemaps.Sitemap):
     def items(self):
         return [
             'home', 'about', 'teachers', 'administration', 
-            'notice_list', 'news_list', 'club_list', 'contact'
+            'notice_list', 'news_list', 'club_list', 'contact',
+            'admissions:landing',
         ]
 
     def location(self, item):

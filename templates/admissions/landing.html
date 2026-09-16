@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+{% include 'admissions/_admission_css.html' %}
+{% endblock %}
+
+{% block content %}
+<section class="adm-hero pt-32 pb-16">
+    <div class="container mx-auto px-4 relative z-10">
+        <nav class="breadcrumb mb-4" style="color: white !important;">
+            <div class="breadcrumb-item"><a href="{% url 'home' %}" style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Admission</div>
+        </nav>
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+                <p class="adm-kicker"><i class="fas fa-graduation-cap"></i> Holy Cross School &amp; College, Rajshahi</p>
+                <h1 class="text-4xl md:text-6xl font-extrabold mt-3 leading-tight">Admission application</h1>
+                <div class="h-1.5 w-24 bg-gradient-to-r from-accent to-accent-light rounded-full my-5"></div>
+                {% if session %}
+                <p class="text-xl text-blue-100 max-w-xl">{{ session.name }} · Academic year {{ session.academic_year }}</p>
+                {% endif %}
+                {% if open_now %}
+                <div class="flex flex-wrap gap-3 mt-6">
+                    <div class="adm-stat">
+                        <p class="text-xs text-blue-200">Opens</p>
+                        <p class="font-bold">{{ session.opens_at|date:"d M Y" }}</p>
+                    </div>
+                    <div class="adm-stat">
+                        <p class="text-xs text-blue-200">Closes</p>
+                        <p class="font-bold">{{ session.closes_at|date:"d M Y" }}</p>
+                    </div>
+                    <div class="adm-stat">
+                        <p class="text-xs text-blue-200">Fee</p>
+                        <p class="font-bold">{% if session.application_fee %}BDT {{ session.application_fee }}{% else %}To be confirmed{% endif %}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="adm-card p-6 md:p-8 text-slate-800">
+                <h2 class="text-lg font-extrabold text-primary mb-4">How it works</h2>
+                <div class="adm-howto">
+                    <div class="adm-howto-item"><span class="adm-num">1</span><p><strong>Fill the form</strong><br><span class="adm-howto-copy">Student, family, address, and a passport photo.</span></p></div>
+                    <div class="adm-howto-item"><span class="adm-num">2</span><p><strong>Choose a viva slot</strong><br><span class="adm-howto-copy">Pick a date and time. Seats are limited.</span></p></div>
+                    <div class="adm-howto-item"><span class="adm-num">3</span><p><strong>Pay the fee</strong><br><span class="adm-howto-copy">Online payment will connect here; office payment is also possible.</span></p></div>
+                    <div class="adm-howto-item"><span class="adm-num">4</span><p><strong>Print the admit card</strong><br><span class="adm-howto-copy">Download the PDF and bring it to the viva.</span></p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="adm-page py-14">
+    <div class="container mx-auto px-4 adm-shell">
+        {% include 'admissions/_messages.html' %}
+
+        <div class="adm-card p-6 md:p-8 mb-6">
+            {% if open_now %}
+            <h2 class="text-2xl font-extrabold text-primary mb-3">Start or return to an application</h2>
+            <p class="text-slate-600 leading-relaxed mb-5">
+                {% if session.instructions %}
+                    {{ session.instructions|linebreaksbr }}
+                {% else %}
+                    Complete the form carefully. Address is selected as Division, Zila and Thana, then a house or road line. You can copy the same address to father or mother.
+                {% endif %}
+            </p>
+            {% if open_classes %}
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Classes open</p>
+            <div class="flex flex-wrap gap-2 mb-6">
+                {% for klass in open_classes %}
+                <span class="adm-chip cursor-default">{{ klass.name }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div class="flex flex-wrap gap-3">
+                <a href="{% url 'admissions:apply' %}" class="btn btn-primary">
+                    <i class="fas fa-pen-to-square mr-2"></i>Start application
+                </a>
+                <a href="{% url 'admissions:resume' %}" class="btn btn-outline">Continue a saved form</a>
+                <a href="{% url 'admissions:lookup' %}" class="btn btn-outline">Reprint paid form</a>
+            </div>
+            {% elif session %}
+            <h2 class="text-2xl font-extrabold text-primary mb-3">Admission is not open right now</h2>
+            <p class="text-slate-600 mb-5">{{ session.name }} is closed. Paid forms can still be reprinted.</p>
+            <a href="{% url 'admissions:lookup' %}" class="btn btn-outline">Reprint a paid form</a>
+            {% else %}
+            <h2 class="text-2xl font-extrabold text-primary mb-3">Circular not published yet</h2>
+            <p class="text-slate-600">Please check notices or contact the school office.</p>
+            {% endif %}
+        </div>
+
+        {% if admission_banner and admission_banner.attachment_url %}
+        <div class="adm-card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-accent-dark">Circular</p>
+                <h2 class="font-extrabold text-primary text-lg">{{ admission_banner.title }}</h2>
+                {% if admission_banner.subtitle %}<p class="text-slate-500 text-sm">{{ admission_banner.subtitle }}</p>{% endif %}
+            </div>
+            <a href="{{ admission_banner.attachment_url }}" target="_blank" rel="noopener" class="btn btn-accent">View circular</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

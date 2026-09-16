@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+{% include 'admissions/_admission_css.html' %}
+{% endblock %}
+{% block content %}
+<section class="adm-hero pt-32 pb-20">
+    <div class="adm-container">
+        <nav class="breadcrumb mb-4" style="color: white !important;">
+            <div class="breadcrumb-item"><a href="{% url 'home' %}" style="color: white !important;">Home</a></div>
+            <div class="breadcrumb-item"><a href="{% url 'admissions:landing' %}" style="color: white !important;">Admission</a></div>
+            <div class="breadcrumb-item active" style="color: #f4d03f !important;">Reprint</div>
+        </nav>
+        <p class="adm-kicker"><i class="fas fa-print"></i> Paid applications</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold mt-2 leading-tight">Reprint admission form</h1>
+        <div class="h-1.5 w-24 bg-gradient-to-r from-accent to-accent-light rounded-full my-5"></div>
+        <p class="text-blue-100 text-lg max-w-xl">Enter the form number and father’s mobile to download the paid application PDF.</p>
+    </div>
+</section>
+<section class="adm-page pb-16">
+    <div class="adm-container">
+        <div class="adm-card adm-panel">
+            <div class="adm-panel-grid">
+                <aside class="adm-panel-aside">
+                    <p class="text-xs font-bold uppercase tracking-wider text-accent-dark mb-4">What you need</p>
+                    <div class="adm-need">
+                        <span class="adm-num">1</span>
+                        <p><strong>Form number</strong> Printed on the application, for example HCR-2026-00001.</p>
+                    </div>
+                    <div class="adm-need">
+                        <span class="adm-num">2</span>
+                        <p><strong>Father’s mobile</strong> The Bangladesh mobile number submitted on the form.</p>
+                    </div>
+                    <p class="adm-secure">
+                        <i class="fas fa-lock mt-0.5"></i>
+                        Only paid forms can be reprinted here. Unfinished drafts are recovered on the continue page.
+                    </p>
+                    <p class="mt-6 mb-0">
+                        <a class="adm-ghost px-0" href="{% url 'admissions:landing' %}">
+                            <i class="fas fa-arrow-left"></i> Back to admission
+                        </a>
+                    </p>
+                </aside>
+                <div class="adm-panel-form">
+                    <h2 class="text-xl font-extrabold mb-1">Find your form</h2>
+                    <p class="adm-hint mb-5">Use the details exactly as they appear on the application.</p>
+                    {% include 'admissions/_messages.html' %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% include 'admissions/_field.html' with field=form.form_number %}
+                        {% include 'admissions/_field.html' with field=form.father_mobile %}
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-magnifying-glass mr-2"></i>Find form
+                        </button>
+                    </form>
+                    <p class="adm-switch">Still filling a draft? <a href="{% url 'admissions:resume' %}">Continue the application</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

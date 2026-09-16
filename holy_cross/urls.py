@@ -58,6 +58,9 @@ urlpatterns = [
     # Contact
     path('contact/', include('contact.urls')),
 
+    # Admission
+    path('admission/', include('admissions.urls')),
+
     # Gallery
     path('gallery/', include('gallery.urls')),
 
