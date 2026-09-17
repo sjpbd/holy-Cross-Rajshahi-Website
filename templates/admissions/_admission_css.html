@@ -153,6 +153,20 @@
         min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem;
     }
     .adm-photo img { width: 118px; height: 148px; object-fit: cover; border-radius: .7rem; border: 1px solid #1e3a8a; }
+    .calendar-grid,
+    .calendar-grid-head {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 0.25rem;
+    }
+    .calendar-grid-head {
+        margin-bottom: 0.5rem;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+    .calendar-grid { margin-bottom: 1.5rem; }
     .calendar-day {
         min-height: 4.2rem; border-radius: .9rem; display: flex; flex-direction: column;
         align-items: center; justify-content: center; font-weight: 700; color: #94a3b8; background: #f8fafc;
