@@ -1,4 +1,5 @@
 # admissions/utils.py
+import re
 from io import BytesIO
 from pathlib import Path
 
@@ -8,6 +9,14 @@ from django.core.files.base import ContentFile
 from PIL import Image, ImageOps
 
 from .constants import CACHE_SKIP_PREFIXES
+
+BENGALI_ERROR = 'শুধু বাংলা অক্ষরে লিখুন / Use Bengali characters only.'
+BIRTH_REG_LENGTHS = (13, 16, 17)
+BIRTH_REG_ERROR = 'Birth registration number must be 13, 16, or 17 digits.'
+PHONE_ERROR = 'Phone number must be 11 digits (01XXXXXXXXX).'
+_HAS_BENGALI = re.compile(r'[\u0980-\u09FF]')
+_HAS_LATIN = re.compile(r'[A-Za-z]')
+_BENGALI_ALLOWED = re.compile(r'^[\u0980-\u09FF\s।॥\-–.,()]+$')
 
 MIN_PHOTO_BYTES = 50 * 1024
 MAX_PHOTO_BYTES = 2 * 1024 * 1024
@@ -44,7 +53,7 @@ def validate_bd_mobile(value):
         digits = digits[3:]
     if len(digits) == 11 and digits.startswith('01') and digits[2] in '3456789':
         return digits
-    raise ValidationError('Enter a valid Bangladeshi mobile number (01XXXXXXXXX).')
+    raise ValidationError(PHONE_ERROR)
 
 
 def validate_nid(value):
@@ -54,12 +63,20 @@ def validate_nid(value):
     return digits
 
 
-def birth_registration_warning(value):
-    """Return a warning string if the number looks unusual; never hard-fail."""
+def validate_birth_registration(value):
     digits = ''.join(ch for ch in (value or '') if ch.isdigit())
-    if digits and len(digits) != 17:
-        return 'Birth registration numbers in Bangladesh are usually 17 digits.'
-    return ''
+    if len(digits) not in BIRTH_REG_LENGTHS:
+        raise ValidationError(BIRTH_REG_ERROR)
+    return digits
+
+
+def validate_bengali_text(value):
+    text = (value or '').strip()
+    if not text:
+        raise ValidationError('This field is required.')
+    if _HAS_LATIN.search(text) or not _HAS_BENGALI.search(text) or not _BENGALI_ALLOWED.match(text):
+        raise ValidationError(BENGALI_ERROR)
+    return text
 
 
 def process_passport_photo(image_field, filename=None):

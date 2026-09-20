@@ -1,17 +1,20 @@
-<form method="post" id="othersForm">
+<form method="post" id="othersForm" novalidate class="adm-wizard-form">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.non_field_errors %}
+    <div class="adm-banner-error">{{ form.non_field_errors }}</div>
+    {% endif %}
 
     <section class="adm-section">
         <div class="adm-section-head">
             <div>
                 <h3 class="text-lg">School bus</h3>
-                <p class="adm-hint">Choose a stop only if the student needs school transport.</p>
+                <p class="adm-hint">If yes, choose starting and ending stops from the school bus list.</p>
             </div>
         </div>
         {% include 'admissions/_field.html' with field=form.needs_bus %}
-        <div id="busStopWrap" class="{% if not form.needs_bus.value %}hidden{% endif %}">
-            {% include 'admissions/_field.html' with field=form.bus_stop %}
+        <div id="busStopWrap" class="grid md:grid-cols-2 gap-x-4 {% if not form.needs_bus.value %}hidden{% endif %}">
+            {% include 'admissions/_field.html' with field=form.bus_start_stop %}
+            {% include 'admissions/_field.html' with field=form.bus_end_stop %}
         </div>
     </section>
 
@@ -49,7 +52,14 @@
         function sync() {
             var checked = document.querySelector('input[name="' + name + '"]:checked');
             var on = checked && (checked.value === 'True' || checked.value === 'true');
-            if (wrap) wrap.classList.toggle('hidden', !on);
+            if (wrap) {
+                wrap.classList.toggle('hidden', !on);
+                wrap.querySelectorAll('select, input:not([type="hidden"])').forEach(function(el) {
+                    if (el.closest('.sibling-row') || wrapId === 'busStopWrap') {
+                        el.disabled = !on;
+                    }
+                });
+            }
         }
         inputs.forEach(function(el) { el.addEventListener('change', sync); });
         sync();

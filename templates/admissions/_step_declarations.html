@@ -1,6 +1,8 @@
-<form method="post">
+<form method="post" novalidate class="adm-wizard-form">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.non_field_errors %}
+    <div class="adm-banner-error">{{ form.non_field_errors }}</div>
+    {% endif %}
     <p class="text-slate-600 mb-5">Please answer each question. Uniform, school rules, and accuracy must be Yes to continue.</p>
     <section class="adm-section font-bengali">
         {% include 'admissions/_field.html' with field=form.financial_capacity %}

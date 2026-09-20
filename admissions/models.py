@@ -145,6 +145,13 @@ class AdmissionClass(models.Model):
         blank=True,
         help_text='Prefix on form numbers, e.g. N for Nursery → N-26-00001.',
     )
+    assigned_viva_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text='Nursery only: applicants skip the calendar and receive this date.',
+    )
+    assigned_viva_start_time = models.TimeField(blank=True, null=True)
+    assigned_viva_end_time = models.TimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['order', 'id']
@@ -153,6 +160,10 @@ class AdmissionClass(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def auto_assigns_viva(self):
+        return (self.code or '').lower() == 'nursery'
 
     def form_number_code(self):
         raw = (self.form_code or '').strip()
@@ -282,7 +293,6 @@ class Application(models.Model):
         O_NEG = 'O-', 'O-'
         AB_POS = 'AB+', 'AB+'
         AB_NEG = 'AB-', 'AB-'
-        UNKNOWN = 'Unknown', 'Unknown'
 
     class Gender(models.TextChoices):
         MALE = 'male', 'Male'
@@ -311,6 +321,15 @@ class Application(models.Model):
         R_150_200 = '150000-200000', '150,000 – 200,000'
         ABOVE_200 = 'above-200000', 'Above 200,000'
 
+    class GuardianType(models.TextChoices):
+        FATHER = 'father', 'Father'
+        MOTHER = 'mother', 'Mother'
+        OTHER = 'other', 'Other person'
+
+    class StudyGroup(models.TextChoices):
+        SCIENCE = 'science', 'Science'
+        COMMERCE = 'commerce', 'Commerce'
+
     session = models.ForeignKey(
         AdmissionSession,
         on_delete=models.PROTECT,
@@ -323,7 +342,7 @@ class Application(models.Model):
         null=True,
         blank=True,
     )
-    form_number = models.CharField(max_length=32, blank=True, db_index=True)
+    form_number = models.CharField('Application No', max_length=32, blank=True, db_index=True)
     status = models.CharField(max_length=32, choices=Status.choices, default=Status.DRAFT, db_index=True)
     payment_status = models.CharField(
         max_length=16,
@@ -365,6 +384,15 @@ class Application(models.Model):
     )
     permanent_address = models.TextField(blank=True, help_text='Composed full permanent address')
     religion = models.CharField(max_length=20, choices=Religion.choices, blank=True)
+    hobby = models.CharField(max_length=200, blank=True)
+    other_skills = models.CharField('Any other skills', max_length=200, blank=True)
+    class_6_reg_no = models.CharField('Class 6 registration no', max_length=40, blank=True)
+    class_8_reg_no = models.CharField('Class 8 registration no', max_length=40, blank=True)
+    study_group = models.CharField(
+        max_length=16,
+        blank=True,
+        choices=StudyGroup.choices,
+    )
     photo = models.ImageField(
         upload_to=application_photo_path,
         blank=True,
@@ -373,6 +401,7 @@ class Application(models.Model):
     )
 
     father_name = models.CharField(max_length=200, blank=True)
+    father_name_bn = models.CharField("Father's name (Bangla)", max_length=200, blank=True)
     father_nid = models.CharField(max_length=20, blank=True)
     father_occupation = models.CharField(max_length=120, blank=True)
     father_designation = models.CharField(max_length=120, blank=True)
@@ -385,6 +414,7 @@ class Application(models.Model):
     father_address = models.TextField(blank=True, help_text="Composed full father work address")
 
     mother_name = models.CharField(max_length=200, blank=True)
+    mother_name_bn = models.CharField("Mother's name (Bangla)", max_length=200, blank=True)
     mother_nid = models.CharField(max_length=20, blank=True)
     mother_occupation = models.CharField(max_length=120, blank=True)
     mother_designation = models.CharField(max_length=120, blank=True)
@@ -396,6 +426,16 @@ class Application(models.Model):
     mother_address_line = models.CharField("Mother's work address", max_length=300, blank=True)
     mother_address = models.TextField(blank=True, help_text="Composed full mother work address")
 
+    whatsapp_number = models.CharField(max_length=20, blank=True)
+    guardian_type = models.CharField(
+        'Guardian is',
+        max_length=16,
+        blank=True,
+        choices=GuardianType.choices,
+    )
+    guardian_name = models.CharField(max_length=200, blank=True)
+    guardian_relation = models.CharField(max_length=80, blank=True)
+    guardian_phone = models.CharField('Guardian phone', max_length=20, blank=True)
     email = models.EmailField(blank=True)
     family_income_yearly = models.CharField(
         'Family income (yearly, BDT)',
@@ -407,12 +447,19 @@ class Application(models.Model):
     previous_school_name = models.CharField(max_length=200, blank=True)
 
     needs_bus = models.BooleanField(default=False)
-    bus_stop = models.ForeignKey(
+    bus_start_stop = models.ForeignKey(
         BusStop,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='applications',
+        related_name='start_applications',
+    )
+    bus_end_stop = models.ForeignKey(
+        BusStop,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='end_applications',
     )
     has_other_child = models.BooleanField(default=False)
 
@@ -475,12 +522,77 @@ class Application(models.Model):
         )
 
     @property
+    def class_code(self):
+        return (self.admit_class.code if self.admit_class_id else '') or ''
+
+    @property
+    def is_nursery(self):
+        return self.class_code.lower() == 'nursery'
+
+    @property
+    def skips_viva_selection(self):
+        return bool(self.admit_class_id and self.admit_class.auto_assigns_viva)
+
+    def apply_guardian_from_parents(self):
+        if self.guardian_type == self.GuardianType.FATHER:
+            self.guardian_name = self.father_name
+            self.guardian_relation = 'Father'
+            self.guardian_phone = self.father_mobile
+        elif self.guardian_type == self.GuardianType.MOTHER:
+            self.guardian_name = self.mother_name
+            self.guardian_relation = 'Mother'
+            self.guardian_phone = self.mother_mobile
+
+    @property
+    def needs_class_6_reg(self):
+        return self.class_code in {'class-7', 'class-8', 'class-9'}
+
+    @property
+    def needs_class_8_reg(self):
+        return self.class_code == 'class-9'
+
+    @property
+    def needs_study_group(self):
+        return self.class_code == 'class-9'
+
+    @property
     def hold_is_valid(self):
         return bool(
             self.viva_slot_id
             and self.slot_held_until
             and self.slot_held_until > timezone.now()
         )
+
+    @property
+    def ready_for_payment(self):
+        if self.skips_viva_selection:
+            return True
+        return self.hold_is_valid
+
+    def viva_when(self):
+        if self.skips_viva_selection and self.admit_class_id:
+            klass = self.admit_class
+            return (
+                klass.assigned_viva_date,
+                klass.assigned_viva_start_time,
+                klass.assigned_viva_end_time,
+            )
+        slot = self.viva_slot
+        if slot:
+            return (slot.date, slot.start_time, slot.end_time)
+        return (None, None, None)
+
+    @property
+    def display_viva_date(self):
+        return self.viva_when()[0]
+
+    @property
+    def display_viva_start(self):
+        return self.viva_when()[1]
+
+    @property
+    def display_viva_end(self):
+        return self.viva_when()[2]
 
     def fee_amount(self):
         if self.admit_class and self.admit_class.fee_override is not None:
@@ -547,12 +659,6 @@ class PreviousResult(models.Model):
     previous_class = models.CharField('Class', max_length=80, blank=True)
     year = models.CharField(max_length=10, blank=True)
     result = models.CharField(max_length=80, blank=True)
-
-    class Meta:
-        ordering = ['id']
-
-    def __str__(self):
-        return f'{self.previous_class} ({self.result})'
 
     class Meta:
         ordering = ['id']

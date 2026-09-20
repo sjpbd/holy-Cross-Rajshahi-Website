@@ -44,6 +44,7 @@ from .services import (
     expire_slot_holds,
     hold_slot,
     mark_application_paid,
+    release_slot_hold,
 )
 from .utils import client_ip, lookup_rate_limited
 
@@ -76,18 +77,53 @@ def _application_from_cookie(request, session=None):
     return qs.first()
 
 
-def _get_or_create_draft(request, session):
-    application = _application_from_cookie(request, session)
-    if application and application.status in LIVE_STATUSES:
-        return application, False
-    if application and application.is_paid:
-        return application, False
-    application = Application.objects.create(
+def _create_draft(request, session):
+    return Application.objects.create(
         session=session,
         ip_address=client_ip(request),
         nationality='Bangladesh',
     )
-    return application, True
+
+
+def _get_or_create_draft(request, session, force_new=False):
+    application = None if force_new else _application_from_cookie(request, session)
+    if application and application.status in LIVE_STATUSES and not force_new:
+        return application, False
+    return _create_draft(request, session), True
+
+
+def _next_wizard_step(application, current):
+    nxt = min(current + 1, STEP_REVIEW)
+    if nxt == STEP_SLOT and application.skips_viva_selection:
+        return STEP_REVIEW
+    return nxt
+
+
+def _previous_wizard_step(application, current):
+    if current == STEP_REVIEW and application.skips_viva_selection:
+        return STEP_DECLARATIONS
+    return max(current - 1, STEP_STUDENT)
+
+
+def _sync_wizard_after_save(application, current_step):
+    nxt = _next_wizard_step(application, current_step)
+    if application.skips_viva_selection:
+        if application.viva_slot_id:
+            release_slot_hold(application, save=False)
+        step = max(application.wizard_step or 1, nxt)
+        if step == STEP_SLOT:
+            step = STEP_REVIEW
+        application.wizard_step = step
+    else:
+        application.wizard_step = max(application.wizard_step or 1, nxt)
+        if application.wizard_step >= STEP_REVIEW and not application.viva_slot_id:
+            application.wizard_step = STEP_SLOT
+    application.save(update_fields=['wizard_step', 'viva_slot', 'slot_held_until', 'updated_at'])
+    return nxt
+
+
+def _class_code_map():
+    return {str(klass.pk): klass.code for klass in AdmissionClass.objects.all()}
 
 
 def _require_open_session(request):
@@ -112,6 +148,8 @@ def _step_form(step, data=None, files=None, instance=None):
 
 def _can_visit_step(application, step):
     if application.is_paid:
+        return False
+    if step == STEP_SLOT and application.skips_viva_selection:
         return False
     return 1 <= step <= max(application.wizard_step or 1, 1) and step <= STEP_REVIEW
 
@@ -146,10 +184,10 @@ def apply(request):
     if not session:
         return redirect('admissions:landing')
 
-    application, created = _get_or_create_draft(request, session)
+    force_new = request.method == 'GET' and request.GET.get('new') in ('1', 'true', 'yes')
+    application, created = _get_or_create_draft(request, session, force_new=force_new)
     if application.is_paid:
-        response = redirect('admissions:success', token=application.access_token)
-        return _set_resume_cookie(response, application)
+        application, created = _create_draft(request, session), True
 
     expire_slot_holds()
     application.refresh_from_db()
@@ -160,8 +198,12 @@ def apply(request):
         step = STEP_STUDENT
     if step < STEP_STUDENT or step > STEP_REVIEW:
         step = STEP_STUDENT
-    if not _can_visit_step(application, step):
+    if step == STEP_SLOT and application.skips_viva_selection:
+        step = STEP_REVIEW if (application.wizard_step or 1) >= STEP_REVIEW else STEP_DECLARATIONS
+    elif not _can_visit_step(application, step):
         step = application.wizard_step or STEP_STUDENT
+        if step == STEP_SLOT and application.skips_viva_selection:
+            step = STEP_REVIEW
 
     form = None
     result_formset = None
@@ -230,7 +272,7 @@ def apply(request):
     elif request.method == 'POST' and step == STEP_REVIEW:
         expire_slot_holds()
         application.refresh_from_db()
-        if not application.hold_is_valid:
+        if not application.ready_for_payment:
             messages.error(request, 'Your viva slot hold expired. Please choose a slot again.')
             response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
             return _set_resume_cookie(response, application)
@@ -251,12 +293,17 @@ def apply(request):
     elif request.method == 'POST' and form is not None:
         formsets_ok = True
         if step == STEP_FAMILY:
-            if not result_formset.is_valid():
+            if application.is_nursery:
+                formsets_ok = True
+            elif not result_formset.is_valid():
                 formsets_ok = False
         if step == STEP_OTHERS:
-            if not sibling_formset.is_valid():
+            wants_siblings = form.is_valid() and form.cleaned_data.get('has_other_child')
+            if not wants_siblings and form.is_valid():
+                formsets_ok = True
+            elif not sibling_formset.is_valid():
                 formsets_ok = False
-            elif form.is_valid() and form.cleaned_data.get('has_other_child'):
+            elif wants_siblings:
                 living = [
                     f for f in sibling_formset.forms
                     if not f.cleaned_data.get('DELETE')
@@ -270,21 +317,22 @@ def apply(request):
         if form.is_valid() and formsets_ok:
             application = form.save()
             if step == STEP_FAMILY:
-                result_formset.instance = application
-                result_formset.save()
-            if step == STEP_STUDENT and getattr(form, 'birth_reg_warning', ''):
-                messages.warning(request, form.birth_reg_warning)
+                if application.is_nursery:
+                    application.previous_results.all().delete()
+                    application.previous_school_name = ''
+                    application.save(update_fields=['previous_school_name', 'updated_at'])
+                else:
+                    result_formset.instance = application
+                    result_formset.save()
             if step == STEP_OTHERS:
-                sibling_formset.instance = application
-                sibling_formset.save()
-            next_step = min(step + 1, STEP_REVIEW)
-            application.wizard_step = max(application.wizard_step, next_step)
-            application.save(update_fields=['wizard_step', 'updated_at'])
+                if form.cleaned_data.get('has_other_child'):
+                    sibling_formset.instance = application
+                    sibling_formset.save()
+                else:
+                    application.siblings.all().delete()
+            next_step = _sync_wizard_after_save(application, step)
             response = redirect(f"{reverse('admissions:apply')}?step={next_step}")
             return _set_resume_cookie(response, application)
-
-    if step == STEP_STUDENT and form and getattr(form, 'birth_reg_warning', '') and form.is_bound and form.is_valid():
-        messages.warning(request, form.birth_reg_warning)
 
     context = {
         'session': session,
@@ -301,6 +349,8 @@ def apply(request):
         'address_state': _address_state(application),
         'step_label': STEP_LABELS.get(step, 'Apply'),
         'step_hint': STEP_HINTS.get(step, ''),
+        'class_codes': _class_code_map(),
+        'prev_step': _previous_wizard_step(application, step) if step > STEP_STUDENT else None,
         'page_title': 'Apply for Admission - Holy Cross School and College',
     }
     response = render(request, 'admissions/apply.html', context)
@@ -467,7 +517,7 @@ def payment_page(request, token):
         return redirect('admissions:success', token=token)
     expire_slot_holds()
     application.refresh_from_db()
-    if not application.hold_is_valid and application.status != Application.Status.PAID:
+    if not application.ready_for_payment and application.status != Application.Status.PAID:
         messages.error(request, 'Your viva slot reservation expired. Please choose a slot again before paying.')
         response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
         return _set_resume_cookie(response, application)

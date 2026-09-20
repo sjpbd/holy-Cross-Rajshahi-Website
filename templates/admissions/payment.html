@@ -5,7 +5,7 @@
 {% block content %}
 <section class="adm-hero pt-32 pb-12">
     <div class="container mx-auto px-4 adm-shell relative z-10">
-        <p class="adm-kicker">Form {{ application.form_number }}</p>
+        <p class="adm-kicker">Application No {{ application.form_number }}</p>
         <h1 class="text-4xl font-extrabold mt-2">Admission payment</h1>
         <p class="text-blue-100 mt-2">Complete payment to lock the viva seat and download the form.</p>
     </div>
@@ -20,16 +20,22 @@
                 <p class="text-sm text-slate-500">Amount due</p>
                 <p class="text-4xl font-extrabold text-primary">BDT {{ application.fee_amount }}</p>
             </div>
-            {% if application.viva_slot %}
+            {% if application.display_viva_date %}
             <p class="text-sm text-slate-600 mb-2">
-                Viva: <strong>{{ application.viva_slot.date|date:"d M Y" }}</strong>
-                {{ application.viva_slot.start_time|time:"g:i A" }}–{{ application.viva_slot.end_time|time:"g:i A" }}
+                Viva: <strong>{{ application.display_viva_date|date:"d M Y" }}</strong>
+                {% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %}–{{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}
             </p>
             {% endif %}
+            {% if application.slot_held_until and not application.skips_viva_selection %}
             <p class="text-sm text-slate-500 mb-6">
                 Online payment will be connected through the school’s payment API. Your viva slot is reserved until
                 {{ application.slot_held_until|date:"g:i A, d M Y" }}.
             </p>
+            {% else %}
+            <p class="text-sm text-slate-500 mb-6">
+                Online payment will be connected through the school’s payment API.
+            </p>
+            {% endif %}
             {% if debug %}
             <p class="text-amber-900 bg-amber-50 rounded-xl px-4 py-3 text-sm mb-4 border border-amber-100">
                 Debug mode: simulate a payment result. Production will redirect to the payment gateway.

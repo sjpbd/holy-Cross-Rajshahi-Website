@@ -141,7 +141,7 @@
             </div>
             <div class="badge">Admission Form — {{ form_year }}</div>
             <div class="klass">Admission for Class: <strong>{{ application.admit_class.name|default:"" }}</strong></div>
-            <div class="form-no">Form Number: <strong>{{ application.form_number }}</strong></div>
+            <div class="form-no">Application No: <strong>{{ application.form_number }}</strong></div>
         </td>
         <td class="col-right">
             <div class="photo-wrap">
@@ -163,6 +163,21 @@
             <td class="lbl">Name of Student (Bengali)</td>
             <td class="val bn" colspan="5">{{ application.student_name_bn }}</td>
         </tr>
+        {% if application.hobby or application.other_skills %}
+        <tr>
+            <td class="lbl">Hobby</td>
+            <td class="val">{{ application.hobby }}</td>
+            <td class="lbl">Other skills</td>
+            <td class="val" colspan="3">{{ application.other_skills }}</td>
+        </tr>
+        {% endif %}
+        {% if application.class_6_reg_no or application.class_8_reg_no or application.study_group %}
+        <tr>
+            {% if application.class_6_reg_no %}<td class="lbl">Class 6 registration no</td><td class="val">{{ application.class_6_reg_no }}</td>{% endif %}
+            {% if application.class_8_reg_no %}<td class="lbl">Class 8 registration no</td><td class="val">{{ application.class_8_reg_no }}</td>{% endif %}
+            {% if application.study_group %}<td class="lbl">Group</td><td class="val">{{ application.get_study_group_display }}</td>{% endif %}
+        </tr>
+        {% endif %}
     </table>
     <table class="form">
         <tr>
@@ -212,6 +227,10 @@
             <td class="val" colspan="5">{{ application.father_name|upper }}</td>
         </tr>
         <tr>
+            <td class="lbl">Father’s Name (Bengali)</td>
+            <td class="val bn" colspan="5">{{ application.father_name_bn }}</td>
+        </tr>
+        <tr>
             <td class="lbl">National ID Number</td>
             <td class="val">{{ application.father_nid }}</td>
             <td class="lbl">Mobile Number</td>
@@ -240,6 +259,10 @@
             <td class="val" colspan="5">{{ application.mother_name|upper }}</td>
         </tr>
         <tr>
+            <td class="lbl">Mother’s Name (Bengali)</td>
+            <td class="val bn" colspan="5">{{ application.mother_name_bn }}</td>
+        </tr>
+        <tr>
             <td class="lbl">National ID Number</td>
             <td class="val">{{ application.mother_nid }}</td>
             <td class="lbl">Mobile Number</td>
@@ -266,10 +289,18 @@
         <tr>
             <td class="lbl">Email</td>
             <td class="val">{{ application.email }}</td>
+            <td class="lbl">WhatsApp</td>
+            <td class="val">{{ application.whatsapp_number }}</td>
+        </tr>
+        <tr>
             <td class="lbl">Yearly Family Income</td>
             <td class="val">{% if application.family_income_yearly %}BDT {{ application.get_family_income_yearly_display }}{% endif %}</td>
             <td class="lbl">Earning members</td>
             <td class="val">{{ application.earning_members }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Guardian</td>
+            <td class="val" colspan="5">{{ application.guardian_name }} ({{ application.guardian_relation }}){% if application.guardian_phone %} · {{ application.guardian_phone }}{% endif %}</td>
         </tr>
         <tr>
             <td class="lbl">Other child in this school</td>
@@ -291,6 +322,7 @@
 
 <div class="section keep">
     <h2>Others Information</h2>
+    {% if not application.is_nursery %}
     <table class="form">
         <tr>
             <td class="lbl">Name of the Previous School</td>
@@ -313,6 +345,7 @@
         <tr><td colspan="3">—</td></tr>
         {% endfor %}
     </table>
+    {% endif %}
 </div>
 
 <div class="section keep">
@@ -321,8 +354,12 @@
         <tr>
             <td class="lbl">School bus required</td>
             <td class="val">{{ answers.needs_bus }}</td>
-            <td class="lbl">Bus stop</td>
-            <td class="val">{% if application.needs_bus %}{{ application.bus_stop }}{% else %}—{% endif %}</td>
+            <td class="lbl">Starting stop</td>
+            <td class="val">{% if application.needs_bus %}{{ application.bus_start_stop }}{% else %}—{% endif %}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Ending stop</td>
+            <td class="val">{% if application.needs_bus %}{{ application.bus_end_stop }}{% else %}—{% endif %}</td>
         </tr>
     </table>
 </div>
@@ -359,9 +396,9 @@
         <table class="form">
             <tr>
                 <td class="lbl">Viva date</td>
-                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.date|date:"l, d F Y" }}{% endif %}</td>
+                <td class="val">{% if application.display_viva_date %}{{ application.display_viva_date|date:"l, d F Y" }}{% elif application.skips_viva_selection %}Date will be announced by the school.{% endif %}</td>
                 <td class="lbl">Time</td>
-                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.start_time|time:"g:i A" }} – {{ application.viva_slot.end_time|time:"g:i A" }}{% endif %}</td>
+                <td class="val">{% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %} – {{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}</td>
             </tr>
             <tr>
                 <td class="lbl">Venue</td>
@@ -397,7 +434,7 @@
                 </div>
                 <div class="badge">Admit Card — {{ form_year }}</div>
                 <div class="klass">Admission for Class: <strong>{{ application.admit_class.name|default:"" }}</strong></div>
-                <div class="form-no">Form Number: <strong>{{ application.form_number }}</strong></div>
+                <div class="form-no">Application No: <strong>{{ application.form_number }}</strong></div>
             </td>
             <td class="col-right">
                 <div class="photo-wrap">
@@ -431,9 +468,9 @@
         <table class="form">
             <tr>
                 <td class="lbl">Viva date</td>
-                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.date|date:"l, d F Y" }}{% endif %}</td>
+                <td class="val">{% if application.display_viva_date %}{{ application.display_viva_date|date:"l, d F Y" }}{% elif application.skips_viva_selection %}Date will be announced by the school.{% endif %}</td>
                 <td class="lbl">Time</td>
-                <td class="val">{% if application.viva_slot %}{{ application.viva_slot.start_time|time:"g:i A" }} – {{ application.viva_slot.end_time|time:"g:i A" }}{% endif %}</td>
+                <td class="val">{% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %} – {{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}</td>
             </tr>
             <tr>
                 <td class="lbl">Venue</td>

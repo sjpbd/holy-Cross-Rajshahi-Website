@@ -4,11 +4,28 @@ from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
 
 from . import geo
-from .constants import INPUT_CLASS, SELECT_CLASS, TEXTAREA_CLASS
+from .constants import (
+    CLASS_6_REG_CODES,
+    CLASS_8_REG_CODES,
+    INPUT_CLASS,
+    SELECT_CLASS,
+    SIBLING_CLASS_NAMES,
+    STUDY_GROUP_CODES,
+    TEXTAREA_CLASS,
+)
 from .models import AdmissionClass, Application, BusStop, PreviousResult, Sibling, VivaSlot
-from .utils import birth_registration_warning, process_passport_photo, validate_bd_mobile, validate_nid
+from .utils import (
+    process_passport_photo,
+    validate_bd_mobile,
+    validate_bengali_text,
+    validate_birth_registration,
+    validate_nid,
+)
 
 YES_NO = ((True, 'Yes'), (False, 'No'))
+PHONE_EXTRA = {'inputmode': 'numeric', 'autocomplete': 'tel', 'data-validate': 'phone'}
+BIRTH_EXTRA = {'inputmode': 'numeric', 'data-validate': 'birth'}
+BENGALI_EXTRA = {'data-validate': 'bengali', 'lang': 'bn'}
 
 
 def coerce_bool(value):
@@ -34,8 +51,18 @@ def _textarea(placeholder='', rows=3):
     return forms.Textarea(attrs={'class': TEXTAREA_CLASS, 'placeholder': placeholder, 'rows': rows})
 
 
+def _radios():
+    return forms.RadioSelect(attrs={'class': 'adm-radios'})
+
+
 def _geo_choices(placeholder, names):
     return [('', placeholder)] + [(name, name) for name in names]
+
+
+def _mark_required_widgets(form):
+    for field in form.fields.values():
+        if field.required and not isinstance(field.widget, forms.RadioSelect):
+            field.widget.attrs['data-required'] = 'true'
 
 
 def bind_geo_fields(form, prefixes):
@@ -107,18 +134,28 @@ class StudentStepForm(forms.ModelForm):
             'permanent_thana',
             'permanent_address_line',
             'religion',
+            'hobby',
+            'other_skills',
+            'class_6_reg_no',
+            'class_8_reg_no',
+            'study_group',
             'photo',
         ]
         widgets = {
             'admit_class': _select(),
             'student_name_en': _text('Student name in English'),
-            'student_name_bn': _text('শিক্ষার্থীর নাম (বাংলা)'),
+            'student_name_bn': _text('শিক্ষার্থীর নাম (বাংলা)', extra=BENGALI_EXTRA),
             'date_of_birth': forms.DateInput(attrs={'class': INPUT_CLASS, 'type': 'date'}),
-            'birth_registration_no': _text('Birth registration number'),
+            'birth_registration_no': _text('13, 16, or 17 digits', extra=BIRTH_EXTRA),
             'nationality': _text(),
             'blood_group': _select(),
             'gender': _select(),
             'religion': _select(),
+            'hobby': _text('Hobby (optional)'),
+            'other_skills': _text('Any other skills (optional)'),
+            'class_6_reg_no': _text('Class 6 registration number'),
+            'class_8_reg_no': _text('Class 8 registration number'),
+            'study_group': _select(),
             'photo': forms.FileInput(attrs={
                 'class': 'sr-only',
                 'accept': 'image/jpeg,image/png',
@@ -145,24 +182,34 @@ class StudentStepForm(forms.ModelForm):
         self.fields['student_name_bn'].required = True
         self.fields['date_of_birth'].required = True
         self.fields['birth_registration_no'].required = True
+        self.fields['birth_registration_no'].help_text = 'Must be 13, 16, or 17 digits.'
         self.fields['nationality'].required = True
         self.fields['blood_group'].required = True
+        self.fields['blood_group'].choices = [('', 'Select blood group')] + list(Application.BloodGroup.choices)
         self.fields['gender'].required = True
         self.fields['religion'].required = True
+        self.fields['hobby'].required = False
+        self.fields['other_skills'].required = False
+        self.fields['class_6_reg_no'].required = False
+        self.fields['class_8_reg_no'].required = False
+        self.fields['study_group'].required = False
+        self.fields['study_group'].choices = [('', 'Select group')] + list(Application.StudyGroup.choices)
         if not self.instance.photo:
             self.fields['photo'].required = True
-        self.birth_reg_warning = ''
         self.fields['student_name_bn'].widget.attrs['class'] += ' font-bengali'
+        self.fields['student_name_bn'].help_text = 'শুধু বাংলা অক্ষরে লিখুন.'
         if self.instance.pk:
             present = self.instance.geo_payload('present')
             permanent = self.instance.geo_payload('permanent')
             if present == permanent and any(present.values()):
                 self.fields['copy_same_permanent'].initial = True
+        _mark_required_widgets(self)
+
+    def clean_student_name_bn(self):
+        return validate_bengali_text(self.cleaned_data.get('student_name_bn'))
 
     def clean_birth_registration_no(self):
-        value = (self.cleaned_data.get('birth_registration_no') or '').strip()
-        self.birth_reg_warning = birth_registration_warning(value)
-        return value
+        return validate_birth_registration(self.cleaned_data.get('birth_registration_no'))
 
     def clean_photo(self):
         photo = self.cleaned_data.get('photo')
@@ -170,7 +217,6 @@ class StudentStepForm(forms.ModelForm):
             return photo
         if getattr(photo, 'closed', False):
             return photo
-        # Skip reprocessing an already-saved file on the instance when unchanged
         if self.instance.pk and self.instance.photo and photo == self.instance.photo:
             return photo
         try:
@@ -216,12 +262,31 @@ class StudentStepForm(forms.ModelForm):
                 raise ValidationError({
                     'birth_registration_no': 'An application with this birth registration number already exists for this session.',
                 })
+        code = (admit_class.code if admit_class else '') or ''
+        errors = {}
+        class_6 = (cleaned.get('class_6_reg_no') or '').strip()
+        class_8 = (cleaned.get('class_8_reg_no') or '').strip()
+        group = cleaned.get('study_group') or ''
+        cleaned['class_6_reg_no'] = class_6
+        cleaned['class_8_reg_no'] = class_8
+        if code not in CLASS_6_REG_CODES:
+            cleaned['class_6_reg_no'] = ''
+        elif not class_6:
+            errors['class_6_reg_no'] = 'Enter the Class 6 registration number.'
+        if code not in CLASS_8_REG_CODES:
+            cleaned['class_8_reg_no'] = ''
+        elif not class_8:
+            errors['class_8_reg_no'] = 'Enter the Class 8 registration number.'
+        if code not in STUDY_GROUP_CODES:
+            cleaned['study_group'] = ''
+        elif not group:
+            errors['study_group'] = 'Select Science or Commerce.'
         prefixes = ['present']
         if not cleaned.get('copy_same_permanent'):
             prefixes.append('permanent')
-        geo_errors = validate_geo_fields(cleaned, prefixes)
-        if geo_errors:
-            raise ValidationError(geo_errors)
+        errors.update(validate_geo_fields(cleaned, prefixes))
+        if errors:
+            raise ValidationError(errors)
         return cleaned
 
     def save(self, commit=True):
@@ -238,27 +303,35 @@ class FamilyStepForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = [
-            'father_name', 'father_nid', 'father_occupation', 'father_designation',
+            'father_name', 'father_name_bn', 'father_nid', 'father_occupation', 'father_designation',
             'father_organization', 'father_mobile',
             'father_division', 'father_zila', 'father_thana', 'father_address_line',
-            'mother_name', 'mother_nid', 'mother_occupation', 'mother_designation',
+            'mother_name', 'mother_name_bn', 'mother_nid', 'mother_occupation', 'mother_designation',
             'mother_organization', 'mother_mobile',
             'mother_division', 'mother_zila', 'mother_thana', 'mother_address_line',
+            'whatsapp_number', 'guardian_type', 'guardian_name', 'guardian_relation', 'guardian_phone',
             'email', 'family_income_yearly', 'earning_members', 'previous_school_name',
         ]
         widgets = {
             'father_name': _text("Father's name"),
+            'father_name_bn': _text('বাবার নাম (বাংলা)', extra=BENGALI_EXTRA),
             'father_nid': _text('Father NID'),
             'father_occupation': _text('Occupation'),
             'father_designation': _text('Designation'),
             'father_organization': _text('Organization / business name'),
-            'father_mobile': _text('01XXXXXXXXX'),
+            'father_mobile': _text('01XXXXXXXXX', extra=PHONE_EXTRA),
             'mother_name': _text("Mother's name"),
+            'mother_name_bn': _text('মায়ের নাম (বাংলা)', extra=BENGALI_EXTRA),
             'mother_nid': _text('Mother NID'),
             'mother_occupation': _text('Occupation'),
             'mother_designation': _text('Designation'),
             'mother_organization': _text('Organization / business name'),
-            'mother_mobile': _text('01XXXXXXXXX'),
+            'mother_mobile': _text('01XXXXXXXXX', extra=PHONE_EXTRA),
+            'whatsapp_number': _text('01XXXXXXXXX', extra=PHONE_EXTRA),
+            'guardian_type': _radios(),
+            'guardian_name': _text('Guardian’s full name'),
+            'guardian_relation': _text('Uncle, aunt, grandfather…'),
+            'guardian_phone': _text('01XXXXXXXXX', extra=PHONE_EXTRA),
             'email': forms.EmailInput(attrs={'class': INPUT_CLASS, 'placeholder': 'Family email'}),
             'family_income_yearly': _select(),
             'earning_members': _text('Total earning members'),
@@ -271,12 +344,30 @@ class FamilyStepForm(forms.ModelForm):
         self.fields['family_income_yearly'].choices = [
             ('', 'Select income range'),
         ] + list(Application.FamilyIncome.choices)
+        self.fields['guardian_type'].choices = Application.GuardianType.choices
+        self.fields['guardian_type'].label = 'Guardian is'
+        self.fields['whatsapp_number'].help_text = (
+            'Must be correct. All information will be sent to this WhatsApp number.'
+        )
+        self.fields['father_name_bn'].widget.attrs['class'] += ' font-bengali'
+        self.fields['mother_name_bn'].widget.attrs['class'] += ' font-bengali'
+        self.fields['father_mobile'].help_text = 'Must be 11 digits (01XXXXXXXXX).'
+        self.fields['mother_mobile'].help_text = 'Must be 11 digits (01XXXXXXXXX).'
         for name in (
-            'father_name', 'father_nid', 'father_occupation', 'father_mobile',
-            'mother_name', 'mother_nid', 'mother_occupation', 'mother_mobile',
+            'father_name', 'father_name_bn', 'father_nid', 'father_occupation', 'father_mobile',
+            'mother_name', 'mother_name_bn', 'mother_nid', 'mother_occupation', 'mother_mobile',
+            'whatsapp_number', 'guardian_type',
             'email', 'family_income_yearly', 'earning_members',
         ):
             self.fields[name].required = True
+        self.fields['guardian_name'].required = False
+        self.fields['guardian_relation'].required = False
+        self.fields['guardian_phone'].required = False
+        self.fields['guardian_phone'].help_text = 'Must be 11 digits (01XXXXXXXXX).'
+        self.fields['guardian_name'].widget.attrs['data-required'] = 'true'
+        self.fields['guardian_relation'].widget.attrs['data-required'] = 'true'
+        self.fields['guardian_phone'].widget.attrs['data-required'] = 'true'
+        _mark_required_widgets(self)
 
     def clean_father_nid(self):
         return validate_nid(self.cleaned_data.get('father_nid'))
@@ -293,16 +384,57 @@ class FamilyStepForm(forms.ModelForm):
             return value
         return validate_bd_mobile(value)
 
+    def clean_whatsapp_number(self):
+        return validate_bd_mobile(self.cleaned_data.get('whatsapp_number'))
+
+    def clean_guardian_phone(self):
+        value = self.cleaned_data.get('guardian_phone')
+        if not value:
+            return ''
+        return validate_bd_mobile(value)
+
+    def clean_father_name_bn(self):
+        return validate_bengali_text(self.cleaned_data.get('father_name_bn'))
+
+    def clean_mother_name_bn(self):
+        return validate_bengali_text(self.cleaned_data.get('mother_name_bn'))
+
     def clean(self):
         cleaned = super().clean()
+        errors = {}
         if not cleaned.get('father_mobile') and not cleaned.get('mother_mobile'):
-            raise ValidationError('Please provide at least one parent mobile number.')
+            errors['__all__'] = 'Please provide at least one parent mobile number.'
         members = cleaned.get('earning_members')
         if members is not None and members < 0:
-            raise ValidationError({'earning_members': 'Earning members cannot be negative.'})
+            errors['earning_members'] = 'Earning members cannot be negative.'
+        if self.instance.is_nursery:
+            cleaned['previous_school_name'] = ''
+        guardian_type = cleaned.get('guardian_type')
+        if guardian_type == Application.GuardianType.FATHER:
+            if not (cleaned.get('father_name') or '').strip():
+                errors['guardian_type'] = 'Enter the father’s name above first.'
+            cleaned['guardian_name'] = (cleaned.get('father_name') or '').strip()
+            cleaned['guardian_relation'] = 'Father'
+            cleaned['guardian_phone'] = (cleaned.get('father_mobile') or '').strip()
+        elif guardian_type == Application.GuardianType.MOTHER:
+            if not (cleaned.get('mother_name') or '').strip():
+                errors['guardian_type'] = 'Enter the mother’s name above first.'
+            cleaned['guardian_name'] = (cleaned.get('mother_name') or '').strip()
+            cleaned['guardian_relation'] = 'Mother'
+            cleaned['guardian_phone'] = (cleaned.get('mother_mobile') or '').strip()
+        elif guardian_type == Application.GuardianType.OTHER:
+            if not (cleaned.get('guardian_name') or '').strip():
+                errors['guardian_name'] = 'Enter the guardian’s name.'
+            if not (cleaned.get('guardian_relation') or '').strip():
+                errors['guardian_relation'] = 'Enter the relation to the student.'
+            if not (cleaned.get('guardian_phone') or '').strip():
+                errors['guardian_phone'] = 'Enter the guardian’s phone number.'
+        elif not guardian_type:
+            errors['guardian_type'] = 'Select father, mother, or another person.'
         geo_errors = validate_geo_fields(cleaned, ['father', 'mother'])
-        if geo_errors:
-            raise ValidationError(geo_errors)
+        errors.update(geo_errors)
+        if errors:
+            raise ValidationError(errors)
         return cleaned
 
 
@@ -310,33 +442,50 @@ class OthersStepForm(forms.ModelForm):
     needs_bus = forms.TypedChoiceField(
         choices=YES_NO,
         coerce=coerce_bool,
-        widget=forms.RadioSelect,
+        widget=_radios(),
         label='Need bus from school for transport?',
     )
     has_other_child = forms.TypedChoiceField(
         choices=YES_NO,
         coerce=coerce_bool,
-        widget=forms.RadioSelect,
+        widget=_radios(),
         label='Any other child in this school?',
     )
+
     class Meta:
         model = Application
-        fields = ['needs_bus', 'bus_stop', 'has_other_child']
+        fields = ['needs_bus', 'bus_start_stop', 'bus_end_stop', 'has_other_child']
         widgets = {
-            'bus_stop': _select(),
+            'bus_start_stop': _select(),
+            'bus_end_stop': _select(),
+        }
+        labels = {
+            'bus_start_stop': 'Starting stop',
+            'bus_end_stop': 'Ending stop',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['bus_stop'].queryset = BusStop.objects.filter(is_active=True)
-        self.fields['bus_stop'].required = False
+        stops = BusStop.objects.filter(is_active=True)
+        self.fields['bus_start_stop'].queryset = stops
+        self.fields['bus_end_stop'].queryset = stops
+        self.fields['bus_start_stop'].required = False
+        self.fields['bus_end_stop'].required = False
+        _mark_required_widgets(self)
 
     def clean(self):
         cleaned = super().clean()
-        if cleaned.get('needs_bus') and not cleaned.get('bus_stop'):
-            raise ValidationError({'bus_stop': 'Please select a bus stop.'})
-        if not cleaned.get('needs_bus'):
-            cleaned['bus_stop'] = None
+        errors = {}
+        if cleaned.get('needs_bus'):
+            if not cleaned.get('bus_start_stop'):
+                errors['bus_start_stop'] = 'Please select a starting stop.'
+            if not cleaned.get('bus_end_stop'):
+                errors['bus_end_stop'] = 'Please select an ending stop.'
+        else:
+            cleaned['bus_start_stop'] = None
+            cleaned['bus_end_stop'] = None
+        if errors:
+            raise ValidationError(errors)
         return cleaned
 
 
@@ -344,27 +493,28 @@ class DeclarationsStepForm(forms.ModelForm):
     financial_capacity = forms.TypedChoiceField(
         choices=YES_NO,
         coerce=coerce_bool,
-        widget=forms.RadioSelect,
+        widget=_radios(),
         label='আর্থিক সামর্থ্য আছে কি / না?',
     )
     agrees_uniform = forms.TypedChoiceField(
         choices=YES_NO,
         coerce=coerce_bool,
-        widget=forms.RadioSelect,
+        widget=_radios(),
         label='Uniform পরিধান করতে পারবে কি না?',
     )
     agrees_rules = forms.TypedChoiceField(
         choices=YES_NO,
         coerce=coerce_bool,
-        widget=forms.RadioSelect,
+        widget=_radios(),
         label='স্কুলের সকল নিয়ম মেনে চলতে পারবে কি না?',
     )
     info_correct = forms.TypedChoiceField(
         choices=YES_NO,
         coerce=coerce_bool,
-        widget=forms.RadioSelect,
+        widget=_radios(),
         label='All information on this form is correct.',
     )
+
     class Meta:
         model = Application
         fields = ['financial_capacity', 'agrees_uniform', 'agrees_rules', 'info_correct']
@@ -373,6 +523,7 @@ class DeclarationsStepForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        _mark_required_widgets(self)
 
     def clean(self):
         cleaned = super().clean()
@@ -421,11 +572,15 @@ class PreviousResultForm(forms.ModelForm):
 def admission_class_choices():
     choices = [('', 'Select class')]
     seen = set()
-    for klass in AdmissionClass.objects.filter(is_active=True).order_by('order', 'id'):
+    for klass in AdmissionClass.objects.all().order_by('order', 'id'):
         if klass.name in seen:
             continue
         seen.add(klass.name)
         choices.append((klass.name, klass.name))
+    for name in SIBLING_CLASS_NAMES:
+        if name not in seen:
+            seen.add(name)
+            choices.append((name, name))
     return choices
 
 
@@ -495,12 +650,17 @@ SiblingFormSet = inlineformset_factory(
 class ResumeForm(forms.Form):
     birth_registration_no = forms.CharField(
         label='Birth registration number',
-        widget=_text('Birth registration number'),
+        widget=_text('Birth registration number', extra=BIRTH_EXTRA),
+        help_text='Must be 13, 16, or 17 digits.',
     )
     father_mobile = forms.CharField(
         label="Father's mobile",
-        widget=_text('01XXXXXXXXX'),
+        widget=_text('01XXXXXXXXX', extra=PHONE_EXTRA),
+        help_text='Must be 11 digits (01XXXXXXXXX).',
     )
+
+    def clean_birth_registration_no(self):
+        return validate_birth_registration(self.cleaned_data.get('birth_registration_no'))
 
     def clean_father_mobile(self):
         return validate_bd_mobile(self.cleaned_data.get('father_mobile'))
@@ -508,12 +668,13 @@ class ResumeForm(forms.Form):
 
 class LookupForm(forms.Form):
     form_number = forms.CharField(
-        label='Form number',
+        label='Application No',
         widget=_text('N-26-00001'),
     )
     father_mobile = forms.CharField(
         label="Father's mobile",
-        widget=_text('01XXXXXXXXX'),
+        widget=_text('01XXXXXXXXX', extra=PHONE_EXTRA),
+        help_text='Must be 11 digits (01XXXXXXXXX).',
     )
 
     def clean_form_number(self):

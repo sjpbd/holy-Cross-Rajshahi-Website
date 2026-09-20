@@ -1,16 +1,19 @@
-<form method="post" id="familyForm" x-data="admissionAddresses">
+<form method="post" id="familyForm" novalidate class="adm-wizard-form" x-data="admissionAddresses">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.non_field_errors %}
+    <div class="adm-banner-error">{{ form.non_field_errors }}</div>
+    {% endif %}
 
     <section class="adm-section">
         <div class="adm-section-head">
             <div>
                 <h3 class="text-lg">Father</h3>
-                <p class="adm-hint">NID and a mobile number are required.</p>
+                <p class="adm-hint">English name, Bengali name, NID, and a mobile number are required.</p>
             </div>
         </div>
         <div class="grid md:grid-cols-2 gap-x-4">
             {% include 'admissions/_field.html' with field=form.father_name %}
+            {% include 'admissions/_field.html' with field=form.father_name_bn %}
             {% include 'admissions/_field.html' with field=form.father_nid %}
             {% include 'admissions/_field.html' with field=form.father_occupation %}
             {% include 'admissions/_field.html' with field=form.father_designation %}
@@ -39,6 +42,7 @@
         </div>
         <div class="grid md:grid-cols-2 gap-x-4">
             {% include 'admissions/_field.html' with field=form.mother_name %}
+            {% include 'admissions/_field.html' with field=form.mother_name_bn %}
             {% include 'admissions/_field.html' with field=form.mother_nid %}
             {% include 'admissions/_field.html' with field=form.mother_occupation %}
             {% include 'admissions/_field.html' with field=form.mother_designation %}
@@ -61,13 +65,35 @@
     <section class="adm-section">
         <div class="adm-section-head">
             <div>
-                <h3 class="text-lg">Family &amp; previous school</h3>
+                <h3 class="text-lg">Guardian &amp; contact</h3>
+                <p class="adm-hint">Choose father, mother, or another person. For someone else, enter their name, relation, and phone.</p>
             </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-x-4">
+            {% include 'admissions/_field.html' with field=form.guardian_type %}
+            {% include 'admissions/_field.html' with field=form.whatsapp_number %}
+        </div>
+        <p id="guardianCopyNote" class="adm-hint {% if form.guardian_type.value != 'father' and form.guardian_type.value != 'mother' %}hidden{% endif %}"></p>
+        <div id="guardianOtherWrap" class="grid md:grid-cols-2 gap-x-4 {% if form.guardian_type.value != 'other' %}hidden{% endif %}">
+            {% include 'admissions/_field.html' with field=form.guardian_name %}
+            {% include 'admissions/_field.html' with field=form.guardian_relation %}
+            {% include 'admissions/_field.html' with field=form.guardian_phone %}
         </div>
         <div class="grid md:grid-cols-2 gap-x-4">
             {% include 'admissions/_field.html' with field=form.email %}
             {% include 'admissions/_field.html' with field=form.family_income_yearly %}
             {% include 'admissions/_field.html' with field=form.earning_members %}
+        </div>
+    </section>
+
+    {% if not application.is_nursery %}
+    <section class="adm-section" id="previousSchoolWrap">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Previous school</h3>
+            </div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-x-4">
             {% include 'admissions/_field.html' with field=form.previous_school_name %}
         </div>
         <div class="mt-2">
@@ -87,6 +113,9 @@
             </button>
         </div>
     </section>
+    {% else %}
+    {{ result_formset.management_form }}
+    {% endif %}
 
     {% include 'admissions/_wizard_nav.html' %}
 </form>

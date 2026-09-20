@@ -80,7 +80,7 @@ def build_pdf_context(application):
         'session_instructions': (application.session.instructions or '').strip(),
         'print_instructions': [
             'Print this form on A4 paper.',
-            'Attach a recent passport-size photograph (school dress, white background) in the box on the first page.',
+            'Attach a recent passport-size photograph (school dress, white background, both ears visible) in the box on the first page.',
             'Student and parent information must match the Birth Certificate and National ID.',
             'Bring the printed form and the admit card to the viva.',
             'Arrive at the venue at least 15 minutes before the viva time.',

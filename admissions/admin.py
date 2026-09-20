@@ -110,9 +110,17 @@ class AdmissionSessionAdmin(admin.ModelAdmin):
 
 @admin.register(AdmissionClass)
 class AdmissionClassAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'fee_override']
+    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'assigned_viva_date', 'fee_override']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'code']
+    fieldsets = (
+        (None, {'fields': ('name', 'code', 'form_code', 'order', 'is_active')}),
+        ('Age & fee', {'fields': ('min_age_years', 'max_age_years', 'fee_override')}),
+        ('Nursery viva', {
+            'fields': ('assigned_viva_date', 'assigned_viva_start_time', 'assigned_viva_end_time'),
+            'description': 'For Nursery, applicants skip the calendar and receive this date.',
+        }),
+    )
 
 
 @admin.register(BusStop)
@@ -148,7 +156,8 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_filter = ['status', 'payment_status', 'session', 'admit_class', 'needs_bus', 'financial_capacity']
     search_fields = [
         'form_number', 'student_name_en', 'student_name_bn', 'father_name',
-        'mother_name', 'father_mobile', 'mother_mobile', 'birth_registration_no', 'email',
+        'father_name_bn', 'mother_name', 'mother_name_bn', 'father_mobile', 'mother_mobile',
+        'whatsapp_number', 'birth_registration_no', 'email', 'guardian_name', 'guardian_phone',
     ]
     readonly_fields = [
         'session', 'form_number', 'status', 'payment_status', 'access_token', 'resume_token',
@@ -156,14 +165,16 @@ class ApplicationAdmin(admin.ModelAdmin):
         'age_months', 'birth_registration_no', 'nationality', 'blood_group', 'gender',
         'present_division', 'present_zila', 'present_thana', 'present_address_line',
         'present_address', 'permanent_division', 'permanent_zila', 'permanent_thana',
-        'permanent_address_line', 'permanent_address', 'religion', 'photo', 'father_name', 'father_nid', 'father_occupation',
+        'permanent_address_line', 'permanent_address', 'religion', 'hobby', 'other_skills',
+        'class_6_reg_no', 'class_8_reg_no', 'study_group', 'photo', 'father_name', 'father_name_bn', 'father_nid', 'father_occupation',
         'father_designation', 'father_organization', 'father_mobile',
         'father_division', 'father_zila', 'father_thana', 'father_address_line', 'father_address',
-        'mother_name', 'mother_nid', 'mother_occupation', 'mother_designation',
+        'mother_name', 'mother_name_bn', 'mother_nid', 'mother_occupation', 'mother_designation',
         'mother_organization', 'mother_mobile',
-        'mother_division', 'mother_zila', 'mother_thana', 'mother_address_line', 'mother_address', 'email',
+        'mother_division', 'mother_zila', 'mother_thana', 'mother_address_line', 'mother_address',
+        'whatsapp_number', 'guardian_type', 'guardian_name', 'guardian_relation', 'guardian_phone', 'email',
         'family_income_yearly', 'earning_members', 'previous_school_name', 'needs_bus',
-        'bus_stop', 'has_other_child', 'financial_capacity', 'agrees_uniform', 'agrees_rules',
+        'bus_start_stop', 'bus_end_stop', 'has_other_child', 'financial_capacity', 'agrees_uniform', 'agrees_rules',
         'info_correct', 'admit_class', 'viva_slot', 'slot_held_until', 'submitted_at',
         'paid_at', 'ip_address', 'form_pdf', 'confirmation_email_sent_at',
         'confirmation_email_error', 'created_at', 'updated_at',
@@ -182,6 +193,7 @@ class ApplicationAdmin(admin.ModelAdmin):
             'fields': (
                 'student_name_en', 'student_name_bn', 'date_of_birth', 'age_years', 'age_months',
                 'birth_registration_no', 'nationality', 'blood_group', 'gender', 'religion',
+                'hobby', 'other_skills', 'class_6_reg_no', 'class_8_reg_no', 'study_group',
                 'present_division', 'present_zila', 'present_thana', 'present_address_line',
                 'present_address',
                 'permanent_division', 'permanent_zila', 'permanent_thana', 'permanent_address_line',
@@ -190,7 +202,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         }),
         ('Father', {
             'fields': (
-                'father_name', 'father_nid', 'father_occupation', 'father_designation',
+                'father_name', 'father_name_bn', 'father_nid', 'father_occupation', 'father_designation',
                 'father_organization', 'father_mobile',
                 'father_division', 'father_zila', 'father_thana', 'father_address_line',
                 'father_address',
@@ -198,7 +210,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         }),
         ('Mother', {
             'fields': (
-                'mother_name', 'mother_nid', 'mother_occupation', 'mother_designation',
+                'mother_name', 'mother_name_bn', 'mother_nid', 'mother_occupation', 'mother_designation',
                 'mother_organization', 'mother_mobile',
                 'mother_division', 'mother_zila', 'mother_thana', 'mother_address_line',
                 'mother_address',
@@ -206,8 +218,9 @@ class ApplicationAdmin(admin.ModelAdmin):
         }),
         ('Family & others', {
             'fields': (
+                'whatsapp_number', 'guardian_type', 'guardian_name', 'guardian_relation', 'guardian_phone',
                 'email', 'family_income_yearly', 'earning_members', 'previous_school_name',
-                'needs_bus', 'bus_stop', 'has_other_child',
+                'needs_bus', 'bus_start_stop', 'bus_end_stop', 'has_other_child',
                 'financial_capacity', 'agrees_uniform', 'agrees_rules', 'info_correct',
             ),
         }),

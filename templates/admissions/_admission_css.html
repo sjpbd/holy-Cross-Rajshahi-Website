@@ -89,26 +89,28 @@
     .adm-progress { height: .35rem; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
     .adm-progress > span { display: block; height: 100%; background: linear-gradient(90deg, #1e3a8a, #d4af37); }
     .adm-section {
-        border: 1px solid #e8edf5; border-radius: 1.1rem; padding: 1.15rem 1.2rem;
-        background: #fbfcfe; margin-bottom: 1.15rem;
+        border: 1px solid #e8edf5; border-radius: .9rem; padding: 1rem 1.05rem;
+        background: #fff; margin-bottom: 1rem;
     }
     .adm-section-head { display: flex; justify-content: space-between; gap: .75rem; align-items: flex-start; flex-wrap: wrap; margin-bottom: .9rem; }
     .adm-section h2, .adm-section h3 { margin: 0; color: #1e3a8a; font-weight: 800; }
-    .adm-hint { color: #64748b; font-size: .85rem; margin: .2rem 0 0; }
-    .adm-field { margin-bottom: 1rem; }
-    .adm-field label { display: block; font-weight: 650; color: #1e3a8a; margin-bottom: .35rem; font-size: .9rem; }
-    .adm-field .errorlist { list-style: none; padding: 0; margin: .35rem 0 0; color: #b91c1c; font-size: .8rem; }
+    .adm-hint { color: #64748b; font-size: .82rem; margin: .2rem 0 0; line-height: 1.45; }
+    .adm-field { margin-bottom: .9rem; }
+    .adm-field label { display: block; font-weight: 650; color: #1e3a8a; margin-bottom: .3rem; font-size: .9rem; }
+    .adm-error, .adm-field .errorlist { list-style: none; padding: 0; margin: .35rem 0 0; color: #b91c1c; font-size: .8rem; font-weight: 600; }
+    .adm-banner-error { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; border-radius: .85rem; padding: .75rem 1rem; margin-bottom: 1rem; }
+    .adm-banner-error .errorlist { list-style: none; padding: 0; margin: 0; }
     .adm-field.is-invalid .adm-control, .adm-field.is-invalid select, .adm-field.is-invalid input, .adm-field.is-invalid textarea {
         border-color: #fca5a5; background: #fff7f7;
     }
-    .adm-field ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
-    .adm-field ul li label {
+    .adm-field ul.adm-radios, .adm-field .adm-radios { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: .65rem; }
+    .adm-field ul.adm-radios li label, .adm-field .adm-radios label {
         display: flex; align-items: center; gap: .55rem;
         border: 1px solid #dbe3ef; border-radius: .9rem; padding: .8rem 1rem;
         background: #fff; cursor: pointer; font-weight: 600; color: #1c2a4e;
         margin: 0;
     }
-    .adm-field ul li label:has(input:checked) {
+    .adm-field ul.adm-radios li label:has(input:checked), .adm-field .adm-radios label:has(input:checked) {
         border-color: #1e3a8a; background: #eef2ff; box-shadow: 0 0 0 3px rgba(30,58,138,.12);
     }
     .adm-field input[type="radio"], .adm-field input[type="checkbox"] { width: 1.05rem; height: 1.05rem; accent-color: #1e3a8a; }
@@ -182,6 +184,19 @@
     }
     .adm-slot:has(input:checked) { border-color: #1e3a8a; background: #eef2ff; box-shadow: 0 0 0 3px rgba(30,58,138,.12); }
     .adm-stat { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 1rem; padding: .9rem 1rem; }
+    .adm-terms {
+        margin: 0;
+        padding-left: 1.25rem;
+        color: #1c2a4e;
+        list-style: disc outside;
+    }
+    .adm-terms li {
+        line-height: 1.6;
+        margin: 0 0 .75rem;
+        padding-left: .15rem;
+        display: list-item;
+    }
+    .adm-terms li:last-child { margin-bottom: 0; }
     .adm-howto { display: grid; gap: .9rem; }
     .adm-howto-item { display: flex; gap: .85rem; align-items: flex-start; color: #1c2a4e; }
     .adm-howto-item p { margin: 0; color: #1c2a4e; }

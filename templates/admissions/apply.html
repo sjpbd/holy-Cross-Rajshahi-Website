@@ -3,6 +3,8 @@
 
 {% block extra_head %}
 {% include 'admissions/_admission_css.html' %}
+{{ class_codes|json_script:"class-codes-data" }}
+<script src="{% static 'js/admission-form.js' %}" defer></script>
 <script>
 document.addEventListener('alpine:init', function () {
     Alpine.data('admissionAddresses', function () {
@@ -132,7 +134,12 @@ document.addEventListener('alpine:init', function () {
         <div class="adm-card p-5 md:p-8">
             <div class="adm-stepper mb-4">
                 {% for num, label in step_labels.items %}
-                    {% if num <= application.wizard_step or num <= step %}
+                    {% if num == 5 and application.skips_viva_selection %}
+                    <div class="adm-step {% if step > 5 %}is-done{% endif %}">
+                        <span class="adm-dot">{% if step > 5 %}<i class="fas fa-check text-xs"></i>{% else %}{{ num }}{% endif %}</span>
+                        <div class="adm-step-label">{{ label }}</div>
+                    </div>
+                    {% elif num <= application.wizard_step or num <= step %}
                     <a href="?step={{ num }}" class="adm-step {% if step == num %}is-active{% elif step > num %}is-done{% endif %}">
                         <span class="adm-dot">{% if step > num %}<i class="fas fa-check text-xs"></i>{% else %}{{ num }}{% endif %}</span>
                         <div class="adm-step-label">{{ label }}</div>

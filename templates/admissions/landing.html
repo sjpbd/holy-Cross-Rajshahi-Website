@@ -38,13 +38,14 @@
                 {% endif %}
             </div>
             <div class="adm-card p-6 md:p-8 text-slate-800">
-                <h2 class="text-lg font-extrabold text-primary mb-4">How it works</h2>
-                <div class="adm-howto">
-                    <div class="adm-howto-item"><span class="adm-num">1</span><p><strong>Fill the form</strong><br><span class="adm-howto-copy">Student, family, address, and a passport photo.</span></p></div>
-                    <div class="adm-howto-item"><span class="adm-num">2</span><p><strong>Choose a viva slot</strong><br><span class="adm-howto-copy">Pick a date and time. Seats are limited.</span></p></div>
-                    <div class="adm-howto-item"><span class="adm-num">3</span><p><strong>Pay the fee</strong><br><span class="adm-howto-copy">Online payment will connect here; office payment is also possible.</span></p></div>
-                    <div class="adm-howto-item"><span class="adm-num">4</span><p><strong>Print the admit card</strong><br><span class="adm-howto-copy">Download the PDF and bring it to the viva.</span></p></div>
-                </div>
+                <h2 class="text-lg font-extrabold text-primary mb-4 font-bengali">আবেদনের শর্তাবলি</h2>
+                <ul class="adm-terms font-bengali">
+                    <li>প্রতিষ্ঠান কর্তৃক নির্ধারিত ও অনুমোদিত লোগোসম্বলিত নির্ধারিত পোশাক পরিধান করতে হবে।</li>
+                    <li>শিক্ষার্থীকে নিয়মিত ও সময়ানুবর্তিতার সঙ্গে বিদ্যালয়ের শ্রেণি কার্যক্রমে উপস্থিত থাকতে হবে।</li>
+                    <li>বিদ্যালয়ের সকল নিয়ম-কানুন, শৃঙ্খলা ও আচরণবিধি যথাযথভাবে মেনে চলতে হবে।</li>
+                    <li>চুলের বিন্যাস পরিপাটি, পরিচ্ছন্ন ও মার্জিত রাখতে হবে এবং বিদ্যালয়ের নির্ধারিত শৃঙ্খলা অনুসরণ করতে হবে।</li>
+                    <li>বিদ্যালয়ের বিভিন্ন সহশিক্ষা কার্যক্রম ও ক্লাব কার্যক্রমে সক্রিয়ভাবে অংশগ্রহণের আগ্রহ ও মানসিকতা থাকতে হবে।</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -73,7 +74,7 @@
             </div>
             {% endif %}
             <div class="flex flex-wrap gap-3">
-                <a href="{% url 'admissions:apply' %}" class="btn btn-primary">
+                <a href="{% url 'admissions:apply' %}?new=1" class="btn btn-primary">
                     <i class="fas fa-pen-to-square mr-2"></i>Start application
                 </a>
                 <a href="{% url 'admissions:resume' %}" class="btn btn-outline">Continue a saved form</a>

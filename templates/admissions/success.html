@@ -8,6 +8,7 @@
         <p class="adm-kicker"><i class="fas fa-circle-check"></i> Payment received</p>
         <h1 class="text-4xl md:text-5xl font-extrabold mt-2">Application submitted</h1>
         <p class="text-accent-light text-2xl mt-3 font-bold">{{ application.form_number }}</p>
+        <p class="text-blue-100 text-sm mt-1">Application No</p>
     </div>
 </section>
 <section class="adm-page py-12">
@@ -17,14 +18,18 @@
                 Thank you, <strong>{{ application.student_name_en }}</strong>
                 <span class="font-bengali">({{ application.student_name_bn }})</span>.
             </p>
-            {% if application.viva_slot %}
+            {% if application.display_viva_date %}
             <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-4 mb-5">
                 <p class="text-xs font-bold uppercase tracking-wider text-indigo-400">Viva</p>
-                <p class="font-bold text-primary">{{ application.viva_slot.date|date:"l, d M Y" }}</p>
+                <p class="font-bold text-primary">{{ application.display_viva_date|date:"l, d M Y" }}</p>
                 <p class="text-sm text-slate-600">
-                    {{ application.viva_slot.start_time|time:"g:i A" }}–{{ application.viva_slot.end_time|time:"g:i A" }}
-                    · {{ application.session.viva_venue }}
+                    {% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %}–{{ application.display_viva_end|time:"g:i A" }}{% endif %} · {% endif %}{{ application.session.viva_venue }}
                 </p>
+            </div>
+            {% elif application.skips_viva_selection %}
+            <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-4 mb-5">
+                <p class="text-xs font-bold uppercase tracking-wider text-indigo-400">Viva</p>
+                <p class="font-bold text-primary">Date will be announced by the school.</p>
             </div>
             {% endif %}
             {% if email_sent %}
@@ -33,12 +38,12 @@
             </p>
             {% elif email_error %}
             <p class="rounded-xl bg-amber-50 text-amber-900 px-4 py-3 mb-6 border border-amber-100">
-                The confirmation email could not be sent. Please download the PDF below, or contact the office with your form number.
+                The confirmation email could not be sent. Please download the PDF below, or contact the office with your Application No.
             </p>
             {% endif %}
             <ol class="adm-howto mb-6">
                 <li class="adm-howto-item"><span class="adm-num">1</span><p>Download and print the application PDF.</p></li>
-                <li class="adm-howto-item"><span class="adm-num">2</span><p>Attach a hard-copy passport photograph where marked.</p></li>
+                <li class="adm-howto-item"><span class="adm-num">2</span><p>Attach a hard-copy passport photograph (white background, both ears visible) where marked.</p></li>
                 <li class="adm-howto-item"><span class="adm-num">3</span><p>Bring the form and admit card to the viva.</p></li>
             </ol>
             {% if application.form_pdf %}
@@ -46,8 +51,11 @@
                 <i class="fas fa-file-pdf mr-2"></i>Download form PDF
             </a>
             {% endif %}
+            <p class="mt-4">
+                <a class="btn btn-outline" href="{% url 'admissions:apply' %}?new=1">Apply for another student</a>
+            </p>
             <p class="text-sm text-slate-500 mt-6">
-                To reprint later, use Form No. plus father’s mobile on the
+                To reprint later, use Application No. plus father’s mobile on the
                 <a class="text-primary underline" href="{% url 'admissions:lookup' %}">lookup page</a>.
             </p>
         </div>

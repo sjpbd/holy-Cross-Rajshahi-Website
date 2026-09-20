@@ -24,6 +24,11 @@
         <dl class="space-y-2 text-sm">
             <div><dt class="text-slate-500">Birth registration</dt><dd class="font-semibold">{{ application.birth_registration_no }}</dd></div>
             <div><dt class="text-slate-500">Nationality / blood / religion</dt><dd>{{ application.nationality }} · {{ application.blood_group }} · {{ application.get_religion_display }}</dd></div>
+            {% if application.hobby %}<div><dt class="text-slate-500">Hobby</dt><dd>{{ application.hobby }}</dd></div>{% endif %}
+            {% if application.other_skills %}<div><dt class="text-slate-500">Other skills</dt><dd>{{ application.other_skills }}</dd></div>{% endif %}
+            {% if application.class_6_reg_no %}<div><dt class="text-slate-500">Class 6 registration</dt><dd>{{ application.class_6_reg_no }}</dd></div>{% endif %}
+            {% if application.class_8_reg_no %}<div><dt class="text-slate-500">Class 8 registration</dt><dd>{{ application.class_8_reg_no }}</dd></div>{% endif %}
+            {% if application.study_group %}<div><dt class="text-slate-500">Group</dt><dd>{{ application.get_study_group_display }}</dd></div>{% endif %}
             <div>
                 <dt class="text-slate-500">Present address</dt>
                 <dd>{{ application.present_address }}</dd>
@@ -40,10 +45,12 @@
             <a class="adm-chip" href="?step=2">Edit</a>
         </div>
         <dl class="space-y-2 text-sm">
-            <div><dt class="text-slate-500">Father</dt><dd>{{ application.father_name }} · {{ application.father_mobile }}</dd></div>
+            <div><dt class="text-slate-500">Father</dt><dd>{{ application.father_name }} · <span class="font-bengali">{{ application.father_name_bn }}</span> · {{ application.father_mobile }}</dd></div>
             <div><dt class="text-slate-500">Father’s work address</dt><dd>{{ application.father_address }}</dd></div>
-            <div><dt class="text-slate-500">Mother</dt><dd>{{ application.mother_name }} · {{ application.mother_mobile }}</dd></div>
+            <div><dt class="text-slate-500">Mother</dt><dd>{{ application.mother_name }} · <span class="font-bengali">{{ application.mother_name_bn }}</span> · {{ application.mother_mobile }}</dd></div>
             <div><dt class="text-slate-500">Mother’s work address</dt><dd>{{ application.mother_address }}</dd></div>
+            <div><dt class="text-slate-500">Guardian</dt><dd>{{ application.guardian_name }} ({{ application.guardian_relation }}){% if application.guardian_phone %} · {{ application.guardian_phone }}{% endif %}</dd></div>
+            <div><dt class="text-slate-500">WhatsApp</dt><dd>{{ application.whatsapp_number }}</dd></div>
             <div><dt class="text-slate-500">Email / income</dt><dd>{{ application.email }} · {{ application.get_family_income_yearly_display }} BDT / {{ application.earning_members }} earner{{ application.earning_members|pluralize }}</dd></div>
         </dl>
     </section>
@@ -52,7 +59,7 @@
             <h3 class="text-base">Others</h3>
             <a class="adm-chip" href="?step=3">Edit</a>
         </div>
-        <p class="text-sm">Bus: {% if application.needs_bus %}Yes — {{ application.bus_stop }}{% else %}No{% endif %}</p>
+        <p class="text-sm">Bus: {% if application.needs_bus %}Yes — {{ application.bus_start_stop }} to {{ application.bus_end_stop }}{% else %}No{% endif %}</p>
         <p class="text-sm mt-2">Siblings in this school:
             {% if application.has_other_child %}
                 {% for s in application.siblings.all %}{{ s.name }} ({{ s.class_name }}){% if not forloop.last %}; {% endif %}{% empty %}Yes{% endfor %}
@@ -62,12 +69,18 @@
     <section class="adm-section">
         <div class="adm-section-head">
             <h3 class="text-base">Viva</h3>
+            {% if not application.skips_viva_selection %}
             <a class="adm-chip" href="?step=5">Change slot</a>
+            {% endif %}
         </div>
-        {% if application.viva_slot %}
-        <p class="font-semibold text-primary">{{ application.viva_slot.date|date:"l, d M Y" }}</p>
-        <p class="text-sm text-slate-600">{{ application.viva_slot.start_time|time:"g:i A" }}–{{ application.viva_slot.end_time|time:"g:i A" }}</p>
+        {% if application.display_viva_date %}
+        <p class="font-semibold text-primary">{{ application.display_viva_date|date:"l, d M Y" }}</p>
+        {% if application.display_viva_start %}
+        <p class="text-sm text-slate-600">{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %}–{{ application.display_viva_end|time:"g:i A" }}{% endif %}</p>
+        {% endif %}
         <p class="text-sm text-slate-500 mt-1">{{ application.session.viva_venue }}</p>
+        {% elif application.skips_viva_selection %}
+        <p class="text-slate-600 text-sm">Date will be announced by the school.</p>
         {% else %}
         <p class="text-red-600 text-sm">No viva slot selected.</p>
         {% endif %}
@@ -80,7 +93,9 @@
         <div>
             <p class="text-blue-100 text-sm">Application fee</p>
             <p class="text-3xl font-extrabold">BDT {{ application.fee_amount }}</p>
+            {% if application.slot_held_until and not application.skips_viva_selection %}
             <p class="text-xs text-blue-100 mt-1">Seat held until {{ application.slot_held_until|date:"g:i A, d M" }}.</p>
+            {% endif %}
         </div>
         <button type="submit" class="btn btn-accent">
             Proceed to payment
@@ -88,4 +103,4 @@
         </button>
     </div>
 </form>
-<p class="mt-3"><a class="adm-ghost px-0" href="?step=5">Back to viva slot</a></p>
+<p class="mt-3"><a class="adm-ghost px-0" href="?step={{ prev_step }}">Back</a></p>

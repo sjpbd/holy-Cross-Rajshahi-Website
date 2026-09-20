@@ -41,3 +41,26 @@ CACHE_SKIP_PREFIXES = (
     '/contact/',
     '/editor/',
 )
+
+NURSERY_CODE = 'nursery'
+CLASS_6_REG_CODES = frozenset({'class-7', 'class-8', 'class-9'})
+CLASS_8_REG_CODES = frozenset({'class-9'})
+STUDY_GROUP_CODES = frozenset({'class-9'})
+
+SIBLING_CLASS_NAMES = [
+    'Play',
+    'Nursery',
+    'KG',
+    'Class 1',
+    'Class 2',
+    'Class 3',
+    'Class 4',
+    'Class 5',
+    'Class 6',
+    'Class 7',
+    'Class 8',
+    'Class 9',
+    'Class 10',
+    'Class XI',
+    'Class XII',
+]

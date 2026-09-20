@@ -1,6 +1,8 @@
-<form method="post" enctype="multipart/form-data" x-data="admissionAddresses" data-photo="{% if application.photo %}{{ application.photo.url }}{% endif %}">
+<form method="post" enctype="multipart/form-data" novalidate class="adm-wizard-form" x-data="admissionAddresses" data-photo="{% if application.photo %}{{ application.photo.url }}{% endif %}">
     {% csrf_token %}
-    {{ form.non_field_errors }}
+    {% if form.non_field_errors %}
+    <div class="adm-banner-error">{{ form.non_field_errors }}</div>
+    {% endif %}
 
     <div class="grid lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2">
@@ -34,16 +36,23 @@
                     {% include 'admissions/_field.html' with field=form.nationality %}
                     {% include 'admissions/_field.html' with field=form.blood_group %}
                     {% include 'admissions/_field.html' with field=form.religion %}
+                    {% include 'admissions/_field.html' with field=form.hobby %}
+                    {% include 'admissions/_field.html' with field=form.other_skills %}
+                </div>
+                <div id="classExtraWrap" class="grid md:grid-cols-2 gap-x-4 mt-1">
+                    <div id="class6RegWrap" class="hidden">{% include 'admissions/_field.html' with field=form.class_6_reg_no %}</div>
+                    <div id="class8RegWrap" class="hidden">{% include 'admissions/_field.html' with field=form.class_8_reg_no %}</div>
+                    <div id="studyGroupWrap" class="hidden">{% include 'admissions/_field.html' with field=form.study_group %}</div>
                 </div>
             </section>
         </div>
 
         <div>
-            <section class="adm-section h-full">
+            <section class="adm-section h-full {% if form.photo.errors %}is-invalid{% endif %}">
                 <div class="adm-section-head">
                     <div>
                         <h3 class="text-lg">Passport photo</h3>
-                        <p class="adm-hint">JPG or PNG, recent, face clearly visible.</p>
+                        <p class="adm-hint">White background. Both ears must be visible. Recent face photo, JPG or PNG.</p>
                     </div>
                 </div>
                 <label class="adm-photo cursor-pointer">
@@ -52,11 +61,13 @@
                     <div x-show="!previewUrl && !currentPhoto">
                         <i class="fas fa-camera text-2xl text-primary mb-2"></i>
                         <p class="font-semibold text-primary">Upload photo</p>
-                        <p class="text-xs text-slate-500 mt-1">Tap to choose a JPG or PNG</p>
+                        <p class="text-xs text-slate-500 mt-1">White background · ears visible</p>
                     </div>
                     <p class="text-xs text-slate-500" x-show="previewUrl || currentPhoto">Tap to replace the photo</p>
                 </label>
-                {{ form.photo.errors }}
+                {% for error in form.photo.errors %}
+                <p class="adm-error">{{ error }}</p>
+                {% endfor %}
             </section>
         </div>
     </div>

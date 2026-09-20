@@ -1,6 +1,8 @@
-<div class="adm-field {% if field.errors %}is-invalid{% endif %}">
+<div class="adm-field {% if field.errors %}is-invalid{% endif %}"{% if field.field.required %} data-required-field="true"{% endif %}>
     <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
     {{ field }}
     {% if field.help_text %}<p class="adm-hint">{{ field.help_text }}</p>{% endif %}
-    {{ field.errors }}
+    {% for error in field.errors %}
+    <p class="adm-error">{{ error }}</p>
+    {% endfor %}
 </div>

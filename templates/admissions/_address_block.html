@@ -3,6 +3,7 @@
         <div class="adm-field {% if division_field.errors %}is-invalid{% endif %}">
             <label for="{{ division_field.id_for_label }}">Division *</label>
             <select class="adm-control" name="{{ division_field.html_name }}" id="{{ division_field.id_for_label }}"
+                    data-required="true"
                     x-model="addr.{{ prefix }}.division"
                     @change="onDivision('{{ prefix }}')">
                 <option value="">Select division</option>
@@ -10,36 +11,37 @@
                 <option value="{{ name }}" {% if division_field.value == name %}selected{% endif %}>{{ name }}</option>
                 {% endfor %}
             </select>
-            {{ division_field.errors }}
+            {% for error in division_field.errors %}<p class="adm-error">{{ error }}</p>{% endfor %}
         </div>
         <div class="adm-field {% if zila_field.errors %}is-invalid{% endif %}">
             <label for="{{ zila_field.id_for_label }}">Zila *</label>
-            <input type="hidden" name="{{ zila_field.html_name }}" :value="addr.{{ prefix }}.zila">
+            <input type="hidden" name="{{ zila_field.html_name }}" :value="addr.{{ prefix }}.zila" data-required="true">
             <select class="adm-control" id="{{ zila_field.id_for_label }}"
                     x-ref="{{ prefix }}Zila"
                     @change="addr.{{ prefix }}.zila = $event.target.value; onZila('{{ prefix }}')">
                 <option value="">Select zila</option>
             </select>
-            {{ zila_field.errors }}
+            {% for error in zila_field.errors %}<p class="adm-error">{{ error }}</p>{% endfor %}
         </div>
         <div class="adm-field {% if thana_field.errors %}is-invalid{% endif %}">
             <label for="{{ thana_field.id_for_label }}">Thana *</label>
-            <input type="hidden" name="{{ thana_field.html_name }}" :value="addr.{{ prefix }}.thana">
+            <input type="hidden" name="{{ thana_field.html_name }}" :value="addr.{{ prefix }}.thana" data-required="true">
             <select class="adm-control" id="{{ thana_field.id_for_label }}"
                     x-ref="{{ prefix }}Thana"
                     @change="addr.{{ prefix }}.thana = $event.target.value">
                 <option value="">Select thana</option>
             </select>
-            {{ thana_field.errors }}
+            {% for error in thana_field.errors %}<p class="adm-error">{{ error }}</p>{% endfor %}
         </div>
         <div class="adm-field adm-line {% if line_field.errors %}is-invalid{% endif %}">
             <label for="{{ line_field.id_for_label }}">House, road, village or area *</label>
             <input class="adm-control" type="text" name="{{ line_field.html_name }}" id="{{ line_field.id_for_label }}"
                    x-model="addr.{{ prefix }}.line"
                    maxlength="300"
+                   data-required="true"
                    placeholder="e.g. House 12, Road 3, Sagorpara"
                    value="{{ line_field.value|default:'' }}">
-            {{ line_field.errors }}
+            {% for error in line_field.errors %}<p class="adm-error">{{ error }}</p>{% endfor %}
         </div>
     </div>
     <p class="adm-preview" x-cloak x-show="preview('{{ prefix }}')" x-text="'Full address: ' + preview('{{ prefix }}')"></p>

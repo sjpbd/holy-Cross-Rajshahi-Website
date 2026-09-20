@@ -35,7 +35,7 @@ def send_confirmation_email(application, force=False, request=None):
         'download_url': download_url,
     }
     subject = (
-        f'Admission Form {application.form_number} — '
+        f'Admission Application {application.form_number} — '
         'Holy Cross School & College, Rajshahi'
     )
     text_body = render_to_string('admissions/email/confirmation.txt', context)
