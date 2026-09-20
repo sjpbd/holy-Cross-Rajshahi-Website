@@ -4,7 +4,7 @@
 {% block extra_head %}
 {% include 'admissions/_admission_css.html' %}
 {{ class_codes|json_script:"class-codes-data" }}
-<script src="{% static 'js/admission-form.js' %}" defer></script>
+<script src="{% static 'js/admission-form.js' %}?v=20260920" defer></script>
 <script>
 document.addEventListener('alpine:init', function () {
     Alpine.data('admissionAddresses', function () {
