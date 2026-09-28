@@ -24,6 +24,7 @@ from .constants import (
     STEP_REVIEW,
     STEP_SLOT,
     STEP_STUDENT,
+    STEP_TITLES,
 )
 from .forms import (
     DeclarationsStepForm,
@@ -81,7 +82,7 @@ def _create_draft(request, session):
     return Application.objects.create(
         session=session,
         ip_address=client_ip(request),
-        nationality='Bangladesh',
+        nationality='Bangladeshi',
     )
 
 
@@ -347,7 +348,7 @@ def apply(request):
         'bd_geo': geo.tree(),
         'geo_divisions': geo.divisions(),
         'address_state': _address_state(application),
-        'step_label': STEP_LABELS.get(step, 'Apply'),
+        'step_label': STEP_TITLES.get(step, 'Apply'),
         'step_hint': STEP_HINTS.get(step, ''),
         'class_codes': _class_code_map(),
         'prev_step': _previous_wizard_step(application, step) if step > STEP_STUDENT else None,

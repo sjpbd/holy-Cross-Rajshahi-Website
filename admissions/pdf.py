@@ -7,6 +7,8 @@ from django.template.loader import render_to_string
 
 from core.models import SchoolInfo
 
+from .constants import DECLARATION_AGREE, DECLARATION_INTRO, DECLARATIONS
+
 
 def _file_uri(path):
     if not path:
@@ -77,21 +79,17 @@ def build_pdf_context(application):
         'form_year': application.session.year_prefix(),
         'results': results,
         'siblings': siblings,
-        'session_instructions': (application.session.instructions or '').strip(),
-        'print_instructions': [
-            'Print this form on A4 paper.',
-            'Attach a recent passport-size photograph (school dress, white background, both ears visible) in the box on the first page.',
-            'Student and parent information must match the Birth Certificate and National ID.',
-            'Bring the printed form and the admit card to the viva.',
-            'Arrive at the venue at least 15 minutes before the viva time.',
-        ],
+        'admit_instructions': application.admit_instructions(),
+        'declaration_intro': DECLARATION_INTRO,
+        'declarations': DECLARATIONS,
+        'declaration_agree': DECLARATION_AGREE,
+        'declaration_agreed': bool(
+            application.agrees_uniform and application.agrees_rules and application.info_correct
+        ),
         'answers': {
-            'financial_capacity': _yn(application.financial_capacity),
-            'agrees_uniform': _yn(application.agrees_uniform),
-            'agrees_rules': _yn(application.agrees_rules),
-            'info_correct': _yn(application.info_correct),
             'needs_bus': 'Yes' if application.needs_bus else 'No',
             'has_other_child': 'Yes' if application.has_other_child else 'No',
+            'studied_here_before': _yn(application.studied_here_before),
         },
     }
 

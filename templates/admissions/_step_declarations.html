@@ -3,18 +3,22 @@
     {% if form.non_field_errors %}
     <div class="adm-banner-error">{{ form.non_field_errors }}</div>
     {% endif %}
-    <p class="text-slate-600 mb-5">Please answer each question. Uniform, school rules, and accuracy must be Yes to continue.</p>
-    <section class="adm-section font-bengali">
-        {% include 'admissions/_field.html' with field=form.financial_capacity %}
-    </section>
-    <section class="adm-section font-bengali">
-        {% include 'admissions/_field.html' with field=form.agrees_uniform %}
-    </section>
-    <section class="adm-section font-bengali">
-        {% include 'admissions/_field.html' with field=form.agrees_rules %}
-    </section>
     <section class="adm-section">
-        {% include 'admissions/_field.html' with field=form.info_correct %}
+        <p class="font-semibold text-primary mb-3">{{ form.DECLARATION_INTRO }}</p>
+        <ol class="adm-terms" style="list-style: decimal outside;">
+            {% for item in form.DECLARATIONS %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ol>
     </section>
+    <div class="adm-field {% if form.accept_all.errors %}is-invalid{% endif %}">
+        <label class="adm-check" for="{{ form.accept_all.id_for_label }}">
+            {{ form.accept_all }}
+            <strong>{{ form.accept_all.label }}</strong>
+        </label>
+        {% for error in form.accept_all.errors %}
+        <p class="adm-error">{{ error }}</p>
+        {% endfor %}
+    </div>
     {% include 'admissions/_wizard_nav.html' %}
 </form>

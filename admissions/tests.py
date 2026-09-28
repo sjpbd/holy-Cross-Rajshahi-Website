@@ -85,7 +85,7 @@ class AdmissionBaseTestCase(TestCase):
             'student_name_bn': 'রহিম আলী',
             'date_of_birth': '2018-06-15',
             'birth_registration_no': '19901234567890123',
-            'nationality': 'Bangladesh',
+            'nationality': 'Bangladeshi',
             'blood_group': 'A+',
             'gender': 'male',
             'present_division': 'Rajshahi',
@@ -150,7 +150,7 @@ class AdmissionBaseTestCase(TestCase):
             'student_name_bn': 'রহিম আলী',
             'date_of_birth': date(2018, 6, 15),
             'birth_registration_no': kwargs.pop('birth_registration_no', '19901234567890123'),
-            'nationality': 'Bangladesh',
+            'nationality': 'Bangladeshi',
             'blood_group': 'A+',
             'gender': Application.Gender.MALE,
             'present_address': 'Rajshahi',
@@ -395,6 +395,7 @@ class WizardFlowTests(AdmissionBaseTestCase):
         response = self.client.post(apply + '?step=3', {
             'needs_bus': 'False',
             'has_other_child': 'False',
+            'studied_here_before': 'False',
             'siblings-TOTAL_FORMS': '1',
             'siblings-INITIAL_FORMS': '0',
             'siblings-MIN_NUM_FORMS': '0',
@@ -410,12 +411,7 @@ class WizardFlowTests(AdmissionBaseTestCase):
             )
         self.assertIn('step=4', response.url)
 
-        response = self.client.post(apply + '?step=4', {
-            'financial_capacity': 'True',
-            'agrees_uniform': 'True',
-            'agrees_rules': 'True',
-            'info_correct': 'True',
-        })
+        response = self.client.post(apply + '?step=4', {'accept_all': 'on'})
         self.assertEqual(response.status_code, 302)
         self.assertIn('step=5', response.url)
 
@@ -494,6 +490,7 @@ class SiblingFormTests(AdmissionBaseTestCase):
         response = self.client.post(reverse('admissions:apply') + '?step=3', {
             'needs_bus': 'False',
             'has_other_child': 'True',
+            'studied_here_before': 'False',
             'siblings-TOTAL_FORMS': '2',
             'siblings-INITIAL_FORMS': '0',
             'siblings-MIN_NUM_FORMS': '0',
@@ -606,6 +603,7 @@ class FormFixTests(AdmissionBaseTestCase):
         response = self.client.post(reverse('admissions:apply') + '?step=3', {
             'needs_bus': 'False',
             'has_other_child': 'False',
+            'studied_here_before': 'False',
             'siblings-TOTAL_FORMS': '1',
             'siblings-INITIAL_FORMS': '0',
             'siblings-MIN_NUM_FORMS': '0',
@@ -654,6 +652,7 @@ class FormFixTests(AdmissionBaseTestCase):
         response = self.client.post(reverse('admissions:apply') + '?step=3', {
             'needs_bus': 'True',
             'has_other_child': 'False',
+            'studied_here_before': 'False',
             'siblings-TOTAL_FORMS': '1',
             'siblings-INITIAL_FORMS': '0',
             'siblings-MIN_NUM_FORMS': '0',
@@ -668,6 +667,7 @@ class FormFixTests(AdmissionBaseTestCase):
             'bus_start_stop': self.stop.pk,
             'bus_end_stop': self.stop.pk,
             'has_other_child': 'False',
+            'studied_here_before': 'False',
             'siblings-TOTAL_FORMS': '1',
             'siblings-INITIAL_FORMS': '0',
             'siblings-MIN_NUM_FORMS': '0',
@@ -702,6 +702,7 @@ class FormFixTests(AdmissionBaseTestCase):
         response = self.client.post(apply + '?step=3', {
             'needs_bus': 'False',
             'has_other_child': 'False',
+            'studied_here_before': 'False',
             'siblings-TOTAL_FORMS': '1',
             'siblings-INITIAL_FORMS': '0',
             'siblings-MIN_NUM_FORMS': '0',
@@ -710,18 +711,25 @@ class FormFixTests(AdmissionBaseTestCase):
             'siblings-0-class_name': '',
         })
         self.assertEqual(response.status_code, 302)
-        response = self.client.post(apply + '?step=4', {
-            'financial_capacity': 'True',
-            'agrees_uniform': 'True',
-            'agrees_rules': 'True',
-            'info_correct': 'True',
-        })
+        response = self.client.post(apply + '?step=4', {'accept_all': 'on'})
         self.assertEqual(response.status_code, 302)
         self.assertIn('step=6', response.url)
         app = Application.objects.get(birth_registration_no='19901234567890921')
         self.assertTrue(app.skips_viva_selection)
         self.assertEqual(app.display_viva_date, date(2026, 2, 10))
         self.assertTrue(app.ready_for_payment)
+
+    def test_kg_uses_fixed_viva_time(self):
+        kg = AdmissionClass.objects.get(code='kg')
+        self.assertTrue(kg.uses_fixed_viva)
+        self.assertFalse(AdmissionClass.objects.get(code='class-5').uses_fixed_viva)
+        kg.assigned_viva_date = date(2026, 2, 11)
+        kg.assigned_viva_start_time = time(11, 0)
+        kg.assigned_viva_end_time = time(12, 0)
+        kg.save()
+        app = Application(session=self.session, admit_class=kg)
+        self.assertTrue(app.skips_viva_selection)
+        self.assertEqual(app.viva_when(), (date(2026, 2, 11), time(11, 0), time(12, 0)))
 
     def test_class_7_requires_class_6_reg(self):
         klass = AdmissionClass.objects.get(code='class-7')

@@ -1,6 +1,6 @@
 <div class="flex flex-col md:flex-row gap-6 mb-8">
     {% if application.photo %}
-    <img src="{{ application.photo.url }}" alt="Student photo" class="h-36 w-28 object-cover rounded-xl border border-primary/20">
+    <img src="{{ application.photo.url }}" alt="Student photo" class="h-36 w-28 object-contain bg-white rounded-xl border border-primary/20">
     {% endif %}
     <div class="flex-1">
         <p class="text-xs font-bold uppercase tracking-wider text-accent-dark">Applicant</p>
@@ -25,7 +25,7 @@
             <div><dt class="text-slate-500">Birth registration</dt><dd class="font-semibold">{{ application.birth_registration_no }}</dd></div>
             <div><dt class="text-slate-500">Nationality / blood / religion</dt><dd>{{ application.nationality }} · {{ application.blood_group }} · {{ application.get_religion_display }}</dd></div>
             {% if application.hobby %}<div><dt class="text-slate-500">Hobby</dt><dd>{{ application.hobby }}</dd></div>{% endif %}
-            {% if application.other_skills %}<div><dt class="text-slate-500">Other skills</dt><dd>{{ application.other_skills }}</dd></div>{% endif %}
+            {% if application.skills_display %}<div><dt class="text-slate-500">Skills</dt><dd>{{ application.skills_display }}</dd></div>{% endif %}
             {% if application.class_6_reg_no %}<div><dt class="text-slate-500">Class 6 registration</dt><dd>{{ application.class_6_reg_no }}</dd></div>{% endif %}
             {% if application.class_8_reg_no %}<div><dt class="text-slate-500">Class 8 registration</dt><dd>{{ application.class_8_reg_no }}</dd></div>{% endif %}
             {% if application.study_group %}<div><dt class="text-slate-500">Group</dt><dd>{{ application.get_study_group_display }}</dd></div>{% endif %}
@@ -65,6 +65,7 @@
                 {% for s in application.siblings.all %}{{ s.name }} ({{ s.class_name }}){% if not forloop.last %}; {% endif %}{% empty %}Yes{% endfor %}
             {% else %}No{% endif %}
         </p>
+        <p class="text-sm mt-2">Studied at this school before: {% if application.studied_here_before %}Yes{% else %}No{% endif %}</p>
     </section>
     <section class="adm-section">
         <div class="adm-section-head">

@@ -61,6 +61,9 @@ class AdmissionSessionAdmin(admin.ModelAdmin):
                 'principal_signature',
             ),
         }),
+        ('Admit card instructions', {
+            'fields': ('admit_instructions_early', 'admit_instructions_general'),
+        }),
     )
 
     def generate_slots_link(self, obj):
@@ -110,15 +113,16 @@ class AdmissionSessionAdmin(admin.ModelAdmin):
 
 @admin.register(AdmissionClass)
 class AdmissionClassAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'assigned_viva_date', 'fee_override']
+    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'uses_fixed_viva', 'assigned_viva_date', 'fee_override']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'code']
     fieldsets = (
         (None, {'fields': ('name', 'code', 'form_code', 'order', 'is_active')}),
         ('Age & fee', {'fields': ('min_age_years', 'max_age_years', 'fee_override')}),
-        ('Nursery viva', {
-            'fields': ('assigned_viva_date', 'assigned_viva_start_time', 'assigned_viva_end_time'),
-            'description': 'For Nursery, applicants skip the calendar and receive this date.',
+        ('Fixed exam & viva time', {
+            'fields': ('uses_fixed_viva', 'assigned_viva_date', 'assigned_viva_start_time', 'assigned_viva_end_time'),
+            'description': 'Used for Nursery and KG. When on, applicants do not pick a viva slot; '
+                           'everyone in this class gets this date and time on their form and admit card.',
         }),
     )
 
@@ -165,7 +169,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         'age_months', 'birth_registration_no', 'nationality', 'blood_group', 'gender',
         'present_division', 'present_zila', 'present_thana', 'present_address_line',
         'present_address', 'permanent_division', 'permanent_zila', 'permanent_thana',
-        'permanent_address_line', 'permanent_address', 'religion', 'hobby', 'other_skills',
+        'permanent_address_line', 'permanent_address', 'religion', 'hobby', 'skills_list',
         'class_6_reg_no', 'class_8_reg_no', 'study_group', 'photo', 'father_name', 'father_name_bn', 'father_nid', 'father_occupation',
         'father_designation', 'father_organization', 'father_mobile',
         'father_division', 'father_zila', 'father_thana', 'father_address_line', 'father_address',
@@ -174,7 +178,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         'mother_division', 'mother_zila', 'mother_thana', 'mother_address_line', 'mother_address',
         'whatsapp_number', 'guardian_type', 'guardian_name', 'guardian_relation', 'guardian_phone', 'email',
         'family_income_yearly', 'earning_members', 'previous_school_name', 'needs_bus',
-        'bus_start_stop', 'bus_end_stop', 'has_other_child', 'financial_capacity', 'agrees_uniform', 'agrees_rules',
+        'bus_start_stop', 'bus_end_stop', 'has_other_child', 'studied_here_before', 'financial_capacity', 'agrees_uniform', 'agrees_rules',
         'info_correct', 'admit_class', 'viva_slot', 'slot_held_until', 'submitted_at',
         'paid_at', 'ip_address', 'form_pdf', 'confirmation_email_sent_at',
         'confirmation_email_error', 'created_at', 'updated_at',
@@ -193,7 +197,7 @@ class ApplicationAdmin(admin.ModelAdmin):
             'fields': (
                 'student_name_en', 'student_name_bn', 'date_of_birth', 'age_years', 'age_months',
                 'birth_registration_no', 'nationality', 'blood_group', 'gender', 'religion',
-                'hobby', 'other_skills', 'class_6_reg_no', 'class_8_reg_no', 'study_group',
+                'hobby', 'skills_list', 'class_6_reg_no', 'class_8_reg_no', 'study_group',
                 'present_division', 'present_zila', 'present_thana', 'present_address_line',
                 'present_address',
                 'permanent_division', 'permanent_zila', 'permanent_thana', 'permanent_address_line',
@@ -220,7 +224,7 @@ class ApplicationAdmin(admin.ModelAdmin):
             'fields': (
                 'whatsapp_number', 'guardian_type', 'guardian_name', 'guardian_relation', 'guardian_phone',
                 'email', 'family_income_yearly', 'earning_members', 'previous_school_name',
-                'needs_bus', 'bus_start_stop', 'bus_end_stop', 'has_other_child',
+                'needs_bus', 'bus_start_stop', 'bus_end_stop', 'has_other_child', 'studied_here_before',
                 'financial_capacity', 'agrees_uniform', 'agrees_rules', 'info_correct',
             ),
         }),
@@ -240,11 +244,15 @@ class ApplicationAdmin(admin.ModelAdmin):
         return '—'
     email_status.short_description = 'Email'
 
+    def skills_list(self, obj):
+        return obj.skills_display or '—'
+    skills_list.short_description = 'Skills'
+
     def has_add_permission(self, request):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        if obj and obj.status == Application.Status.PAID:
+        if obj and obj.status == Application.Status.PAID and not request.user.is_superuser:
             return False
         return super().has_delete_permission(request, obj)
 

@@ -42,6 +42,15 @@
         </div>
     </section>
 
+    <section class="adm-section">
+        <div class="adm-section-head">
+            <div>
+                <h3 class="text-lg">Previous study at this school</h3>
+            </div>
+        </div>
+        {% include 'admissions/_field.html' with field=form.studied_here_before %}
+    </section>
+
     {% include 'admissions/_wizard_nav.html' %}
 </form>
 <script>

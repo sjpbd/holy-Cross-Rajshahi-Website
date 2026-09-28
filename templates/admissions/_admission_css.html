@@ -1,5 +1,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+    [x-cloak] { display: none !important; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     .font-bengali, .font-bengali input, .font-bengali textarea { font-family: 'Noto Sans Bengali', 'Inter', sans-serif; }
     .adm-page { background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 220px, #f4f6fb 100%); }
@@ -137,6 +138,19 @@
         margin: .15rem 0 0; font-size: .8rem; color: #334155; background: #eef2ff;
         border-radius: .7rem; padding: .55rem .75rem;
     }
+    .adm-skill-toggle { display: flex; align-items: center; justify-content: space-between; gap: .5rem; text-align: left; cursor: pointer; min-width: 0; }
+    .adm-skill-menu {
+        position: absolute; left: 0; right: 0; top: 100%; margin-top: .35rem; z-index: 30;
+        max-height: 18rem; overflow-y: auto; padding: .35rem;
+        background: #fff; border: 1px solid #dbe3ef; border-radius: .85rem;
+        box-shadow: 0 18px 40px rgba(15,23,42,.14);
+    }
+    .adm-field .adm-skill-option {
+        display: flex; align-items: flex-start; gap: .6rem; margin: 0; padding: .55rem .7rem;
+        border-radius: .6rem; font-weight: 500; color: #1c2a4e; font-size: .88rem; cursor: pointer;
+    }
+    .adm-skill-option input { margin-top: .15rem; flex: none; }
+    .adm-skill-option:hover, .adm-skill-option:has(input:checked) { background: #eef2ff; }
     .adm-check {
         display: flex; align-items: flex-start; gap: .65rem; padding: .75rem .9rem;
         border: 1px solid #dbe3ef; border-radius: .9rem; background: #fff; cursor: pointer;
@@ -154,7 +168,7 @@
         border: 2px dashed #c7d2fe; border-radius: 1.1rem; padding: 1rem; text-align: center; background: #fff;
         min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem;
     }
-    .adm-photo img { width: 118px; height: 148px; object-fit: cover; border-radius: .7rem; border: 1px solid #1e3a8a; }
+    .adm-photo img { width: 118px; height: 148px; object-fit: contain; background: #fff; border-radius: .7rem; border: 1px solid #1e3a8a; }
     .calendar-grid,
     .calendar-grid-head {
         display: grid;

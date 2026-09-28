@@ -7,9 +7,14 @@ from . import geo
 from .constants import (
     CLASS_6_REG_CODES,
     CLASS_8_REG_CODES,
+    DECLARATION_AGREE,
+    DECLARATION_INTRO,
+    DECLARATIONS,
     INPUT_CLASS,
     SELECT_CLASS,
     SIBLING_CLASS_NAMES,
+    SKILL_CHOICES,
+    SKILL_OTHERS,
     STUDY_GROUP_CODES,
     TEXTAREA_CLASS,
 )
@@ -113,6 +118,12 @@ class StudentStepForm(forms.ModelForm):
             '@change': "if ($event.target.checked) copy('present', 'permanent')",
         }),
     )
+    skills = forms.MultipleChoiceField(
+        choices=SKILL_CHOICES,
+        required=False,
+        label='Skills',
+        widget=forms.CheckboxSelectMultiple,
+    )
 
     class Meta:
         model = Application
@@ -135,6 +146,7 @@ class StudentStepForm(forms.ModelForm):
             'permanent_address_line',
             'religion',
             'hobby',
+            'skills',
             'other_skills',
             'class_6_reg_no',
             'class_8_reg_no',
@@ -152,7 +164,7 @@ class StudentStepForm(forms.ModelForm):
             'gender': _select(),
             'religion': _select(),
             'hobby': _text('Hobby (optional)'),
-            'other_skills': _text('Any other skills (optional)'),
+            'other_skills': _text('Write the other skills', extra={'data-required': 'true'}),
             'class_6_reg_no': _text('Class 6 registration number'),
             'class_8_reg_no': _text('Class 8 registration number'),
             'study_group': _select(),
@@ -190,6 +202,12 @@ class StudentStepForm(forms.ModelForm):
         self.fields['religion'].required = True
         self.fields['hobby'].required = False
         self.fields['other_skills'].required = False
+        self.fields['other_skills'].label = 'Other skills'
+        if not self.is_bound and self.instance.pk:
+            skills = list(self.instance.skills or [])
+            if self.instance.other_skills and SKILL_OTHERS not in skills:
+                skills.append(SKILL_OTHERS)
+            self.initial['skills'] = skills
         self.fields['class_6_reg_no'].required = False
         self.fields['class_8_reg_no'].required = False
         self.fields['study_group'].required = False
@@ -264,6 +282,13 @@ class StudentStepForm(forms.ModelForm):
                 })
         code = (admit_class.code if admit_class else '') or ''
         errors = {}
+        other_skills = (cleaned.get('other_skills') or '').strip()
+        if SKILL_OTHERS in (cleaned.get('skills') or []):
+            cleaned['other_skills'] = other_skills
+            if not other_skills:
+                errors['other_skills'] = 'Write the other skills.'
+        else:
+            cleaned['other_skills'] = ''
         class_6 = (cleaned.get('class_6_reg_no') or '').strip()
         class_8 = (cleaned.get('class_8_reg_no') or '').strip()
         group = cleaned.get('study_group') or ''
@@ -347,7 +372,7 @@ class FamilyStepForm(forms.ModelForm):
         self.fields['guardian_type'].choices = Application.GuardianType.choices
         self.fields['guardian_type'].label = 'Guardian is'
         self.fields['whatsapp_number'].help_text = (
-            'Must be correct. All information will be sent to this WhatsApp number.'
+            'This number will be used by the school for communication and sharing information'
         )
         self.fields['father_name_bn'].widget.attrs['class'] += ' font-bengali'
         self.fields['mother_name_bn'].widget.attrs['class'] += ' font-bengali'
@@ -451,10 +476,16 @@ class OthersStepForm(forms.ModelForm):
         widget=_radios(),
         label='Any other child in this school?',
     )
+    studied_here_before = forms.TypedChoiceField(
+        choices=YES_NO,
+        coerce=coerce_bool,
+        widget=_radios(),
+        label='Has the student studied at our school before?',
+    )
 
     class Meta:
         model = Application
-        fields = ['needs_bus', 'bus_start_stop', 'bus_end_stop', 'has_other_child']
+        fields = ['needs_bus', 'bus_start_stop', 'bus_end_stop', 'has_other_child', 'studied_here_before']
         widgets = {
             'bus_start_stop': _select(),
             'bus_end_stop': _select(),
@@ -490,50 +521,32 @@ class OthersStepForm(forms.ModelForm):
 
 
 class DeclarationsStepForm(forms.ModelForm):
-    financial_capacity = forms.TypedChoiceField(
-        choices=YES_NO,
-        coerce=coerce_bool,
-        widget=_radios(),
-        label='আর্থিক সামর্থ্য আছে কি / না?',
-    )
-    agrees_uniform = forms.TypedChoiceField(
-        choices=YES_NO,
-        coerce=coerce_bool,
-        widget=_radios(),
-        label='Uniform পরিধান করতে পারবে কি না?',
-    )
-    agrees_rules = forms.TypedChoiceField(
-        choices=YES_NO,
-        coerce=coerce_bool,
-        widget=_radios(),
-        label='স্কুলের সকল নিয়ম মেনে চলতে পারবে কি না?',
-    )
-    info_correct = forms.TypedChoiceField(
-        choices=YES_NO,
-        coerce=coerce_bool,
-        widget=_radios(),
-        label='All information on this form is correct.',
+    DECLARATION_FIELDS = ('agrees_uniform', 'agrees_rules', 'info_correct')
+    DECLARATION_INTRO = DECLARATION_INTRO
+    DECLARATIONS = DECLARATIONS
+
+    accept_all = forms.BooleanField(
+        required=True,
+        label=DECLARATION_AGREE,
+        error_messages={'required': 'Please agree to the declaration to continue.'},
     )
 
     class Meta:
         model = Application
-        fields = ['financial_capacity', 'agrees_uniform', 'agrees_rules', 'info_correct']
-        widgets = {}
-        labels = {}
+        fields = []
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        _mark_required_widgets(self)
+        if all(getattr(self.instance, name) is True for name in self.DECLARATION_FIELDS):
+            self.fields['accept_all'].initial = True
 
-    def clean(self):
-        cleaned = super().clean()
-        if cleaned.get('agrees_uniform') is not True:
-            raise ValidationError({'agrees_uniform': 'You must be able to wear the school uniform to proceed.'})
-        if cleaned.get('agrees_rules') is not True:
-            raise ValidationError({'agrees_rules': 'You must agree to follow all school rules to proceed.'})
-        if cleaned.get('info_correct') is not True:
-            raise ValidationError({'info_correct': 'Please confirm that all information is correct.'})
-        return cleaned
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        for name in self.DECLARATION_FIELDS:
+            setattr(instance, name, True)
+        if commit:
+            instance.save()
+        return instance
 
 
 class PreviousResultForm(forms.ModelForm):

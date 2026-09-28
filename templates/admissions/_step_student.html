@@ -37,7 +37,38 @@
                     {% include 'admissions/_field.html' with field=form.blood_group %}
                     {% include 'admissions/_field.html' with field=form.religion %}
                     {% include 'admissions/_field.html' with field=form.hobby %}
-                    {% include 'admissions/_field.html' with field=form.other_skills %}
+                </div>
+                <div class="grid md:grid-cols-2 gap-x-4"
+                     x-data="{ open: false, selected: [], sync() { this.selected = Array.from($refs.skillList.querySelectorAll('input:checked')).map(el => el.parentElement.textContent.trim()); this.showOther = !!$refs.skillList.querySelector('input[value=&quot;others&quot;]:checked'); }, showOther: false }"
+                     x-init="sync()">
+                    <div class="adm-field {% if form.skills.errors %}is-invalid{% endif %}" @click.outside="open = false" @keydown.escape="open = false">
+                        <label>{{ form.skills.label }}</label>
+                        <div class="relative">
+                        <button type="button" class="adm-control adm-skill-toggle" @click="open = !open" :aria-expanded="open">
+                            <span class="truncate" :class="selected.length ? 'text-slate-800' : 'text-slate-400'"
+                                  x-text="selected.length ? selected.join(', ') : 'Select skills (optional)'">Select skills (optional)</span>
+                            <i class="fas fa-chevron-down text-xs text-slate-400 transition" :class="open && 'rotate-180'"></i>
+                        </button>
+                        <div class="adm-skill-menu" x-show="open" x-cloak x-transition.opacity x-ref="skillList" @change="sync()">
+                            {% for choice in form.skills %}
+                            <label class="adm-skill-option">{{ choice.tag }} {{ choice.choice_label }}</label>
+                            {% endfor %}
+                        </div>
+                        </div>
+                        <p class="adm-hint">You can choose more than one.</p>
+                        {% for error in form.skills.errors %}
+                        <p class="adm-error">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div :class="{ 'hidden': !showOther }" class="{% if not form.other_skills.value and not form.other_skills.errors %}hidden{% endif %}">
+                        <div class="adm-field {% if form.other_skills.errors %}is-invalid{% endif %}">
+                            <label for="{{ form.other_skills.id_for_label }}">{{ form.other_skills.label }} *</label>
+                            {{ form.other_skills }}
+                            {% for error in form.other_skills.errors %}
+                            <p class="adm-error">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
                 <div id="classExtraWrap" class="grid md:grid-cols-2 gap-x-4 mt-1">
                     <div id="class6RegWrap" class="hidden">{% include 'admissions/_field.html' with field=form.class_6_reg_no %}</div>

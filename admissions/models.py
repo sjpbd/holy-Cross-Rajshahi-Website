@@ -7,6 +7,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
+from .constants import SKILL_CHOICES, SKILL_OTHERS
+
 
 def default_slot_times():
     return [
@@ -15,6 +17,15 @@ def default_slot_times():
         {'start': '11:00', 'end': '12:00'},
         {'start': '14:00', 'end': '15:00'},
     ]
+
+
+DEFAULT_ADMIT_INSTRUCTIONS = '\n'.join([
+    'Print this form on A4 paper.',
+    'Attach a recent passport-size photograph (school dress, white background, both ears visible) in the box on the first page.',
+    'Student and parent information must match the Birth Certificate and National ID.',
+    'Bring the printed form and the admit card to the viva.',
+    'Arrive at the venue at least 15 minutes before the viva time.',
+])
 
 
 def application_photo_path(instance, filename):
@@ -83,6 +94,18 @@ class AdmissionSession(models.Model):
         blank=True,
         help_text="Shown on the public admission landing page.",
     )
+    admit_instructions_early = models.TextField(
+        'Admit card instructions (Nursery & KG)',
+        blank=True,
+        default=DEFAULT_ADMIT_INSTRUCTIONS,
+        help_text="Printed on the admit card for Nursery and KG applicants. One instruction per line.",
+    )
+    admit_instructions_general = models.TextField(
+        'Admit card instructions (other classes)',
+        blank=True,
+        default=DEFAULT_ADMIT_INSTRUCTIONS,
+        help_text="Printed on the admit card for all other classes. One instruction per line.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -145,13 +168,14 @@ class AdmissionClass(models.Model):
         blank=True,
         help_text='Prefix on form numbers, e.g. N for Nursery → N-26-00001.',
     )
-    assigned_viva_date = models.DateField(
-        blank=True,
-        null=True,
-        help_text='Nursery only: applicants skip the calendar and receive this date.',
+    uses_fixed_viva = models.BooleanField(
+        'Fixed exam & viva time',
+        default=False,
+        help_text='Applicants skip the viva calendar and all get the date and time below.',
     )
-    assigned_viva_start_time = models.TimeField(blank=True, null=True)
-    assigned_viva_end_time = models.TimeField(blank=True, null=True)
+    assigned_viva_date = models.DateField('Exam & viva date', blank=True, null=True)
+    assigned_viva_start_time = models.TimeField('Start time', blank=True, null=True)
+    assigned_viva_end_time = models.TimeField('End time', blank=True, null=True)
 
     class Meta:
         ordering = ['order', 'id']
@@ -163,7 +187,7 @@ class AdmissionClass(models.Model):
 
     @property
     def auto_assigns_viva(self):
-        return (self.code or '').lower() == 'nursery'
+        return self.uses_fixed_viva
 
     def form_number_code(self):
         raw = (self.form_code or '').strip()
@@ -360,7 +384,7 @@ class Application(models.Model):
     age_years = models.PositiveSmallIntegerField(blank=True, null=True)
     age_months = models.PositiveSmallIntegerField(blank=True, null=True)
     birth_registration_no = models.CharField(max_length=30, blank=True, db_index=True)
-    nationality = models.CharField(max_length=80, blank=True, default='Bangladesh')
+    nationality = models.CharField(max_length=80, blank=True, default='Bangladeshi')
     blood_group = models.CharField(max_length=8, choices=BloodGroup.choices, blank=True)
     gender = models.CharField(max_length=16, choices=Gender.choices, blank=True)
     present_division = models.CharField('Present division', max_length=80, blank=True)
@@ -385,7 +409,8 @@ class Application(models.Model):
     permanent_address = models.TextField(blank=True, help_text='Composed full permanent address')
     religion = models.CharField(max_length=20, choices=Religion.choices, blank=True)
     hobby = models.CharField(max_length=200, blank=True)
-    other_skills = models.CharField('Any other skills', max_length=200, blank=True)
+    skills = models.JSONField(default=list, blank=True)
+    other_skills = models.CharField('Other skills', max_length=200, blank=True)
     class_6_reg_no = models.CharField('Class 6 registration no', max_length=40, blank=True)
     class_8_reg_no = models.CharField('Class 8 registration no', max_length=40, blank=True)
     study_group = models.CharField(
@@ -438,7 +463,7 @@ class Application(models.Model):
     guardian_phone = models.CharField('Guardian phone', max_length=20, blank=True)
     email = models.EmailField(blank=True)
     family_income_yearly = models.CharField(
-        'Family income (yearly, BDT)',
+        'Family income (monthly, BDT)',
         max_length=32,
         blank=True,
         choices=FamilyIncome.choices,
@@ -462,6 +487,7 @@ class Application(models.Model):
         related_name='end_applications',
     )
     has_other_child = models.BooleanField(default=False)
+    studied_here_before = models.BooleanField('Studied at this school before', null=True, blank=True)
 
     financial_capacity = models.BooleanField(
         'Has financial capacity',
@@ -528,6 +554,15 @@ class Application(models.Model):
     @property
     def is_nursery(self):
         return self.class_code.lower() == 'nursery'
+
+    @property
+    def is_early_years(self):
+        return self.class_code.lower() in ('nursery', 'kg')
+
+    def admit_instructions(self):
+        session = self.session
+        text = session.admit_instructions_early if self.is_early_years else session.admit_instructions_general
+        return [line.strip() for line in (text or '').splitlines() if line.strip()]
 
     @property
     def skips_viva_selection(self):
@@ -614,6 +649,14 @@ class Application(models.Model):
             months += 12
         self.age_years = max(0, years)
         self.age_months = months
+
+    @property
+    def skills_display(self):
+        labels = dict(SKILL_CHOICES)
+        items = [labels[key] for key in (self.skills or []) if key in labels and key != SKILL_OTHERS]
+        if self.other_skills:
+            items.append(self.other_skills)
+        return ', '.join(items)
 
     def geo_payload(self, prefix):
         return {
