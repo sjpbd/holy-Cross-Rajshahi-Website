@@ -20,6 +20,7 @@ from .models import (
     AdmissionSession,
     Application,
     BusStop,
+    PaymentAttempt,
     VivaSlot,
 )
 from .payments import StubPaymentGateway
@@ -46,6 +47,7 @@ def fake_store_pdf(application, force=False):
     return application
 
 
+@override_settings(PAYMENT_GATEWAY='stub')
 class AdmissionBaseTestCase(TestCase):
     def setUp(self):
         AdmissionSession.objects.update(is_open=False)
@@ -267,15 +269,15 @@ class SlotTests(AdmissionBaseTestCase):
         first = assign_form_number(app)
         second = assign_form_number(app)
         self.assertEqual(first, second)
-        self.assertTrue(first.startswith('1-26-'))
-        self.assertEqual(AdmissionSequence.objects.get(year='2026', class_code='1').last_number, 1)
+        self.assertTrue(first.startswith('1-27-'))
+        self.assertEqual(AdmissionSequence.objects.get(year='2027', class_code='1').last_number, 1)
 
     def test_nursery_form_number_format(self):
         nursery = AdmissionClass.objects.create(
             name='Nursery', code='n-test', form_code='N', is_active=True,
         )
         app = self.make_application(admit_class=nursery, birth_registration_no='19901234567890911')
-        self.assertEqual(assign_form_number(app), 'N-26-00001')
+        self.assertEqual(assign_form_number(app), 'N-27-00001')
 
 
 class PaymentPdfEmailTests(AdmissionBaseTestCase):
@@ -850,3 +852,198 @@ class FormFixTests(AdmissionBaseTestCase):
 
 
 
+class FakeJanataPayClient:
+    """Stands in for JanataPayClient; verify() returns whatever status is queued."""
+
+    def __init__(self, status_code='1003', amount=None):
+        self.status_code = status_code
+        self.amount = amount
+        self.tokenize_calls = []
+        self.verify_calls = []
+
+    def tokenize(self, amount, reference_id, description, currency=None):
+        self.tokenize_calls.append((amount, reference_id))
+        return {
+            'payment_url': f'https://sandbox-pg.janatapay.com/jbagg/init-payment?token=T{reference_id}',
+            'transaction_token': f'T{reference_id}',
+            'expires': '',
+            'aes_key': 'a2V5',
+        }
+
+    def verify(self, reference_id, transaction_token):
+        self.verify_calls.append(reference_id)
+        from decimal import Decimal
+        return {
+            'status_code': self.status_code,
+            'status': {'1001': 'Initiated', '1002': 'SentToPgw', '1003': 'Success', '1004': 'Failed',
+                       '1005': 'Canceled', '1007': 'Refunded'}.get(self.status_code, ''),
+            'amount': Decimal(str(self.amount)) if self.amount is not None else None,
+            'ft_number': 'FT123' if self.status_code == '1003' else '',
+            'payment_gateway': 'JBL',
+            'raw': {'statusCode': 200},
+        }
+
+
+class JanataPayCryptoTests(TestCase):
+    def test_aes_round_trip(self):
+        from .janatapay import aes_decrypt, aes_encrypt, generate_aes_key
+
+        key = generate_aes_key()
+        token = aes_encrypt('{"hello": "world"}', key)
+        self.assertEqual(aes_decrypt(token, key), '{"hello": "world"}')
+
+    def test_aes_wrong_key_raises(self):
+        from .janatapay import JanataPayError, aes_decrypt, aes_encrypt, generate_aes_key
+
+        token = aes_encrypt('secret', generate_aes_key())
+        with self.assertRaises(JanataPayError):
+            aes_decrypt(token, generate_aes_key())
+
+    def test_public_key_wrapped_as_pem_and_usable(self):
+        from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import rsa
+
+        from .janatapay import public_key_pem, rsa_encrypt_key
+
+        private = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        der = private.public_key().public_bytes(
+            serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+        import base64
+        raw = base64.b64encode(der).decode()
+        self.assertTrue(public_key_pem(raw).startswith('-----BEGIN PUBLIC KEY-----\n'))
+        self.assertTrue(rsa_encrypt_key('a2V5', raw))
+
+
+@override_settings(PAYMENT_GATEWAY='janatapay', EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+@patch('admissions.pdf.generate_and_store_pdf', side_effect=fake_store_pdf)
+class JanataPayGatewayTests(AdmissionBaseTestCase):
+    def start(self, client=None, app=None):
+        from .payments import JanataPayGateway
+
+        client = client or FakeJanataPayClient(amount=500)
+        gateway = JanataPayGateway(client=client)
+        app = app or self.make_application()
+        hold_slot(app, self.slot)
+        assign_form_number(app)
+        app.status = Application.Status.AWAITING_PAYMENT
+        app.payment_status = Application.PaymentStatus.PENDING
+        app.save()
+        url = gateway.start_payment(None, app)
+        attempt = app.payment_attempts.get()
+        return gateway, client, app, attempt, url
+
+    def test_start_payment_tokenizes_integer_amount(self, _pdf):
+        _gateway, client, app, attempt, url = self.start()
+        self.assertEqual(client.tokenize_calls, [(500, attempt.reference_id)])
+        self.assertEqual(url, attempt.payment_url)
+        self.assertTrue(attempt.reference_id.startswith('HC'))
+        self.assertEqual(attempt.status, 'started')
+        app.refresh_from_db()
+        self.assertFalse(app.is_paid)
+
+    def test_non_integer_fee_rejected(self, _pdf):
+        from .payments import JanataPayGateway, PaymentError
+
+        self.session.application_fee = '500.50'
+        self.session.save()
+        app = self.make_application()
+        assign_form_number(app)
+        with self.assertRaises(PaymentError):
+            JanataPayGateway(client=FakeJanataPayClient()).start_payment(None, app)
+
+    def test_success_with_matching_amount_marks_paid(self, _pdf):
+        gateway, _client, app, attempt, _url = self.start()
+        gateway.verify_attempt(attempt)
+        app.refresh_from_db()
+        attempt.refresh_from_db()
+        self.assertTrue(app.is_paid)
+        self.assertEqual(attempt.status, 'success')
+        self.assertEqual(attempt.ft_number, 'FT123')
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_success_with_wrong_amount_not_paid(self, _pdf):
+        gateway, _client, app, attempt, _url = self.start(client=FakeJanataPayClient('1003', amount=5))
+        gateway.verify_attempt(attempt)
+        app.refresh_from_db()
+        attempt.refresh_from_db()
+        self.assertFalse(app.is_paid)
+        self.assertEqual(attempt.status, 'failed')
+        self.assertIn('does not match', app.admin_notes)
+
+    def test_failed_and_cancelled_codes(self, _pdf):
+        for code, expected in (('1004', 'failed'), ('1005', 'cancelled')):
+            with self.subTest(code=code):
+                Application.objects.all().delete()
+                self.slot.booked_count = 0
+                self.slot.save()
+                gateway, _c, app, attempt, _u = self.start(client=FakeJanataPayClient(code, amount=500))
+                gateway.verify_attempt(attempt)
+                app.refresh_from_db()
+                attempt.refresh_from_db()
+                self.assertEqual(attempt.status, expected)
+                self.assertEqual(app.status, Application.Status.PAYMENT_FAILED)
+                self.assertFalse(app.is_paid)
+
+    def test_pending_code_leaves_attempt_started(self, _pdf):
+        gateway, _client, app, attempt, _url = self.start(client=FakeJanataPayClient('1002', amount=500))
+        gateway.verify_attempt(attempt)
+        attempt.refresh_from_db()
+        app.refresh_from_db()
+        self.assertEqual(attempt.status, 'started')
+        self.assertEqual(attempt.gateway_status_code, '1002')
+        self.assertFalse(app.is_paid)
+
+    def test_verify_twice_is_idempotent(self, _pdf):
+        gateway, client, app, attempt, _url = self.start()
+        gateway.verify_attempt(attempt)
+        gateway.verify_attempt(attempt)
+        self.assertEqual(len(client.verify_calls), 1)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_callback_verifies_instead_of_trusting_redirect(self, _pdf):
+        gateway, client, app, attempt, _url = self.start(client=FakeJanataPayClient('1004', amount=500))
+        with patch('admissions.payments.janatapay.JanataPayClient', return_value=client):
+            response = self.client.get(reverse('admissions:janatapay_success') + f'?refid={attempt.reference_id}')
+        self.assertEqual(client.verify_calls, [attempt.reference_id])
+        self.assertRedirects(
+            response, reverse('admissions:payment', kwargs={'token': app.access_token}),
+            fetch_redirect_response=False,
+        )
+        app.refresh_from_db()
+        self.assertFalse(app.is_paid)
+
+    def test_callback_success_redirects_to_form(self, _pdf):
+        gateway, client, app, attempt, _url = self.start()
+        with patch('admissions.payments.janatapay.JanataPayClient', return_value=client):
+            response = self.client.get(reverse('admissions:janatapay_fail') + f'?refid={attempt.reference_id}')
+        self.assertRedirects(
+            response, reverse('admissions:success', kwargs={'token': app.access_token}),
+            fetch_redirect_response=False,
+        )
+
+    def test_unknown_refid(self, _pdf):
+        response = self.client.get(reverse('admissions:janatapay_success') + '?refid=NOPE')
+        self.assertRedirects(response, reverse('admissions:landing'), fetch_redirect_response=False)
+
+    def test_reconcile_confirms_stale_attempt(self, _pdf):
+        from .payments import reconcile_pending_payments
+
+        gateway, client, app, attempt, _url = self.start()
+        PaymentAttempt.objects.filter(pk=attempt.pk).update(created_at=timezone.now() - timedelta(minutes=30))
+        counts = reconcile_pending_payments(gateway=gateway)
+        self.assertEqual(counts['paid'], 1)
+        app.refresh_from_db()
+        self.assertTrue(app.is_paid)
+
+    def test_start_view_redirects_to_gateway(self, _pdf):
+        app = self.make_application()
+        hold_slot(app, self.slot)
+        assign_form_number(app)
+        app.status = Application.Status.AWAITING_PAYMENT
+        app.save()
+        client = FakeJanataPayClient(amount=500)
+        with patch('admissions.payments.janatapay.JanataPayClient', return_value=client):
+            response = self.client.post(reverse('admissions:start_payment', kwargs={'token': app.access_token}))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith('https://sandbox-pg.janatapay.com/'))

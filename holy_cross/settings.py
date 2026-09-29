@@ -10,10 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
+from email.utils import formataddr
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -188,16 +194,36 @@ THUMBNAIL_ALIASES = {
 
 # Email Configuration
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Replace with your SMTP host
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your email password or app password
-DEFAULT_FROM_EMAIL = 'Holy Cross School <your-email@gmail.com>'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true').strip().lower() in ('1', 'true', 'yes')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '').strip()
+# Gmail shows app passwords in groups of four; the spaces are not part of the password.
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '').replace(' ', '')
+EMAIL_TIMEOUT = int(os.getenv('EMAIL_TIMEOUT', '20'))
+EMAIL_FROM_NAME = os.getenv('EMAIL_FROM_NAME', 'Holy Cross School and College')
+DEFAULT_FROM_EMAIL = formataddr((EMAIL_FROM_NAME, EMAIL_HOST_USER or 'noreply@holycrossrajshahi.edu.bd'))
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND') or (
+    'django.core.mail.backends.smtp.EmailBackend'
+    if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
+    else 'django.core.mail.backends.console.EmailBackend'
+)
 
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Absolute base URL used for links in emails sent outside a request (e.g. after payment).
+SITE_URL = os.getenv('SITE_URL', 'https://holycrossrajshahi.edu.bd').rstrip('/')
+
+# Payment gateway (see docs/PAYMENT_GATEWAY.md)
+# ------------------------------------------------------------------------------
+PAYMENT_GATEWAY = os.getenv('PAYMENT_GATEWAY', 'stub').strip().lower()
+JANATAPAY_BASE_URL = os.getenv('JANATAPAY_BASE_URL', 'https://sandbox-pg.janatapay.com').rstrip('/')
+JANATAPAY_USERNAME = os.getenv('JANATAPAY_USERNAME', '')
+JANATAPAY_PASSWORD = os.getenv('JANATAPAY_PASSWORD', '')
+JANATAPAY_MERCHANT_UID = os.getenv('JANATAPAY_MERCHANT_UID', '')
+JANATAPAY_PUBLIC_KEY = os.getenv('JANATAPAY_PUBLIC_KEY', '')
+JANATAPAY_TIMEOUT = int(os.getenv('JANATAPAY_TIMEOUT', '30'))
+JANATAPAY_PAYMENT_WINDOW_MINUTES = int(os.getenv('JANATAPAY_PAYMENT_WINDOW_MINUTES', '20'))
+JANATAPAY_CURRENCY = os.getenv('JANATAPAY_CURRENCY', 'BDT')
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024

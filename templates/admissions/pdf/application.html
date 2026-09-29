@@ -388,21 +388,8 @@
 </div>
 
 <div class="section keep">
-    <h2>Viva Time</h2>
-    <div class="viva">
-        <table class="form">
-            <tr>
-                <td class="lbl">Viva date</td>
-                <td class="val">{% if application.display_viva_date %}{{ application.display_viva_date|date:"l, d F Y" }}{% elif application.skips_viva_selection %}Date will be announced by the school.{% endif %}</td>
-                <td class="lbl">Time</td>
-                <td class="val">{% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %} – {{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}</td>
-            </tr>
-            <tr>
-                <td class="lbl">Venue</td>
-                <td class="val" colspan="3">{{ application.session.viva_venue }}</td>
-            </tr>
-        </table>
-    </div>
+    <h2>{% if application.skips_viva_selection %}Exam &amp; Viva Time{% elif application.written_exam_date %}Viva &amp; Written Exam Time{% else %}Viva Time{% endif %}</h2>
+    {% include 'admissions/pdf/_schedule.html' %}
     <div class="guardian-sign">
         <div class="sign-line"></div>
         <div class="muted">Guardian Signature</div>
@@ -453,20 +440,7 @@
             <td class="val">{{ application.contact_number }}</td>
         </tr>
     </table>
-    <div class="viva" style="margin-top:12px">
-        <table class="form">
-            <tr>
-                <td class="lbl">Viva date</td>
-                <td class="val">{% if application.display_viva_date %}{{ application.display_viva_date|date:"l, d F Y" }}{% elif application.skips_viva_selection %}Date will be announced by the school.{% endif %}</td>
-                <td class="lbl">Time</td>
-                <td class="val">{% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %} – {{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}</td>
-            </tr>
-            <tr>
-                <td class="lbl">Venue</td>
-                <td class="val" colspan="3">{{ application.session.viva_venue }}</td>
-            </tr>
-        </table>
-    </div>
+    {% include 'admissions/pdf/_schedule.html' with style='margin-top:12px' %}
     {% if admit_instructions %}
     <div class="section" style="margin-top:14px">
         <h2>Instructions</h2>
@@ -485,7 +459,7 @@
             </td>
             <td style="text-align:right; vertical-align:bottom; font-size:11px; color:#333;">
                 {% if application.paid_at %}Submitted: {{ application.paid_at|date:"d F Y" }}<br>{% endif %}
-                Bring this admit card to the viva.
+                Bring this admit card to the {% if application.skips_viva_selection or application.written_exam_date %}exam and viva{% else %}viva{% endif %}.
             </td>
         </tr>
     </table>

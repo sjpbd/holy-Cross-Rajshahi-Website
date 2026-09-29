@@ -18,7 +18,6 @@ _HAS_BENGALI = re.compile(r'[\u0980-\u09FF]')
 _HAS_LATIN = re.compile(r'[A-Za-z]')
 _BENGALI_ALLOWED = re.compile(r'^[\u0980-\u09FF\s।॥\-–.,()]+$')
 
-MIN_PHOTO_BYTES = 50 * 1024
 MAX_PHOTO_BYTES = 2 * 1024 * 1024
 MIN_PHOTO_DIM = 300
 MAX_PHOTO_WIDTH = 600
@@ -88,8 +87,6 @@ def process_passport_photo(image_field, filename=None):
 
     image_field.seek(0)
     data = image_field.read()
-    if len(data) < MIN_PHOTO_BYTES:
-        raise ValidationError('Photo is too small. Please upload an image of at least 50 KB.')
     if len(data) > MAX_PHOTO_BYTES:
         raise ValidationError('Photo must be 2 MB or smaller.')
 

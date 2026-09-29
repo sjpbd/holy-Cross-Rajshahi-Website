@@ -37,8 +37,9 @@ from .forms import (
     SlotHoldForm,
     StudentStepForm,
 )
-from .models import AdmissionClass, AdmissionSession, Application, VivaSlot
-from .payments import get_gateway
+from .janatapay import JanataPayError
+from .models import AdmissionClass, AdmissionSession, Application, PaymentAttempt, VivaSlot
+from .payments import PaymentError, get_gateway
 from .services import (
     SlotUnavailable,
     assign_form_number,
@@ -287,7 +288,10 @@ def apply(request):
             application.submitted_at = timezone.now()
         application.save(update_fields=['status', 'payment_status', 'submitted_at', 'updated_at'])
         gateway = get_gateway()
-        pay_url = gateway.start_payment(request, application)
+        if gateway.hosted:
+            pay_url = reverse('admissions:payment', kwargs={'token': application.access_token})
+        else:
+            pay_url = gateway.start_payment(request, application)
         response = redirect(pay_url)
         return _set_resume_cookie(response, application)
 
@@ -516,6 +520,21 @@ def payment_page(request, token):
     application = get_object_or_404(Application, access_token=token)
     if application.is_paid:
         return redirect('admissions:success', token=token)
+    gateway = get_gateway()
+    if gateway.hosted:
+        pending = application.payment_attempts.filter(
+            gateway=gateway.name,
+            status=PaymentAttempt.Status.STARTED,
+            created_at__gte=timezone.now() - timedelta(hours=24),
+        ).exclude(transaction_token='').first()
+        if pending:
+            try:
+                gateway.verify_attempt(pending)
+            except JanataPayError:
+                pass
+            application.refresh_from_db()
+            if application.is_paid:
+                return redirect('admissions:success', token=token)
     expire_slot_holds()
     application.refresh_from_db()
     if not application.ready_for_payment and application.status != Application.Status.PAID:
@@ -525,8 +544,106 @@ def payment_page(request, token):
     return render(request, 'admissions/payment.html', {
         'application': application,
         'debug': settings.DEBUG,
+        'online_payment': gateway.hosted,
+        'gateway_name': gateway.name,
         'page_title': 'Admission payment',
     })
+
+
+@never_cache
+@require_POST
+def start_payment(request, token):
+    application = get_object_or_404(Application, access_token=token)
+    if application.is_paid:
+        return redirect('admissions:success', token=token)
+    gateway = get_gateway()
+    if not gateway.hosted:
+        return redirect('admissions:payment', token=token)
+    expire_slot_holds()
+    application.refresh_from_db()
+    if not application.ready_for_payment:
+        messages.error(request, 'Your viva slot reservation expired. Please choose a slot again before paying.')
+        response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
+        return _set_resume_cookie(response, application)
+    if application.status not in (Application.Status.AWAITING_PAYMENT, Application.Status.PAYMENT_FAILED):
+        messages.error(request, 'This application is not ready for payment. Please review and submit it first.')
+        return redirect(f"{reverse('admissions:apply')}?step={STEP_REVIEW}")
+    try:
+        pay_url = gateway.start_payment(request, application)
+    except PaymentError as exc:
+        messages.error(request, str(exc))
+        return redirect('admissions:payment', token=token)
+    return redirect(pay_url)
+
+
+def _janatapay_callback(request, outcome):
+    reference_id = (request.GET.get('refid') or request.POST.get('refid') or '').strip()
+    if not reference_id:
+        messages.error(request, 'Payment could not be matched to an application.')
+        return redirect('admissions:landing')
+    gateway = get_gateway('janatapay')
+    try:
+        attempt = gateway.handle_callback(reference_id)
+    except JanataPayError:
+        attempt = PaymentAttempt.objects.filter(reference_id=reference_id).select_related('application').first()
+        if attempt is None:
+            messages.error(request, 'Payment could not be matched to an application.')
+            return redirect('admissions:landing')
+        messages.warning(
+            request,
+            'We could not confirm your payment with the bank yet. If money was deducted, the form will be '
+            'confirmed automatically within a few minutes. Please check again shortly.',
+        )
+        return redirect('admissions:payment', token=attempt.application.access_token)
+    if attempt is None:
+        messages.error(request, 'Payment could not be matched to an application.')
+        return redirect('admissions:landing')
+
+    application = attempt.application
+    application.refresh_from_db()
+    if application.is_paid:
+        return redirect('admissions:success', token=application.access_token)
+    if attempt.status == PaymentAttempt.Status.CANCELLED:
+        messages.error(request, 'Payment was cancelled. You can try again.')
+    elif attempt.status == PaymentAttempt.Status.FAILED:
+        messages.error(request, 'Payment failed. No fee has been taken. You can try again.')
+    elif outcome in ('success', 'callback'):
+        messages.warning(
+            request,
+            'The bank has not confirmed your payment yet. If money was deducted, the form will be confirmed '
+            'automatically within a few minutes. Please check again shortly.',
+        )
+    else:
+        messages.error(request, 'Payment was not completed. You can try again.')
+    return redirect('admissions:payment', token=application.access_token)
+
+
+@never_cache
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def janatapay_callback(request):
+    return _janatapay_callback(request, 'callback')
+
+
+@never_cache
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def janatapay_success(request):
+    return _janatapay_callback(request, 'success')
+
+
+@never_cache
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def janatapay_fail(request):
+    return _janatapay_callback(request, 'fail')
+
+
+@never_cache
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def janatapay_cancel(request):
+    return _janatapay_callback(request, 'cancel')
 
 
 @never_cache
@@ -536,6 +653,8 @@ def simulate_payment(request, token):
         raise Http404()
     application = get_object_or_404(Application, access_token=token)
     gateway = get_gateway()
+    if gateway.hosted:
+        raise Http404()
     outcome = request.POST.get('outcome')
     try:
         if outcome == 'fail':

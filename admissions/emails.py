@@ -19,16 +19,11 @@ def send_confirmation_email(application, force=False, request=None):
         application.save(update_fields=['confirmation_email_error', 'updated_at'])
         return False
 
-    download_url = ''
+    path = reverse('admissions:pdf_download', kwargs={'token': application.access_token})
     if request:
-        download_url = request.build_absolute_uri(
-            reverse('admissions:pdf_download', kwargs={'token': application.access_token})
-        )
+        download_url = request.build_absolute_uri(path)
     else:
-        try:
-            download_url = reverse('admissions:pdf_download', kwargs={'token': application.access_token})
-        except Exception:
-            download_url = ''
+        download_url = f'{settings.SITE_URL}{path}'
 
     context = {
         'application': application,

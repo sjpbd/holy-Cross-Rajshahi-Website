@@ -20,13 +20,33 @@
                 <p class="text-sm text-slate-500">Amount due</p>
                 <p class="text-4xl font-extrabold text-primary">BDT {{ application.fee_amount }}</p>
             </div>
+            {% if application.written_exam_date %}
+            <p class="text-sm text-slate-600 mb-2">
+                Written exam: <strong>{{ application.written_exam_date|date:"d M Y" }}</strong>
+                {% if application.written_exam_start %}{{ application.written_exam_start|time:"g:i A" }}{% if application.written_exam_end %}–{{ application.written_exam_end|time:"g:i A" }}{% endif %}{% endif %}
+            </p>
+            {% endif %}
             {% if application.display_viva_date %}
             <p class="text-sm text-slate-600 mb-2">
                 Viva: <strong>{{ application.display_viva_date|date:"d M Y" }}</strong>
                 {% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %}–{{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}
             </p>
             {% endif %}
-            {% if application.slot_held_until and not application.skips_viva_selection %}
+            {% if online_payment %}
+            <p class="text-sm text-slate-500 mb-6">
+                You will be taken to the secure JanataPay (Janata Bank) payment page. After paying, you will return here automatically and can download your form.
+                {% if application.slot_held_until and not application.skips_viva_selection %}
+                Your viva slot is reserved until {{ application.slot_held_until|date:"g:i A, d M Y" }}.
+                {% endif %}
+            </p>
+            <form method="post" action="{% url 'admissions:start_payment' application.access_token %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary w-full sm:w-auto">Pay BDT {{ application.fee_amount|floatformat:0 }} with JanataPay</button>
+            </form>
+            <p class="text-xs text-slate-400 mt-3">
+                If money was deducted but this page still shows unpaid, wait a few minutes and reload — payments are re-checked with the bank automatically.
+            </p>
+            {% elif application.slot_held_until and not application.skips_viva_selection %}
             <p class="text-sm text-slate-500 mb-6">
                 Online payment will be connected through the school’s payment API. Your viva slot is reserved until
                 {{ application.slot_held_until|date:"g:i A, d M Y" }}.
@@ -36,7 +56,8 @@
                 Online payment will be connected through the school’s payment API.
             </p>
             {% endif %}
-            {% if debug %}
+            {% if online_payment %}
+            {% elif debug %}
             <p class="text-amber-900 bg-amber-50 rounded-xl px-4 py-3 text-sm mb-4 border border-amber-100">
                 Debug mode: simulate a payment result. Production will redirect to the payment gateway.
             </p>

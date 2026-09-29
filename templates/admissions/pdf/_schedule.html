@@ -1,0 +1,31 @@
+<div class="viva"{% if style %} style="{{ style }}"{% endif %}>
+    <table class="form">
+        {% if application.skips_viva_selection %}
+        <tr>
+            <td class="lbl">Exam &amp; Viva date</td>
+            <td class="val">{% if application.display_viva_date %}{{ application.display_viva_date|date:"l, d F Y" }}{% else %}Date will be announced by the school.{% endif %}</td>
+            <td class="lbl">Exam &amp; Viva time</td>
+            <td class="val">{% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %} – {{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td class="lbl">Viva date</td>
+            <td class="val">{% if application.display_viva_date %}{{ application.display_viva_date|date:"l, d F Y" }}{% endif %}</td>
+            <td class="lbl">Viva time</td>
+            <td class="val">{% if application.display_viva_start %}{{ application.display_viva_start|time:"g:i A" }}{% if application.display_viva_end %} – {{ application.display_viva_end|time:"g:i A" }}{% endif %}{% endif %}</td>
+        </tr>
+        {% if application.written_exam_date %}
+        <tr>
+            <td class="lbl">Written exam date</td>
+            <td class="val">{{ application.written_exam_date|date:"l, d F Y" }}</td>
+            <td class="lbl">Written exam time</td>
+            <td class="val">{% if application.written_exam_start %}{{ application.written_exam_start|time:"g:i A" }}{% if application.written_exam_end %} – {{ application.written_exam_end|time:"g:i A" }}{% endif %}{% endif %}</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+        <tr>
+            <td class="lbl">Venue</td>
+            <td class="val" colspan="3">{{ application.session.viva_venue }}</td>
+        </tr>
+    </table>
+</div>

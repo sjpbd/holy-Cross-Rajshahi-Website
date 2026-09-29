@@ -1,4 +1,5 @@
 # admissions/models.py
+import re
 import uuid
 
 from django.core.exceptions import ValidationError
@@ -134,8 +135,15 @@ class AdmissionSession(models.Model):
         return True
 
     def year_prefix(self):
-        digits = ''.join(ch for ch in self.academic_year if ch.isdigit())
-        return digits[:4] if len(digits) >= 4 else str(timezone.localdate().year)
+        """Admission year = ending year of the academic year ("2026-27" → "2027")."""
+        groups = re.findall(r'\d+', self.academic_year or '')
+        if groups:
+            first, last = groups[0], groups[-1]
+            if len(last) == 4:
+                return last
+            if len(last) == 2 and len(first) == 4:
+                return first[:2] + last
+        return str(timezone.localdate().year + 1)
 
     def year_yy(self):
         return self.year_prefix()[-2:]
@@ -176,6 +184,13 @@ class AdmissionClass(models.Model):
     assigned_viva_date = models.DateField('Exam & viva date', blank=True, null=True)
     assigned_viva_start_time = models.TimeField('Start time', blank=True, null=True)
     assigned_viva_end_time = models.TimeField('End time', blank=True, null=True)
+    written_exam_date = models.DateField(
+        blank=True,
+        null=True,
+        help_text='Leave blank if this class has no written exam.',
+    )
+    written_exam_start_time = models.TimeField('Written exam start time', blank=True, null=True)
+    written_exam_end_time = models.TimeField('Written exam end time', blank=True, null=True)
 
     class Meta:
         ordering = ['order', 'id']
@@ -629,6 +644,18 @@ class Application(models.Model):
     def display_viva_end(self):
         return self.viva_when()[2]
 
+    @property
+    def written_exam_date(self):
+        return self.admit_class.written_exam_date if self.admit_class_id else None
+
+    @property
+    def written_exam_start(self):
+        return self.admit_class.written_exam_start_time if self.admit_class_id else None
+
+    @property
+    def written_exam_end(self):
+        return self.admit_class.written_exam_end_time if self.admit_class_id else None
+
     def fee_amount(self):
         if self.admit_class and self.admit_class.fee_override is not None:
             return self.admit_class.fee_override
@@ -731,6 +758,8 @@ class PaymentAttempt(models.Model):
         STARTED = 'started', 'Started'
         SUCCESS = 'success', 'Success'
         FAILED = 'failed', 'Failed'
+        CANCELLED = 'cancelled', 'Cancelled'
+        REFUNDED = 'refunded', 'Refunded'
         EXPIRED = 'expired', 'Expired'
 
     application = models.ForeignKey(
@@ -741,8 +770,23 @@ class PaymentAttempt(models.Model):
     gateway = models.CharField(max_length=40, default='stub')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_id = models.CharField(max_length=120, blank=True, db_index=True)
+    reference_id = models.CharField(
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text='Our unique reference sent to the gateway (returned as refid on callback).',
+    )
+    transaction_token = models.CharField(max_length=200, blank=True)
+    aes_key = models.CharField(max_length=64, blank=True, help_text='Session AES key used when tokenizing.')
+    payment_url = models.URLField(max_length=500, blank=True)
+    gateway_status_code = models.CharField(max_length=10, blank=True)
+    gateway_status = models.CharField(max_length=80, blank=True)
+    ft_number = models.CharField('Financial transaction no', max_length=80, blank=True)
+    verified_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    verified_at = models.DateTimeField(blank=True, null=True)
     raw_payload = models.JSONField(blank=True, null=True)
-    status = models.CharField(max_length=16, choices=Status.choices, default=Status.STARTED)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.STARTED, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -751,3 +795,20 @@ class PaymentAttempt(models.Model):
 
     def __str__(self):
         return f'{self.application} · {self.status} · {self.amount}'
+
+
+class GatewayAuthToken(models.Model):
+    """Cached gateway access token + AES key, shared by all worker processes."""
+
+    gateway = models.CharField(max_length=40, unique=True)
+    access_token = models.TextField(blank=True)
+    aes_key = models.CharField(max_length=64, blank=True)
+    expires_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Gateway auth token'
+        verbose_name_plural = 'Gateway auth tokens'
+
+    def __str__(self):
+        return f'{self.gateway} (expires {self.expires_at})'

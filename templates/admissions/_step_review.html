@@ -69,11 +69,19 @@
     </section>
     <section class="adm-section">
         <div class="adm-section-head">
-            <h3 class="text-base">Viva</h3>
+            <h3 class="text-base">{% if application.written_exam_date %}Written exam &amp; viva{% else %}Viva{% endif %}</h3>
             {% if not application.skips_viva_selection %}
             <a class="adm-chip" href="?step=5">Change slot</a>
             {% endif %}
         </div>
+        {% if application.written_exam_date %}
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Written exam</p>
+        <p class="font-semibold text-primary">{{ application.written_exam_date|date:"l, d M Y" }}</p>
+        {% if application.written_exam_start %}
+        <p class="text-sm text-slate-600 mb-3">{{ application.written_exam_start|time:"g:i A" }}{% if application.written_exam_end %}–{{ application.written_exam_end|time:"g:i A" }}{% endif %}</p>
+        {% endif %}
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Viva</p>
+        {% endif %}
         {% if application.display_viva_date %}
         <p class="font-semibold text-primary">{{ application.display_viva_date|date:"l, d M Y" }}</p>
         {% if application.display_viva_start %}

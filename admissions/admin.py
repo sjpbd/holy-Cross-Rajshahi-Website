@@ -9,6 +9,7 @@ from django.utils.html import format_html
 from .emails import send_confirmation_email
 from .excel import applications_workbook
 from .forms import GenerateSlotsForm
+from .janatapay import JanataPayError
 from .models import (
     AdmissionClass,
     AdmissionSequence,
@@ -20,6 +21,7 @@ from .models import (
     Sibling,
     VivaSlot,
 )
+from .payments import JanataPayGateway
 from .pdf import generate_and_store_pdf
 from .services import cancel_application, generate_slots, mark_application_paid
 
@@ -38,11 +40,59 @@ class SiblingInline(admin.TabularInline):
 class PaymentAttemptInline(admin.TabularInline):
     model = PaymentAttempt
     extra = 0
-    readonly_fields = ['gateway', 'amount', 'transaction_id', 'status', 'raw_payload', 'created_at']
+    fields = [
+        'gateway', 'amount', 'reference_id', 'status', 'gateway_status_code', 'gateway_status',
+        'ft_number', 'verified_amount', 'verified_at', 'created_at',
+    ]
+    readonly_fields = fields
     can_delete = False
 
     def has_add_permission(self, request, obj=None):
         return False
+
+
+def _reverify_attempts(modeladmin, request, attempts):
+    gateway = JanataPayGateway()
+    checked = errors = 0
+    for attempt in attempts:
+        if attempt.gateway != JanataPayGateway.name or not attempt.transaction_token:
+            continue
+        try:
+            gateway.verify_attempt(attempt)
+            checked += 1
+        except JanataPayError as exc:
+            errors += 1
+            modeladmin.message_user(request, f'{attempt.reference_id}: {exc}', level=messages.ERROR)
+    modeladmin.message_user(request, f'Re-verified {checked} JanataPay payment(s) with the bank.')
+    return checked, errors
+
+
+@admin.register(PaymentAttempt)
+class PaymentAttemptAdmin(admin.ModelAdmin):
+    list_display = [
+        'reference_id', 'application', 'gateway', 'amount', 'status',
+        'gateway_status_code', 'gateway_status', 'ft_number', 'created_at', 'verified_at',
+    ]
+    list_filter = ['gateway', 'status', 'gateway_status_code']
+    search_fields = ['reference_id', 'transaction_id', 'ft_number', 'application__form_number']
+    date_hierarchy = 'created_at'
+    exclude = ['aes_key']
+    readonly_fields = [
+        'application', 'gateway', 'amount', 'transaction_id', 'reference_id', 'transaction_token',
+        'payment_url', 'gateway_status_code', 'gateway_status', 'ft_number', 'verified_amount',
+        'verified_at', 'raw_payload', 'status', 'created_at', 'updated_at',
+    ]
+    actions = ['reverify_with_gateway']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.action(description='Re-verify with gateway')
+    def reverify_with_gateway(self, request, queryset):
+        _reverify_attempts(self, request, queryset.select_related('application'))
 
 
 @admin.register(AdmissionSession)
@@ -113,7 +163,7 @@ class AdmissionSessionAdmin(admin.ModelAdmin):
 
 @admin.register(AdmissionClass)
 class AdmissionClassAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'uses_fixed_viva', 'assigned_viva_date', 'fee_override']
+    list_display = ['name', 'code', 'form_code', 'order', 'is_active', 'min_age_years', 'max_age_years', 'uses_fixed_viva', 'assigned_viva_date', 'written_exam_date', 'fee_override']
     list_editable = ['order', 'is_active']
     search_fields = ['name', 'code']
     fieldsets = (
@@ -123,6 +173,11 @@ class AdmissionClassAdmin(admin.ModelAdmin):
             'fields': ('uses_fixed_viva', 'assigned_viva_date', 'assigned_viva_start_time', 'assigned_viva_end_time'),
             'description': 'Used for Nursery and KG. When on, applicants do not pick a viva slot; '
                            'everyone in this class gets this date and time on their form and admit card.',
+        }),
+        ('Written exam', {
+            'fields': ('written_exam_date', 'written_exam_start_time', 'written_exam_end_time'),
+            'description': 'Shown on the form, admit card, and confirmation for this class. '
+                           'Leave the date blank if there is no written exam.',
         }),
     )
 
@@ -185,7 +240,10 @@ class ApplicationAdmin(admin.ModelAdmin):
     ]
     inlines = [PreviousResultInline, SiblingInline, PaymentAttemptInline]
     date_hierarchy = 'created_at'
-    actions = ['export_excel', 'mark_paid_office', 'resend_confirmation', 'regenerate_pdf', 'cancel_selected']
+    actions = [
+        'export_excel', 'mark_paid_office', 'reverify_payments', 'resend_confirmation',
+        'regenerate_pdf', 'cancel_selected',
+    ]
     fieldsets = (
         ('Status', {
             'fields': (
@@ -308,6 +366,15 @@ class ApplicationAdmin(admin.ModelAdmin):
             )
             count += 1
         self.message_user(request, f'Marked {count} application(s) as paid at the office.')
+
+    @admin.action(description='Re-verify JanataPay payments with the bank')
+    def reverify_payments(self, request, queryset):
+        attempts = PaymentAttempt.objects.select_related('application').filter(
+            application__in=queryset,
+            gateway=JanataPayGateway.name,
+            status=PaymentAttempt.Status.STARTED,
+        ).exclude(transaction_token='')
+        _reverify_attempts(self, request, attempts)
 
     @admin.action(description='Resend confirmation email')
     def resend_confirmation(self, request, queryset):

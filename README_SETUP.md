@@ -54,6 +54,9 @@ python manage.py runserver
 Once the server is running, you can access the website at:
 **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
 
+### 7. Online Payment (JanataPay)
+Admission fees are collected through the Janata Bank JanataPay gateway. Copy `.env.example` to `.env`, fill in the credentials, then run `python manage.py janatapay_check`. Full setup, sandbox testing, cron jobs and admin operations are in **[docs/PAYMENT_GATEWAY.md](docs/PAYMENT_GATEWAY.md)**.
+
 ## Project Structure
 
 - `holy_cross/`: Project configuration and settings.

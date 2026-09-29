@@ -18,6 +18,15 @@
                 Thank you, <strong>{{ application.student_name_en }}</strong>
                 <span class="font-bengali">({{ application.student_name_bn }})</span>.
             </p>
+            {% if application.written_exam_date %}
+            <div class="rounded-xl bg-amber-50 border border-amber-100 p-4 mb-3">
+                <p class="text-xs font-bold uppercase tracking-wider text-amber-600">Written exam</p>
+                <p class="font-bold text-primary">{{ application.written_exam_date|date:"l, d M Y" }}</p>
+                <p class="text-sm text-slate-600">
+                    {% if application.written_exam_start %}{{ application.written_exam_start|time:"g:i A" }}{% if application.written_exam_end %}–{{ application.written_exam_end|time:"g:i A" }}{% endif %} · {% endif %}{{ application.session.viva_venue }}
+                </p>
+            </div>
+            {% endif %}
             {% if application.display_viva_date %}
             <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-4 mb-5">
                 <p class="text-xs font-bold uppercase tracking-wider text-indigo-400">Viva</p>
