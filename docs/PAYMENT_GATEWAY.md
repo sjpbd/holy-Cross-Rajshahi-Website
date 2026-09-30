@@ -3,7 +3,8 @@
 This document explains how admission fees are collected online through the JanataPay payment gateway, how to set it up, how to test it with the sandbox accounts, and how to operate it day to day.
 
 - Gateway: JanataPay by Janata Bank PLC (guide version 1.0.1)
-- Environment in use: **Sandbox** (`https://sandbox-pg.janatapay.com`)
+- Environment in use: **Live** (`https://pg.janatapay.com`, merchant `5504003030`, since 30 Sep 2026). The live API only accepts calls from the whitelisted server IP, so live checks must be run on the server (`./scripts/deploy.sh payment-check`).
+- Sandbox (for testing): `https://sandbox-pg.janatapay.com`
 - Bank technical support: Hafijur Rahaman — hafij@janatabank-bd.com — 01671761155
 
 ---
@@ -116,9 +117,9 @@ After payment the bank redirects the parent to a URL that is **registered on the
 
 All four behave the same way: they read `refid`, verify with the bank, and show the correct result.
 
-> **Current status (checked 28 Sep 2026):** the sandbox merchant account is still redirecting to
+> **Sandbox note:** the shared sandbox merchant redirects to
 > `https://sandbox.eduapi.xyz/api/v1/site/student/payment/gateway-callback-url?refid=...`, which is **not our site**.
-> Until the bank changes it, see "Testing locally" below for a workaround.
+> For sandbox tests, see "Testing locally" below for a workaround. The live merchant uses our own callback URL.
 
 For local testing you can also ask the bank to register `http://127.0.0.1:8000/admission/payment/janatapay/callback/`, or expose your machine with a tunnel (for example `ngrok http 8000`) and register the tunnel URL.
 
@@ -268,13 +269,18 @@ Each attempt gets a unique reference like `HC1260001297A3F0B1` (`HC` + applicati
 
 ## 7. Going live (production)
 
-1. Get production credentials, public key and base URL from Janata Bank.
-2. Update `.env` on the server: `JANATAPAY_BASE_URL`, `JANATAPAY_USERNAME`, `JANATAPAY_PASSWORD`, `JANATAPAY_MERCHANT_UID`, `JANATAPAY_PUBLIC_KEY`; keep `PAYMENT_GATEWAY=janatapay`.
+1. Get production credentials, public key and base URL from Janata Bank, and have them whitelist the server IP.
+2. Update the server `.env` from your Mac (values in single quotes so `$` is not expanded):
+   ```bash
+   ./scripts/deploy.sh set-env 'PAYMENT_GATEWAY=janatapay' 'JANATAPAY_BASE_URL=https://pg.janatapay.com' \
+     'JANATAPAY_USERNAME=...' 'JANATAPAY_PASSWORD=...' 'JANATAPAY_MERCHANT_UID=...' 'JANATAPAY_PUBLIC_KEY=...' \
+     "SECRET_KEY=$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
+   ```
+   `DEBUG` must not be set on the server (it defaults to off).
 3. Ask the bank to register the production callback URL (section 2.4).
-4. Run `python manage.py janatapay_check` on the server.
-5. Make sure the cron jobs (section 2.5) are installed.
-6. Turn `DEBUG` off in `holy_cross/settings.py` and serve the site over HTTPS.
-7. Do one small real payment end-to-end and confirm it shows as Paid with the bank status 1003.
+4. Deploy the code: `./scripts/deploy.sh`.
+5. Run `./scripts/deploy.sh payment-check`. It clears the cached sandbox token, expires unfinished sandbox attempts, checks the live connection from the server and installs the cron jobs (section 2.5).
+6. Do one small real payment end-to-end and confirm it shows as Paid with the bank status 1003.
 
 ---
 

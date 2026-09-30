@@ -5,6 +5,7 @@
 #   ./scripts/deploy.sh --no-push          deploy what is already on GitHub
 #   ./scripts/deploy.sh set-env KEY=VALUE  add or update a variable in the VPS .env, then restart
 #   ./scripts/deploy.sh show-env           list variable names in the VPS .env (values hidden)
+#   ./scripts/deploy.sh payment-check      check live JanataPay from the VPS and install payment cron jobs
 #
 # SSH asks for the VPS root password unless you have set up an SSH key.
 # Override the server with: DEPLOY_HOST=user@host ./scripts/deploy.sh
@@ -43,10 +44,14 @@ case "${1:-}" in
     remote "sed -E 's/=.*/=<hidden>/' $REMOTE_ENV"
     exit 0
     ;;
+  payment-check)
+    remote "bash -s" < scripts/remote_payment_check.sh
+    exit 0
+    ;;
   --no-push|"")
     ;;
   *)
-    sed -n '2,11p' "$0"; exit 1
+    sed -n '2,12p' "$0"; exit 1
     ;;
 esac
 
