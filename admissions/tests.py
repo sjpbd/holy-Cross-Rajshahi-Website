@@ -1,10 +1,12 @@
 # admissions/tests.py
 import os
+import tempfile
 from datetime import date, time, timedelta
 from io import BytesIO
 from unittest.mock import patch
 
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase, override_settings
@@ -16,6 +18,7 @@ from .constants import RESUME_COOKIE
 from .excel import sanitize_excel
 from .models import (
     AdmissionClass,
+    AdmissionDocument,
     AdmissionSequence,
     AdmissionSession,
     Application,
@@ -1047,3 +1050,46 @@ class JanataPayGatewayTests(AdmissionBaseTestCase):
             response = self.client.post(reverse('admissions:start_payment', kwargs={'token': app.access_token}))
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith('https://sandbox-pg.janatapay.com/'))
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class AdmissionDocumentTests(AdmissionBaseTestCase):
+    def _doc(self, category, name, content=b'%PDF-1.4 test', **kwargs):
+        doc = AdmissionDocument(category=category, title=f'{category} doc', **kwargs)
+        if name:
+            doc.file = SimpleUploadedFile(name, content)
+        return doc
+
+    def test_prospectus_and_guideline_require_pdf(self):
+        for category in (AdmissionDocument.Category.PROSPECTUS, AdmissionDocument.Category.GUIDELINE):
+            with self.assertRaises(ValidationError):
+                self._doc(category, None).full_clean()
+            with self.assertRaises(ValidationError):
+                self._doc(category, 'scan.jpg', make_photo_file().read()).full_clean()
+            self._doc(category, 'file.pdf').full_clean()
+
+    def test_notice_needs_text_or_file(self):
+        with self.assertRaises(ValidationError):
+            self._doc(AdmissionDocument.Category.NOTICE, None).full_clean()
+        self._doc(AdmissionDocument.Category.NOTICE, None, body='Viva starts at 9 AM').full_clean()
+
+    def test_result_accepts_image_or_pdf(self):
+        with self.assertRaises(ValidationError):
+            self._doc(AdmissionDocument.Category.RESULT, None).full_clean()
+        self._doc(AdmissionDocument.Category.RESULT, 'result.png', make_photo_file().read()).full_clean()
+        self._doc(AdmissionDocument.Category.RESULT, 'result.pdf').full_clean()
+
+    def test_landing_shows_active_documents_by_category(self):
+        self._doc(AdmissionDocument.Category.PROSPECTUS, 'prospectus.pdf').save()
+        self._doc(AdmissionDocument.Category.GUIDELINE, 'guide.pdf').save()
+        self._doc(AdmissionDocument.Category.NOTICE, None, body='Bring birth certificate').save()
+        self._doc(AdmissionDocument.Category.RESULT, 'merit.jpg', make_photo_file().read()).save()
+        self._doc(AdmissionDocument.Category.NOTICE, None, body='Hidden notice', is_active=False).save()
+
+        response = self.client.get(reverse('admissions:landing'))
+        self.assertEqual(len(response.context['prospectus_docs']), 1)
+        self.assertEqual(len(response.context['guideline_docs']), 1)
+        self.assertEqual(len(response.context['notice_docs']), 1)
+        self.assertContains(response, 'Bring birth certificate')
+        self.assertNotContains(response, 'Hidden notice')
+        self.assertContains(response, 'class="adm-result-img"')

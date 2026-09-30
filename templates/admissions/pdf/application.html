@@ -106,8 +106,7 @@
         padding: 10px 12px 6px;
         background: #f7f9ff;
     }
-    .steps { margin: 0; padding-left: 18px; }
-    .steps li { margin: 5px 0; font-size: 12px; }
+    .admit-instructions { white-space: pre-wrap; font-size: 12px; line-height: 1.7; }
     .principal { margin-top: 18px; padding: 28px 8px 4px 0; }
     .principal .sign-space { height: 28px; width: 170px; }
     .principal img { height: 40px; display: block; margin-bottom: 4px; }
@@ -444,11 +443,7 @@
     {% if admit_instructions %}
     <div class="section" style="margin-top:14px">
         <h2>Instructions</h2>
-        <ol class="steps">
-            {% for item in admit_instructions %}
-            <li>{{ item }}</li>
-            {% endfor %}
-        </ol>
+        <div class="admit-instructions">{{ admit_instructions }}</div>
     </div>
     {% endif %}
     <table class="form" style="margin-top:16px">

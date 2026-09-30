@@ -90,6 +90,80 @@
             {% endif %}
         </div>
 
+        <div class="adm-doc-grid mb-6">
+            <div class="adm-card p-6">
+                <p class="adm-kicker"><i class="fas fa-book-open"></i> Prospectus</p>
+                <h2 class="text-xl font-extrabold mt-1 mb-4">Admission prospectus</h2>
+                {% for doc in prospectus_docs %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-doc-link">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>{{ doc.title }}</span>
+                    <i class="fas fa-download adm-doc-link-end"></i>
+                </a>
+                {% empty %}
+                <p class="adm-doc-empty">Will be published soon.</p>
+                {% endfor %}
+            </div>
+            <div class="adm-card p-6">
+                <p class="adm-kicker"><i class="fas fa-list-check"></i> Guideline</p>
+                <h2 class="text-xl font-extrabold mt-1 mb-4">Application guideline</h2>
+                {% for doc in guideline_docs %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-doc-link">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>{{ doc.title }}</span>
+                    <i class="fas fa-download adm-doc-link-end"></i>
+                </a>
+                {% empty %}
+                <p class="adm-doc-empty">Will be published soon.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="adm-card p-6 md:p-8 mb-6">
+            <p class="adm-kicker"><i class="fas fa-bullhorn"></i> General Notice</p>
+            <h2 class="text-xl font-extrabold mt-1 mb-4">Admission notices</h2>
+            {% for doc in notice_docs %}
+            <div class="adm-notice">
+                <p class="adm-notice-date">{{ doc.published_on|date:"d M Y" }}</p>
+                <h3 class="adm-notice-title">{{ doc.title }}</h3>
+                {% if doc.body %}<div class="adm-notice-body font-bengali">{{ doc.body|linebreaks }}</div>{% endif %}
+                {% if doc.file %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-notice-file">
+                    <i class="fas {% if doc.is_pdf %}fa-file-pdf{% else %}fa-image{% endif %}"></i>
+                    View attachment
+                </a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="adm-doc-empty">No notices yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="adm-card p-6 md:p-8 mb-6" id="result">
+            <p class="adm-kicker"><i class="fas fa-trophy"></i> Admission Result</p>
+            <h2 class="text-xl font-extrabold mt-1 mb-4">Admission result</h2>
+            {% for doc in result_docs %}
+            <div class="adm-result">
+                <h3 class="adm-notice-title">{{ doc.title }}</h3>
+                <p class="adm-notice-date">{{ doc.published_on|date:"d M Y" }}</p>
+                {% if doc.is_image %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" title="Open full size">
+                    <img src="{{ doc.file.url }}" alt="{{ doc.title }}" loading="lazy" class="adm-result-img">
+                </a>
+                {% else %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-doc-link">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Download result (PDF)</span>
+                    <i class="fas fa-download adm-doc-link-end"></i>
+                </a>
+                {% endif %}
+                {% if doc.body %}<div class="adm-notice-body font-bengali">{{ doc.body|linebreaks }}</div>{% endif %}
+            </div>
+            {% empty %}
+            <p class="adm-doc-empty">Results will be published here.</p>
+            {% endfor %}
+        </div>
+
         {% if admission_banner and admission_banner.attachment_url %}
         <div class="adm-card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>

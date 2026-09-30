@@ -1,7 +1,7 @@
 # core/views.py
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from .models import Slider, SchoolInfo, FactsFigures
+from .models import Slider, SchoolInfo, FactsFigures, PopupBanner
 from notices.models import Notice
 from news.models import NewsItem
 
@@ -13,6 +13,8 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
+        context['popup_banner'] = PopupBanner.current()
+
         # Hero Slider
         context['sliders'] = Slider.objects.filter(is_active=True)[:15]
         

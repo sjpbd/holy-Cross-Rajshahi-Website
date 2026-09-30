@@ -38,7 +38,7 @@ from .forms import (
     StudentStepForm,
 )
 from .janatapay import JanataPayError
-from .models import AdmissionClass, AdmissionSession, Application, PaymentAttempt, VivaSlot
+from .models import AdmissionClass, AdmissionDocument, AdmissionSession, Application, PaymentAttempt, VivaSlot
 from .payments import PaymentError, get_gateway
 from .services import (
     SlotUnavailable,
@@ -170,9 +170,16 @@ def _address_state(application):
 def landing(request):
     session = AdmissionSession.objects.filter(is_open=True).first()
     open_now = bool(session and session.is_currently_open())
+    documents = {category: [] for category in AdmissionDocument.Category.values}
+    for doc in AdmissionDocument.objects.filter(is_active=True):
+        documents[doc.category].append(doc)
     return render(request, 'admissions/landing.html', {
         'session': session,
         'open_now': open_now,
+        'prospectus_docs': documents[AdmissionDocument.Category.PROSPECTUS],
+        'guideline_docs': documents[AdmissionDocument.Category.GUIDELINE],
+        'notice_docs': documents[AdmissionDocument.Category.NOTICE],
+        'result_docs': documents[AdmissionDocument.Category.RESULT],
         'open_classes': AdmissionClass.objects.filter(is_active=True),
         'page_title': 'Admission - Holy Cross School and College',
         'page_description': 'Apply for admission to Holy Cross School & College, Rajshahi.',

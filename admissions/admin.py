@@ -12,6 +12,7 @@ from .forms import GenerateSlotsForm
 from .janatapay import JanataPayError
 from .models import (
     AdmissionClass,
+    AdmissionDocument,
     AdmissionSequence,
     AdmissionSession,
     Application,
@@ -404,3 +405,33 @@ class ApplicationAdmin(admin.ModelAdmin):
 @admin.register(AdmissionSequence)
 class AdmissionSequenceAdmin(admin.ModelAdmin):
     list_display = ['year', 'last_number']
+
+
+@admin.register(AdmissionDocument)
+class AdmissionDocumentAdmin(admin.ModelAdmin):
+    list_display = ['title', 'category', 'file_link', 'published_on', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    list_filter = ['category', 'is_active']
+    search_fields = ['title', 'body']
+    readonly_fields = ['preview']
+    fieldsets = (
+        (None, {
+            'description': 'Everything here appears on the public admission page, grouped by category.',
+            'fields': ('category', 'title', 'file', 'preview', 'body'),
+        }),
+        ('Display', {'fields': ('published_on', 'order', 'is_active')}),
+    )
+
+    @admin.display(description='File')
+    def file_link(self, obj):
+        if not obj.file:
+            return '-'
+        return format_html('<a href="{}" target="_blank">{}</a>', obj.file.url, obj.extension.upper())
+
+    @admin.display(description='Current file')
+    def preview(self, obj):
+        if not obj.file:
+            return '-'
+        if obj.is_image:
+            return format_html('<img src="{}" style="max-height:320px;border-radius:6px;">', obj.file.url)
+        return format_html('<a href="{}" target="_blank">Open file</a>', obj.file.url)

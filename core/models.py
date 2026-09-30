@@ -200,3 +200,63 @@ class AdmissionBanner(models.Model):
         if self.external_link:
             return self.external_link
         return None
+
+
+class PopupBanner(models.Model):
+    """Poster shown as a popup when visitors open the homepage."""
+    title = models.CharField(
+        max_length=200,
+        help_text="Internal name, also used as the image description for screen readers."
+    )
+    image = models.ImageField(
+        upload_to='popup/',
+        help_text="Poster image (portrait works best, e.g. 1080x1350px). Shown uncropped."
+    )
+    link = models.CharField(
+        max_length=500,
+        blank=True,
+        default='/admission/',
+        help_text="Where clicking the poster goes. A site path like /admission/ or a full URL. Leave blank for no link."
+    )
+    button_text = models.CharField(
+        max_length=60,
+        blank=True,
+        default='Apply Now',
+        help_text="Button under the poster. Leave blank to hide the button."
+    )
+    starts_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Optional. The popup is hidden before this time."
+    )
+    ends_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Optional. The popup is hidden after this time."
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Only one popup is shown; if several are active, the most recently updated wins."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+        verbose_name = "Popup Banner"
+        verbose_name_plural = "Popup Banners"
+
+    def __str__(self):
+        return self.title
+
+    @classmethod
+    def current(cls):
+        from django.db.models import Q
+        from django.utils import timezone
+        now = timezone.now()
+        return (
+            cls.objects.filter(is_active=True)
+            .filter(Q(starts_at__isnull=True) | Q(starts_at__lte=now))
+            .filter(Q(ends_at__isnull=True) | Q(ends_at__gte=now))
+            .first()
+        )

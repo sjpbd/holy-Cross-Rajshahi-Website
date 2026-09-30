@@ -577,7 +577,8 @@ class Application(models.Model):
     def admit_instructions(self):
         session = self.session
         text = session.admit_instructions_early if self.is_early_years else session.admit_instructions_general
-        return [line.strip() for line in (text or '').splitlines() if line.strip()]
+        lines = [line.rstrip() for line in (text or '').splitlines()]
+        return '\n'.join(lines).strip('\n')
 
     @property
     def skips_viva_selection(self):
@@ -812,3 +813,69 @@ class GatewayAuthToken(models.Model):
 
     def __str__(self):
         return f'{self.gateway} (expires {self.expires_at})'
+
+
+IMAGE_EXTENSIONS = ('jpg', 'jpeg', 'png', 'webp')
+
+
+class AdmissionDocument(models.Model):
+    """Prospectus, guideline, notice or result published on the admission landing page."""
+
+    class Category(models.TextChoices):
+        PROSPECTUS = 'prospectus', 'Prospectus'
+        GUIDELINE = 'guideline', 'Guideline'
+        NOTICE = 'notice', 'General Notice'
+        RESULT = 'result', 'Admission Result'
+
+    category = models.CharField(max_length=20, choices=Category.choices)
+    title = models.CharField(max_length=200)
+    file = models.FileField(
+        upload_to='admission/documents/',
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', *IMAGE_EXTENSIONS])],
+        help_text='Prospectus and Guideline: PDF. Result: image (preferred, shown on the page) or PDF. '
+                  'Notice: optional PDF or image.',
+    )
+    body = models.TextField(
+        blank=True,
+        help_text='Notice text shown on the page. Optional for other categories.',
+    )
+    published_on = models.DateField(default=timezone.localdate)
+    order = models.PositiveIntegerField(default=0, help_text='Lower numbers appear first within a category.')
+    is_active = models.BooleanField(default=True, help_text='Untick to hide from the admission page.')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', '-published_on', '-created_at']
+        verbose_name = 'Admission document'
+        verbose_name_plural = 'Admission documents (prospectus, guideline, notice, result)'
+
+    def __str__(self):
+        return f'{self.get_category_display()}: {self.title}'
+
+    @property
+    def extension(self):
+        name = self.file.name if self.file else ''
+        return name.rsplit('.', 1)[-1].lower() if '.' in name else ''
+
+    @property
+    def is_image(self):
+        return self.extension in IMAGE_EXTENSIONS
+
+    @property
+    def is_pdf(self):
+        return self.extension == 'pdf'
+
+    def clean(self):
+        super().clean()
+        pdf_only = (self.Category.PROSPECTUS, self.Category.GUIDELINE)
+        if self.category in pdf_only:
+            if not self.file:
+                raise ValidationError({'file': 'Upload the PDF.'})
+            if not self.is_pdf:
+                raise ValidationError({'file': 'Prospectus and Guideline must be PDF files.'})
+        elif self.category == self.Category.RESULT and not self.file:
+            raise ValidationError({'file': 'Upload the result as an image or PDF.'})
+        elif self.category == self.Category.NOTICE and not (self.file or self.body.strip()):
+            raise ValidationError('Write the notice text or attach a file.')
