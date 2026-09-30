@@ -71,7 +71,8 @@ as_app "$PY" manage.py check
 echo "=== VERIFY CONTENT UNCHANGED ==="
 AFTER=$(count_rows)
 MEDIA_AFTER=$(find "$APP/media" -type f | wc -l)
-if [ "$BEFORE" != "$AFTER" ] || [ "$MEDIA_BEFORE" != "$MEDIA_AFTER" ]; then
+# Migrations may add media (e.g. seeded images); only a drop means content was lost.
+if [ "$BEFORE" != "$AFTER" ] || [ "$MEDIA_AFTER" -lt "$MEDIA_BEFORE" ]; then
   echo "Row or media counts changed. Not restarting. Backup: $BACKUP"
   diff <(echo "$BEFORE") <(echo "$AFTER") || true
   echo "media before $MEDIA_BEFORE after $MEDIA_AFTER"
