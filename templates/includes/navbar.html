@@ -85,7 +85,7 @@
                 <a href="{% url 'resources' %}" class="nav-link">
                     <i class="fas fa-book mr-1"></i>Resources
                 </a>
-                <a href="{% url 'admissions:landing' %}" class="nav-link">
+                <a href="{% url 'admissions:landing' %}" class="nav-link nav-link-admission">
                     <i class="fas fa-file-signature mr-1"></i>Admission
                 </a>
                 <a href="{% url 'contact' %}" class="nav-link">
@@ -152,7 +152,7 @@
             <a href="{% url 'resources' %}" class="mobile-nav-link">
                 <i class="fas fa-book mr-2"></i>Resources
             </a>
-            <a href="{% url 'admissions:landing' %}" class="mobile-nav-link">
+            <a href="{% url 'admissions:landing' %}" class="mobile-nav-link nav-link-admission">
                 <i class="fas fa-file-signature mr-2"></i>Admission
             </a>
             <a href="{% url 'contact' %}" class="mobile-nav-link">
@@ -353,6 +353,34 @@
 
     .nav-link:active {
         transform: translateY(0);
+    }
+
+    /* Admission - highlighted red call to action */
+    .nav-link-admission {
+        background: #dc2626;
+        color: #fff !important;
+        margin-left: 0.25rem;
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
+        animation: admission-pulse 2s ease-out infinite;
+    }
+
+    .nav-link-admission::before {
+        display: none;
+    }
+
+    .nav-link-admission:hover {
+        background: #b91c1c;
+        color: #fff !important;
+    }
+
+    @keyframes admission-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .nav-link-admission { animation: none; }
     }
 
     /* Dropdown Menu - Modern Card Style */
