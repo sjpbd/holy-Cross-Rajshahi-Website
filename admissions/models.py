@@ -727,7 +727,14 @@ class PreviousResult(models.Model):
         on_delete=models.CASCADE,
         related_name='previous_results',
     )
+    class Exam(models.TextChoices):
+        FIRST_TERM = 'first_term', '1st Term'
+        SECOND_TERM = 'second_term', '2nd Term'
+        THIRD_TERM = 'third_term', '3rd Term'
+        HALF_YEARLY = 'half_yearly', 'Half Yearly'
+
     previous_class = models.CharField('Class', max_length=80, blank=True)
+    exam = models.CharField(max_length=20, choices=Exam.choices, blank=True)
     year = models.CharField(max_length=10, blank=True)
     result = models.CharField(max_length=80, blank=True)
 
@@ -735,7 +742,7 @@ class PreviousResult(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return f'{self.previous_class} ({self.result})'
+        return f'{self.previous_class} {self.get_exam_display()} ({self.result})'
 
 
 class Sibling(models.Model):

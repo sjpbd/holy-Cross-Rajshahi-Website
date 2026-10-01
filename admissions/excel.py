@@ -53,7 +53,7 @@ def applications_workbook(queryset):
     )
     for app in qs:
         results = '; '.join(
-            f'{r.previous_class} {r.year} {r.result}'.strip()
+            ' '.join(filter(None, [r.previous_class, r.get_exam_display(), r.year, r.result]))
             for r in app.previous_results.all()
         )
         siblings = '; '.join(

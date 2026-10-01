@@ -343,17 +343,19 @@
     <table class="results">
         <tr>
             <th>Previous class</th>
+            <th>Exam</th>
             <th>Year</th>
             <th>Result</th>
         </tr>
         {% for r in results %}
         <tr>
             <td>{{ r.previous_class }}</td>
+            <td>{{ r.get_exam_display }}</td>
             <td>{{ r.year }}</td>
             <td>{{ r.result }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="3">—</td></tr>
+        <tr><td colspan="4">—</td></tr>
         {% endfor %}
     </table>
     {% endif %}

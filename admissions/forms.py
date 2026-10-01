@@ -552,20 +552,23 @@ class DeclarationsStepForm(forms.ModelForm):
 class PreviousResultForm(forms.ModelForm):
     class Meta:
         model = PreviousResult
-        fields = ['previous_class', 'year', 'result']
+        fields = ['previous_class', 'exam', 'year', 'result']
         widgets = {
             'previous_class': _text('e.g. Class 5'),
+            'exam': _select(),
             'year': _text('e.g. 2025'),
             'result': _text('GPA, division, or marks'),
         }
         labels = {
             'previous_class': 'Class',
+            'exam': 'Exam',
             'year': 'Year',
             'result': 'Result',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['exam'].choices = [('', 'Select exam'), *PreviousResult.Exam.choices]
         self.fields['previous_class'].required = False
         self.fields['year'].required = False
         self.fields['result'].required = False

@@ -220,8 +220,71 @@
         width: 2rem; height: 2rem; flex: none; border-radius: 999px; background: #eef2ff; color: #1e3a8a;
         display: inline-flex; align-items: center; justify-content: center; font-weight: 800;
     }
-    .adm-doc-grid { display: grid; gap: 1.5rem; }
-    @media (min-width: 768px) { .adm-doc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .adm-l-top { padding: 8rem 0 5.5rem; }
+    .adm-l-narrow { max-width: 760px; }
+    .adm-l-status {
+        display: inline-flex; align-items: center; gap: .5rem; padding: .4rem .9rem; border-radius: 999px;
+        font-size: .8rem; font-weight: 800; letter-spacing: .03em;
+    }
+    .adm-l-status.is-open { background: rgba(34,197,94,.18); color: #bbf7d0; border: 1px solid rgba(134,239,172,.4); }
+    .adm-l-status.is-soon { background: rgba(212,175,55,.2); color: #fde68a; border: 1px solid rgba(244,208,63,.4); }
+    .adm-l-status.is-closed { background: rgba(255,255,255,.1); color: #e2e8f0; border: 1px solid rgba(255,255,255,.2); }
+    .adm-l-dot { width: .55rem; height: .55rem; border-radius: 999px; background: #4ade80; animation: admPulse 1.8s infinite; }
+    @keyframes admPulse { 0% { box-shadow: 0 0 0 0 rgba(74,222,128,.7); } 70%, 100% { box-shadow: 0 0 0 .5rem rgba(74,222,128,0); } }
+    .adm-l-title { font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 800; line-height: 1.1; margin: 1rem 0 .4rem; }
+    .adm-l-lead { color: #dbeafe; font-size: 1.05rem; line-height: 1.6; margin: 0; }
+    .adm-l-cta { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.6rem; }
+    .adm-l-btn { padding: .95rem 1.5rem; font-size: 1rem; }
+    .adm-l-reprint { display: inline-flex; align-items: center; gap: .4rem; margin-top: 1rem; color: #fde68a; font-size: .9rem; font-weight: 600; }
+    .adm-l-reprint:hover { text-decoration: underline; }
+    .adm-l-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin-top: 1.8rem; max-width: 30rem; }
+    .adm-l-facts .adm-stat { padding: .7rem .85rem; }
+    .adm-l-bottom { padding-bottom: 4rem; }
+    .adm-l-body { margin-top: -3rem; display: grid; gap: 1.25rem; }
+    .adm-l-section { padding: 1.4rem; scroll-margin-top: 6rem; }
+    @media (min-width: 768px) { .adm-l-section { padding: 1.8rem; } }
+    .adm-l-h2 { font-size: 1.25rem; font-weight: 800; margin: 0 0 1rem; }
+    .adm-l-rows { display: grid; gap: .6rem; }
+    .adm-l-row {
+        display: flex; align-items: center; gap: .9rem; padding: .8rem .9rem; border-radius: 1rem;
+        border: 1px solid #e6ebf4; color: #1c2a4e; text-decoration: none; transition: background .15s, border-color .15s;
+    }
+    a.adm-l-row:hover { background: #f4f7ff; border-color: #c7d2fe; }
+    .adm-l-row-text { flex: 1; min-width: 0; }
+    .adm-l-row-text strong { display: block; color: #1e3a8a; }
+    .adm-l-row-text small { display: block; color: #64748b; font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .adm-l-row-action { font-size: .85rem; font-weight: 700; color: #1e3a8a; white-space: nowrap; display: inline-flex; align-items: center; gap: .4rem; }
+    .adm-l-row.is-empty { background: #f8fafc; }
+    .adm-l-row.is-empty .adm-l-icon { background: #e2e8f0; color: #94a3b8; }
+    .adm-l-row.is-empty .adm-l-row-text strong { color: #64748b; }
+    .adm-l-row.is-empty .adm-l-row-action { color: #94a3b8; font-weight: 600; }
+    .adm-l-row.is-highlight { background: #fffbeb; border-color: #fde68a; }
+    .adm-l-row.is-highlight .adm-l-icon { background: #d4af37; color: #fff; }
+    .adm-l-icon {
+        width: 2.5rem; height: 2.5rem; flex: none; border-radius: .8rem; display: inline-flex; align-items: center; justify-content: center;
+        background: #eef2ff; color: #1e3a8a; font-size: 1rem;
+    }
+    .adm-l-details { padding: 0; overflow: hidden; }
+    .adm-l-details summary {
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem; cursor: pointer; list-style: none;
+        padding: 1.1rem 1.4rem; font-weight: 800; color: #1e3a8a;
+    }
+    .adm-l-details summary::-webkit-details-marker { display: none; }
+    .adm-l-details summary .fa-circle-info { color: #d4af37; margin-right: .35rem; }
+    .adm-l-chevron { color: #94a3b8; transition: transform .2s; }
+    .adm-l-details[open] .adm-l-chevron { transform: rotate(180deg); }
+    .adm-l-details-body { padding: 0 1.4rem 1.4rem; }
+    .adm-l-note { margin-top: 1.1rem; padding: .9rem 1rem; border-radius: .9rem; background: #fffbeb; border: 1px solid #fde68a; color: #78350f; font-size: .9rem; line-height: 1.6; }
+    .adm-pay-details {
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem 1rem;
+        margin: 0 0 1.25rem; padding: 1rem 1.1rem; border: 1px solid #e6ebf4; border-radius: 1rem;
+    }
+    .adm-pay-details dt { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+    .adm-pay-details dd { margin: .15rem 0 0; font-weight: 700; color: #1c2a4e; overflow-wrap: anywhere; }
+    .adm-pay-details .adm-pay-id { font-size: 1.15rem; color: #1e3a8a; letter-spacing: .02em; }
+    .adm-result-grid { display: grid; column-gap: 1rem; }
+    @media (min-width: 640px) { .adm-result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1024px) { .adm-result-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     .adm-doc-link {
         display: flex; align-items: center; gap: .7rem; padding: .85rem 1rem; margin-bottom: .6rem;
         border: 1px solid #dbe3ef; border-radius: .9rem; background: #f8fafc;
@@ -231,7 +294,6 @@
     .adm-doc-link .fa-file-pdf { color: #dc2626; font-size: 1.2rem; }
     .adm-doc-link span { flex: 1; min-width: 0; }
     .adm-doc-link-end { color: #64748b; }
-    .adm-doc-empty { color: #94a3b8; font-style: italic; margin: 0; }
     .adm-notice, .adm-result { padding: 1rem 0; border-top: 1px solid #e8edf5; }
     .adm-notice:first-of-type, .adm-result:first-of-type { border-top: 0; padding-top: 0; }
     .adm-notice-date { font-size: .75rem; font-weight: 700; color: #b8941f; margin: 0 0 .15rem; }

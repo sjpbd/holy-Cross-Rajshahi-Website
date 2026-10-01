@@ -16,6 +16,24 @@
         <div class="adm-card p-8">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Applicant</p>
             <h2 class="text-2xl font-extrabold text-primary mb-4">{{ application.student_name_en }}</h2>
+            <dl class="adm-pay-details">
+                <div>
+                    <dt>Application ID</dt>
+                    <dd class="adm-pay-id">{{ application.form_number|default:"—" }}</dd>
+                </div>
+                <div>
+                    <dt>Class</dt>
+                    <dd>{{ application.admit_class.name|default:"—" }}</dd>
+                </div>
+                <div>
+                    <dt>Father's name</dt>
+                    <dd>{{ application.father_name|default:"—" }}</dd>
+                </div>
+                <div>
+                    <dt>Father's phone</dt>
+                    <dd>{{ application.father_mobile|default:"—" }}</dd>
+                </div>
+            </dl>
             <div class="rounded-2xl bg-slate-50 border border-slate-100 p-5 mb-5">
                 <p class="text-sm text-slate-500">Amount due</p>
                 <p class="text-4xl font-extrabold text-primary">BDT {{ application.fee_amount }}</p>
@@ -36,7 +54,8 @@
             <p class="text-sm text-slate-500 mb-6">
                 You will be taken to the secure JanataPay (Janata Bank) payment page. After paying, you will return here automatically and can download your form.
                 {% if application.slot_held_until and not application.skips_viva_selection %}
-                Your viva slot is reserved until {{ application.slot_held_until|date:"g:i A, d M Y" }}.
+                Your viva seat is booked only once payment succeeds, so please pay before
+                {{ application.slot_held_until|date:"g:i A, d M Y" }}.
                 {% endif %}
             </p>
             <form method="post" action="{% url 'admissions:start_payment' application.access_token %}">
@@ -48,8 +67,8 @@
             </p>
             {% elif application.slot_held_until and not application.skips_viva_selection %}
             <p class="text-sm text-slate-500 mb-6">
-                Online payment will be connected through the school’s payment API. Your viva slot is reserved until
-                {{ application.slot_held_until|date:"g:i A, d M Y" }}.
+                Online payment will be connected through the school’s payment API. Your viva seat is booked only once
+                payment succeeds, so please pay before {{ application.slot_held_until|date:"g:i A, d M Y" }}.
             </p>
             {% else %}
             <p class="text-sm text-slate-500 mb-6">

@@ -1,11 +1,11 @@
-<p class="text-slate-600 mb-5">Pick a date with seats, then a time. The seat is held for {{ session.slot_hold_minutes }} minutes until payment is finished.</p>
+<p class="text-slate-600 mb-5">Pick a date with seats, then a time. Your seat is booked only after the fee is paid — seats go to applicants in the order they pay. Your selection stays valid for {{ session.slot_hold_minutes }} minutes.</p>
 {% if application.viva_slot and application.hold_is_valid %}
 <div class="mb-5 rounded-xl bg-indigo-50 text-primary px-4 py-3 border border-indigo-100">
-    <p class="text-xs font-bold uppercase tracking-wide text-indigo-400 mb-1">Currently reserved</p>
+    <p class="text-xs font-bold uppercase tracking-wide text-indigo-400 mb-1">Currently selected (not booked until paid)</p>
     <p>
         <strong>{{ application.viva_slot.date|date:"l, d M Y" }}</strong>
         · {{ application.viva_slot.start_time|time:"g:i A" }}–{{ application.viva_slot.end_time|time:"g:i A" }}
-        · held until {{ application.slot_held_until|time:"g:i A" }}
+        · selection valid until {{ application.slot_held_until|time:"g:i A" }}
     </p>
 </div>
 {% endif %}

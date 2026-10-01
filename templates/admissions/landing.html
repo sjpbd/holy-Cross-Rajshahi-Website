@@ -6,146 +6,116 @@
 {% endblock %}
 
 {% block content %}
-<section class="adm-hero pt-32 pb-16">
-    <div class="container mx-auto px-4 relative z-10">
-        <nav class="breadcrumb mb-4" style="color: white !important;">
+<section class="adm-hero adm-l-top">
+    <div class="adm-container adm-l-narrow">
+        <nav class="breadcrumb mb-5" style="color: white !important;">
             <div class="breadcrumb-item"><a href="{% url 'home' %}" style="color: white !important;">Home</a></div>
             <div class="breadcrumb-item active" style="color: #f4d03f !important;">Admission</div>
         </nav>
-        <div class="grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-                <p class="adm-kicker"><i class="fas fa-graduation-cap"></i> Holy Cross School &amp; College, Rajshahi</p>
-                <h1 class="text-4xl md:text-6xl font-extrabold mt-3 leading-tight">Admission application</h1>
-                <div class="h-1.5 w-24 bg-gradient-to-r from-accent to-accent-light rounded-full my-5"></div>
-                {% if session %}
-                <p class="text-xl text-blue-100 max-w-xl">{{ session.name }} · Academic year {{ session.academic_year }}</p>
-                {% endif %}
-                {% if open_now %}
-                <div class="flex flex-wrap gap-3 mt-6">
-                    <div class="adm-stat">
-                        <p class="text-xs text-blue-200">Opens</p>
-                        <p class="font-bold">{{ session.opens_at|date:"d M Y" }}</p>
-                    </div>
-                    <div class="adm-stat">
-                        <p class="text-xs text-blue-200">Closes</p>
-                        <p class="font-bold">{{ session.closes_at|date:"d M Y" }}</p>
-                    </div>
-                    <div class="adm-stat">
-                        <p class="text-xs text-blue-200">Fee</p>
-                        <p class="font-bold">{% if session.application_fee %}BDT {{ session.application_fee }}{% else %}To be confirmed{% endif %}</p>
-                    </div>
-                </div>
-                {% endif %}
+
+        {% if open_now %}
+        <span class="adm-l-status is-open"><span class="adm-l-dot"></span>Admission open</span>
+        {% elif not_started %}
+        <span class="adm-l-status is-soon"><i class="fas fa-clock"></i>Opens {{ session.opens_at|date:"d M Y" }}</span>
+        {% else %}
+        <span class="adm-l-status is-closed"><i class="fas fa-lock"></i>Admission closed</span>
+        {% endif %}
+
+        <h1 class="adm-l-title">{% if session %}{{ session.name }}{% else %}Admission{% endif %}</h1>
+        <p class="adm-l-lead">Holy Cross School &amp; College, Rajshahi</p>
+
+        {% if open_now %}
+        <div class="adm-l-cta">
+            <a href="{% url 'admissions:apply' %}?new=1" class="btn btn-accent adm-l-btn">
+                <i class="fas fa-pen-to-square mr-2"></i>Apply online
+            </a>
+            <a href="{% url 'admissions:resume' %}" class="btn btn-glass adm-l-btn">Continue saved form</a>
+        </div>
+        {% elif not_started %}
+        <p class="adm-l-lead mt-6">Online application starts on {{ session.opens_at|date:"d F Y" }}.</p>
+        {% elif session %}
+        <p class="adm-l-lead mt-6">{{ session.name }} is closed.</p>
+        {% else %}
+        <p class="adm-l-lead mt-6">The admission circular has not been published yet.</p>
+        {% endif %}
+        <a href="{% url 'admissions:lookup' %}" class="adm-l-reprint">Already paid? Reprint form &amp; admit card <i class="fas fa-arrow-right"></i></a>
+
+        {% if session %}
+        <div class="adm-l-facts">
+            <div class="adm-stat">
+                <p class="text-xs text-blue-200">Opens</p>
+                <p class="font-bold">{{ session.opens_at|date:"d M Y" }}</p>
             </div>
-            <div class="adm-card p-6 md:p-8 text-slate-800">
-                <h2 class="text-lg font-extrabold text-primary mb-4 font-bengali">আবেদনের শর্তাবলি</h2>
-                <ul class="adm-terms font-bengali">
-                    <li>প্রতিষ্ঠান কর্তৃক নির্ধারিত ও অনুমোদিত লোগোসম্বলিত নির্ধারিত পোশাক পরিধান করতে হবে।</li>
-                    <li>শিক্ষার্থীকে নিয়মিত ও সময়ানুবর্তিতার সঙ্গে বিদ্যালয়ের শ্রেণি কার্যক্রমে উপস্থিত থাকতে হবে।</li>
-                    <li>বিদ্যালয়ের সকল নিয়ম-কানুন, শৃঙ্খলা ও আচরণবিধি যথাযথভাবে মেনে চলতে হবে।</li>
-                    <li>চুলের বিন্যাস পরিপাটি, পরিচ্ছন্ন ও মার্জিত রাখতে হবে এবং বিদ্যালয়ের নির্ধারিত শৃঙ্খলা অনুসরণ করতে হবে।</li>
-                    <li>বিদ্যালয়ের বিভিন্ন সহশিক্ষা কার্যক্রম ও ক্লাব কার্যক্রমে সক্রিয়ভাবে অংশগ্রহণের আগ্রহ ও মানসিকতা থাকতে হবে।</li>
-                </ul>
+            <div class="adm-stat">
+                <p class="text-xs text-blue-200">Closes</p>
+                <p class="font-bold">{{ session.closes_at|date:"d M Y" }}</p>
+            </div>
+            <div class="adm-stat">
+                <p class="text-xs text-blue-200">Fee</p>
+                <p class="font-bold">{% if session.application_fee %}BDT {{ session.application_fee|floatformat:0 }}{% else %}TBA{% endif %}</p>
             </div>
         </div>
+        {% endif %}
     </div>
 </section>
 
-<section class="adm-page py-14">
-    <div class="container mx-auto px-4 adm-shell">
+<section class="adm-page adm-l-bottom">
+    <div class="adm-container adm-l-narrow adm-l-body">
         {% include 'admissions/_messages.html' %}
 
-        <div class="adm-card p-6 md:p-8 mb-6">
-            {% if open_now %}
-            <h2 class="text-2xl font-extrabold text-primary mb-3">Start or return to an application</h2>
-            <p class="text-slate-600 leading-relaxed mb-5">
-                {% if session.instructions %}
-                    {{ session.instructions|linebreaksbr }}
-                {% else %}
-                    Complete the form carefully. Address is selected as Division, Zila and Thana, then a house or road line. You can copy present address to permanent address.
-                {% endif %}
-            </p>
-            {% if open_classes %}
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Classes open</p>
-            <div class="flex flex-wrap gap-2 mb-6">
-                {% for klass in open_classes %}
-                <span class="adm-chip cursor-default">{{ klass.name }}</span>
-                {% endfor %}
-            </div>
-            {% endif %}
-            <div class="flex flex-wrap gap-3">
-                <a href="{% url 'admissions:apply' %}?new=1" class="btn btn-primary">
-                    <i class="fas fa-pen-to-square mr-2"></i>Start application
-                </a>
-                <a href="{% url 'admissions:resume' %}" class="btn btn-outline">Continue a saved form</a>
-                <a href="{% url 'admissions:lookup' %}" class="btn btn-outline">Reprint paid form</a>
-            </div>
-            {% elif session %}
-            <h2 class="text-2xl font-extrabold text-primary mb-3">Admission is not open right now</h2>
-            <p class="text-slate-600 mb-5">{{ session.name }} is closed. Paid forms can still be reprinted.</p>
-            <a href="{% url 'admissions:lookup' %}" class="btn btn-outline">Reprint a paid form</a>
-            {% else %}
-            <h2 class="text-2xl font-extrabold text-primary mb-3">Circular not published yet</h2>
-            <p class="text-slate-600">Please check notices or contact the school office.</p>
-            {% endif %}
-        </div>
-
-        <div class="adm-doc-grid mb-6">
-            <div class="adm-card p-6">
-                <p class="adm-kicker"><i class="fas fa-book-open"></i> Prospectus</p>
-                <h2 class="text-xl font-extrabold mt-1 mb-4">Admission prospectus</h2>
+        <div class="adm-card adm-l-section">
+            <h2 class="adm-l-h2">Admission documents</h2>
+            <div class="adm-l-rows">
                 {% for doc in prospectus_docs %}
-                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-doc-link">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>{{ doc.title }}</span>
-                    <i class="fas fa-download adm-doc-link-end"></i>
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-l-row">
+                    <span class="adm-l-icon"><i class="fas fa-book-open"></i></span>
+                    <span class="adm-l-row-text"><strong>Prospectus</strong>{% if prospectus_docs|length > 1 %}<small>{{ doc.title }}</small>{% endif %}</span>
+                    <span class="adm-l-row-action">Download <i class="fas fa-download"></i></span>
                 </a>
                 {% empty %}
-                <p class="adm-doc-empty">Will be published soon.</p>
+                <div class="adm-l-row is-empty">
+                    <span class="adm-l-icon"><i class="fas fa-book-open"></i></span>
+                    <span class="adm-l-row-text"><strong>Prospectus</strong></span>
+                    <span class="adm-l-row-action">Coming soon</span>
+                </div>
                 {% endfor %}
-            </div>
-            <div class="adm-card p-6">
-                <p class="adm-kicker"><i class="fas fa-list-check"></i> Guideline</p>
-                <h2 class="text-xl font-extrabold mt-1 mb-4">Application guideline</h2>
-                {% for doc in guideline_docs %}
-                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-doc-link">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>{{ doc.title }}</span>
-                    <i class="fas fa-download adm-doc-link-end"></i>
-                </a>
-                {% empty %}
-                <p class="adm-doc-empty">Will be published soon.</p>
-                {% endfor %}
-            </div>
-        </div>
 
-        <div class="adm-card p-6 md:p-8 mb-6">
-            <p class="adm-kicker"><i class="fas fa-bullhorn"></i> General Notice</p>
-            <h2 class="text-xl font-extrabold mt-1 mb-4">Admission notices</h2>
-            {% for doc in notice_docs %}
-            <div class="adm-notice">
-                <p class="adm-notice-date">{{ doc.published_on|date:"d M Y" }}</p>
-                <h3 class="adm-notice-title">{{ doc.title }}</h3>
-                {% if doc.body %}<div class="adm-notice-body font-bengali">{{ doc.body|linebreaks }}</div>{% endif %}
-                {% if doc.file %}
-                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-notice-file">
-                    <i class="fas {% if doc.is_pdf %}fa-file-pdf{% else %}fa-image{% endif %}"></i>
-                    View attachment
+                {% for doc in guideline_docs %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-l-row">
+                    <span class="adm-l-icon"><i class="fas fa-list-check"></i></span>
+                    <span class="adm-l-row-text"><strong>Guideline</strong>{% if guideline_docs|length > 1 %}<small>{{ doc.title }}</small>{% endif %}</span>
+                    <span class="adm-l-row-action">Download <i class="fas fa-download"></i></span>
                 </a>
+                {% empty %}
+                <div class="adm-l-row is-empty">
+                    <span class="adm-l-icon"><i class="fas fa-list-check"></i></span>
+                    <span class="adm-l-row-text"><strong>Guideline</strong></span>
+                    <span class="adm-l-row-action">Coming soon</span>
+                </div>
+                {% endfor %}
+
+                {% if result_docs %}
+                <a href="#result" class="adm-l-row is-highlight">
+                    <span class="adm-l-icon"><i class="fas fa-trophy"></i></span>
+                    <span class="adm-l-row-text"><strong>Admission result</strong><small>Published</small></span>
+                    <span class="adm-l-row-action">View <i class="fas fa-arrow-down"></i></span>
+                </a>
+                {% else %}
+                <div class="adm-l-row is-empty">
+                    <span class="adm-l-icon"><i class="fas fa-trophy"></i></span>
+                    <span class="adm-l-row-text"><strong>Admission result</strong></span>
+                    <span class="adm-l-row-action">Not published yet</span>
+                </div>
                 {% endif %}
             </div>
-            {% empty %}
-            <p class="adm-doc-empty">No notices yet.</p>
-            {% endfor %}
         </div>
 
-        <div class="adm-card p-6 md:p-8 mb-6" id="result">
-            <p class="adm-kicker"><i class="fas fa-trophy"></i> Admission Result</p>
-            <h2 class="text-xl font-extrabold mt-1 mb-4">Admission result</h2>
+        {% if result_docs %}
+        <div class="adm-card adm-l-section" id="result">
+            <h2 class="adm-l-h2">Admission result</h2>
             {% for doc in result_docs %}
             <div class="adm-result">
                 <h3 class="adm-notice-title">{{ doc.title }}</h3>
-                <p class="adm-notice-date">{{ doc.published_on|date:"d M Y" }}</p>
                 {% if doc.is_image %}
                 <a href="{{ doc.file.url }}" target="_blank" rel="noopener" title="Open full size">
                     <img src="{{ doc.file.url }}" alt="{{ doc.title }}" loading="lazy" class="adm-result-img">
@@ -159,21 +129,47 @@
                 {% endif %}
                 {% if doc.body %}<div class="adm-notice-body font-bengali">{{ doc.body|linebreaks }}</div>{% endif %}
             </div>
-            {% empty %}
-            <p class="adm-doc-empty">Results will be published here.</p>
             {% endfor %}
         </div>
+        {% endif %}
 
-        {% if admission_banner and admission_banner.attachment_url %}
-        <div class="adm-card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-accent-dark">Circular</p>
-                <h2 class="font-extrabold text-primary text-lg">{{ admission_banner.title }}</h2>
-                {% if admission_banner.subtitle %}<p class="text-slate-500 text-sm">{{ admission_banner.subtitle }}</p>{% endif %}
+        {% if notice_docs %}
+        <div class="adm-card adm-l-section" id="notices">
+            <h2 class="adm-l-h2">Notices</h2>
+            {% for doc in notice_docs %}
+            <div class="adm-notice">
+                <p class="adm-notice-date">{{ doc.published_on|date:"d M Y" }}</p>
+                <h3 class="adm-notice-title">{{ doc.title }}</h3>
+                {% if doc.body %}<div class="adm-notice-body font-bengali">{{ doc.body|linebreaks }}</div>{% endif %}
+                {% if doc.file %}
+                <a href="{{ doc.file.url }}" target="_blank" rel="noopener" class="adm-notice-file">
+                    <i class="fas {% if doc.is_pdf %}fa-file-pdf{% else %}fa-image{% endif %}"></i>
+                    View attachment
+                </a>
+                {% endif %}
             </div>
-            <a href="{{ admission_banner.attachment_url }}" target="_blank" rel="noopener" class="btn btn-accent">View circular</a>
+            {% endfor %}
         </div>
         {% endif %}
+
+        <details class="adm-card adm-l-details">
+            <summary>
+                <span><i class="fas fa-circle-info"></i> Before you apply <span class="font-bengali">· আবেদনের শর্তাবলি</span></span>
+                <i class="fas fa-chevron-down adm-l-chevron"></i>
+            </summary>
+            <div class="adm-l-details-body">
+                <ul class="adm-terms font-bengali">
+                    <li>প্রতিষ্ঠান কর্তৃক নির্ধারিত ও অনুমোদিত লোগোসম্বলিত নির্ধারিত পোশাক পরিধান করতে হবে।</li>
+                    <li>শিক্ষার্থীকে নিয়মিত ও সময়ানুবর্তিতার সঙ্গে বিদ্যালয়ের শ্রেণি কার্যক্রমে উপস্থিত থাকতে হবে।</li>
+                    <li>বিদ্যালয়ের সকল নিয়ম-কানুন, শৃঙ্খলা ও আচরণবিধি যথাযথভাবে মেনে চলতে হবে।</li>
+                    <li>চুলের বিন্যাস পরিপাটি, পরিচ্ছন্ন ও মার্জিত রাখতে হবে এবং বিদ্যালয়ের নির্ধারিত শৃঙ্খলা অনুসরণ করতে হবে।</li>
+                    <li>বিদ্যালয়ের বিভিন্ন সহশিক্ষা কার্যক্রম ও ক্লাব কার্যক্রমে সক্রিয়ভাবে অংশগ্রহণের আগ্রহ ও মানসিকতা থাকতে হবে।</li>
+                </ul>
+                {% if session.instructions %}
+                <div class="adm-l-note font-bengali">{{ session.instructions|linebreaksbr }}</div>
+                {% endif %}
+            </div>
+        </details>
     </div>
 </section>
 {% endblock %}

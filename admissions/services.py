@@ -14,19 +14,33 @@ class SlotUnavailable(Exception):
     pass
 
 
-def _decrement_slot(slot_id):
-    VivaSlot.objects.filter(pk=slot_id, booked_count__gt=0).update(
-        booked_count=F('booked_count') - 1,
-    )
+def append_admin_note(application, note):
+    stamp = timezone.localtime().strftime('%Y-%m-%d %H:%M')
+    line = f'[{stamp}] {note}'
+    application.admin_notes = f'{application.admin_notes}\n{line}'.strip() if application.admin_notes else line
+    application.save(update_fields=['admin_notes', 'updated_at'])
+
+
+def _book_slot(slot_id):
+    """Take one seat in the slot. Only paid applications occupy seats."""
+    return bool(VivaSlot.objects.filter(
+        pk=slot_id,
+        booked_count__lt=F('capacity'),
+    ).update(booked_count=F('booked_count') + 1))
+
+
+def selected_slot_is_full(application):
+    if application.skips_viva_selection or not application.viva_slot_id:
+        return False
+    return VivaSlot.objects.filter(pk=application.viva_slot_id, booked_count__gte=F('capacity')).exists()
 
 
 def release_slot_hold(application, save=True):
-    """Release a non-paid hold and clear the application's slot."""
+    """Clear an unpaid application's slot choice. Unpaid choices never occupy a seat."""
     if not application.viva_slot_id:
         return
     if application.status == Application.Status.PAID:
         return
-    _decrement_slot(application.viva_slot_id)
     application.viva_slot = None
     application.slot_held_until = None
     if save:
@@ -43,9 +57,6 @@ def release_unpaid_holds_for_slot(slot):
         if application.status == Application.Status.AWAITING_PAYMENT:
             application.status = Application.Status.DRAFT
         application.save(update_fields=['viva_slot', 'slot_held_until', 'status', 'updated_at'])
-        if slot.booked_count:
-            _decrement_slot(slot.pk)
-            slot.refresh_from_db(fields=['booked_count'])
 
 
 def expire_slot_holds(now=None):
@@ -107,37 +118,13 @@ def hold_slot(application, slot):
     if _slot_has_passed(slot):
         raise SlotUnavailable('This viva slot has already passed.')
 
-    hold_until = timezone.now() + timedelta(minutes=application.session.slot_hold_minutes)
+    slot.refresh_from_db(fields=['booked_count', 'capacity'])
+    if slot.is_full:
+        raise SlotUnavailable('This viva slot is full. Please choose another time.')
 
-    with transaction.atomic():
-        if (
-            application.viva_slot_id == slot.pk
-            and application.slot_held_until
-            and application.slot_held_until > timezone.now()
-        ):
-            application.slot_held_until = hold_until
-            application.save(update_fields=['slot_held_until', 'updated_at'])
-            return application
-
-        if application.viva_slot_id:
-            _decrement_slot(application.viva_slot_id)
-
-        updated = VivaSlot.objects.filter(
-            pk=slot.pk,
-            is_active=True,
-            booked_count__lt=F('capacity'),
-        ).update(booked_count=F('booked_count') + 1)
-        if not updated:
-            # Restore previous hold occupancy if we decremented it
-            if application.viva_slot_id and application.viva_slot_id != slot.pk:
-                VivaSlot.objects.filter(pk=application.viva_slot_id).update(
-                    booked_count=F('booked_count') + 1,
-                )
-            raise SlotUnavailable('This viva slot is full. Please choose another time.')
-
-        application.viva_slot_id = slot.pk
-        application.slot_held_until = hold_until
-        application.save(update_fields=['viva_slot', 'slot_held_until', 'updated_at'])
+    application.viva_slot_id = slot.pk
+    application.slot_held_until = timezone.now() + timedelta(minutes=application.session.slot_hold_minutes)
+    application.save(update_fields=['viva_slot', 'slot_held_until', 'updated_at'])
     return application
 
 
@@ -199,8 +186,13 @@ def mark_application_paid(application, payment_status=None, transaction_id='', g
     if application.is_paid:
         return application
 
+    lost_slot = None
     with transaction.atomic():
         assign_form_number(application)
+        if application.viva_slot_id and not application.skips_viva_selection:
+            if not _book_slot(application.viva_slot_id):
+                lost_slot = application.viva_slot
+                application.viva_slot = None
         application.status = Application.Status.PAID
         application.payment_status = payment_status
         application.paid_at = timezone.now()
@@ -209,8 +201,13 @@ def mark_application_paid(application, payment_status=None, transaction_id='', g
             application.submitted_at = application.paid_at
         application.save(update_fields=[
             'form_number', 'status', 'payment_status', 'paid_at',
-            'submitted_at', 'slot_held_until', 'updated_at',
+            'submitted_at', 'viva_slot', 'slot_held_until', 'updated_at',
         ])
+    if lost_slot is not None:
+        append_admin_note(
+            application,
+            f'Paid, but the chosen viva slot ({lost_slot}) was already full. Assign a viva slot manually.',
+        )
 
     generate_and_store_pdf(application)
     send_confirmation_email(application)

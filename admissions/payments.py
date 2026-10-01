@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from . import janatapay
 from .models import Application, PaymentAttempt
+from .services import append_admin_note as _append_admin_note
 from .services import fee_as_decimal, mark_application_paid
 
 logger = logging.getLogger(__name__)
@@ -135,13 +136,6 @@ class StubPaymentGateway(PaymentGateway):
         application.payment_status = Application.PaymentStatus.FAILED
         application.save(update_fields=['status', 'payment_status', 'updated_at'])
         return application
-
-
-def _append_admin_note(application, note):
-    stamp = timezone.localtime().strftime('%Y-%m-%d %H:%M')
-    line = f'[{stamp}] {note}'
-    application.admin_notes = f'{application.admin_notes}\n{line}'.strip() if application.admin_notes else line
-    application.save(update_fields=['admin_notes', 'updated_at'])
 
 
 class JanataPayGateway(PaymentGateway):

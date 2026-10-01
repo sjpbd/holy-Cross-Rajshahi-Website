@@ -103,7 +103,7 @@
             <p class="text-blue-100 text-sm">Application fee</p>
             <p class="text-3xl font-extrabold">BDT {{ application.fee_amount }}</p>
             {% if application.slot_held_until and not application.skips_viva_selection %}
-            <p class="text-xs text-blue-100 mt-1">Seat held until {{ application.slot_held_until|date:"g:i A, d M" }}.</p>
+            <p class="text-xs text-blue-100 mt-1">Viva seat is booked only after payment. Selection valid until {{ application.slot_held_until|date:"g:i A, d M" }}.</p>
             {% endif %}
         </div>
         <button type="submit" class="btn btn-accent">

@@ -64,7 +64,7 @@ def build_pdf_context(application):
 
     results = [
         row for row in application.previous_results.all()
-        if row.previous_class or row.year or row.result
+        if row.previous_class or row.exam or row.year or row.result
     ]
 
     return {

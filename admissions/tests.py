@@ -9,6 +9,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.template.loader import render_to_string
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -24,9 +25,11 @@ from .models import (
     Application,
     BusStop,
     PaymentAttempt,
+    PreviousResult,
     VivaSlot,
 )
 from .payments import StubPaymentGateway
+from .pdf import build_pdf_context
 from .services import (
     SlotUnavailable,
     assign_form_number,
@@ -243,18 +246,53 @@ class AgeAndDuplicateTests(AdmissionBaseTestCase):
 
 
 class SlotTests(AdmissionBaseTestCase):
-    def test_last_seat_race(self):
+    def test_unpaid_selection_does_not_book_seat(self):
         self.slot.capacity = 1
         self.slot.save()
         first = self.make_application(birth_registration_no='19901234567890001')
         second = self.make_application(birth_registration_no='19901234567890002')
         hold_slot(first, self.slot)
+        hold_slot(second, self.slot)
+        self.slot.refresh_from_db()
+        self.assertEqual(self.slot.booked_count, 0)
+
+    @patch('admissions.pdf.generate_and_store_pdf', side_effect=fake_store_pdf)
+    def test_seat_booked_on_payment_first_payer_wins(self, _pdf):
+        self.slot.capacity = 1
+        self.slot.save()
+        first = self.make_application(birth_registration_no='19901234567890001')
+        second = self.make_application(birth_registration_no='19901234567890002')
+        third = self.make_application(birth_registration_no='19901234567890003')
+        hold_slot(first, self.slot)
+        hold_slot(second, self.slot)
+        mark_application_paid(first)
         self.slot.refresh_from_db()
         self.assertEqual(self.slot.booked_count, 1)
         with self.assertRaises(SlotUnavailable):
-            hold_slot(second, self.slot)
+            hold_slot(third, self.slot)
 
-    def test_hold_expiry_releases_seat(self):
+        mark_application_paid(second)
+        self.slot.refresh_from_db()
+        second.refresh_from_db()
+        self.assertEqual(self.slot.booked_count, 1)
+        self.assertTrue(second.is_paid)
+        self.assertIsNone(second.viva_slot_id)
+        self.assertIn('Assign a viva slot manually', second.admin_notes)
+
+    def test_payment_page_redirects_when_selected_slot_filled(self):
+        self.slot.capacity = 1
+        self.slot.save()
+        app = self.make_application()
+        hold_slot(app, self.slot)
+        app.status = Application.Status.AWAITING_PAYMENT
+        app.save(update_fields=['status'])
+        VivaSlot.objects.filter(pk=self.slot.pk).update(booked_count=1)
+        response = self.client.get(reverse('admissions:payment', kwargs={'token': app.access_token}))
+        self.assertRedirects(response, f"{reverse('admissions:apply')}?step=5", fetch_redirect_response=False)
+        app.refresh_from_db()
+        self.assertIsNone(app.viva_slot_id)
+
+    def test_hold_expiry_clears_selection(self):
         app = self.make_application()
         hold_slot(app, self.slot)
         app.slot_held_until = timezone.now() - timedelta(minutes=1)
@@ -383,6 +421,22 @@ class SessionAndCacheTests(AdmissionBaseTestCase):
 
 
 class WizardFlowTests(AdmissionBaseTestCase):
+    def test_photo_kept_when_other_fields_invalid(self):
+        apply = reverse('admissions:apply')
+        self.client.get(apply)
+        response = self.client.post(
+            apply + '?step=1',
+            self.student_payload(photo=make_photo_file(), student_name_en=''),
+        )
+        self.assertEqual(response.status_code, 200)
+        application = response.context['application']
+        application.refresh_from_db()
+        self.assertTrue(application.photo)
+        self.assertNotIn('photo', response.context['form'].errors)
+
+        response = self.client.post(apply + '?step=1', self.student_payload())
+        self.assertEqual(response.status_code, 302)
+
     def test_full_apply_to_paid_pdf(self):
         apply = reverse('admissions:apply')
         self.client.get(apply)
@@ -1093,3 +1147,35 @@ class AdmissionDocumentTests(AdmissionBaseTestCase):
         self.assertContains(response, 'Bring birth certificate')
         self.assertNotContains(response, 'Hidden notice')
         self.assertContains(response, 'class="adm-result-img"')
+
+
+class PreviousResultExamTests(AdmissionBaseTestCase):
+    def test_exam_is_saved_and_printed(self):
+        app = self.make_application(birth_registration_no='19901234567890905')
+        app.wizard_step = 2
+        app.save()
+        self.client.cookies[RESUME_COOKIE] = str(app.resume_token)
+        payload = self.family_payload(previous_school_name='Rajshahi Model School')
+        payload.update({
+            'results-0-previous_class': 'Class 5',
+            'results-0-exam': PreviousResult.Exam.HALF_YEARLY,
+            'results-0-year': '2026',
+            'results-0-result': 'GPA 5.00',
+        })
+        response = self.client.post(reverse('admissions:apply') + '?step=2', payload)
+        self.assertEqual(response.status_code, 302)
+        row = app.previous_results.get()
+        self.assertEqual(row.get_exam_display(), 'Half Yearly')
+        self.assertIn('Half Yearly', render_to_string('admissions/pdf/application.html', build_pdf_context(app)))
+
+
+class PaymentPageDetailsTests(AdmissionBaseTestCase):
+    def test_shows_application_id_and_father_details(self):
+        app = self.make_application(father_name='Karim Ali', father_mobile='01711111111')
+        hold_slot(app, self.slot)
+        assign_form_number(app)
+        response = self.client.get(reverse('admissions:payment', kwargs={'token': app.access_token}))
+        self.assertContains(response, 'Application ID')
+        self.assertContains(response, app.form_number)
+        self.assertContains(response, 'Karim Ali')
+        self.assertContains(response, '01711111111')

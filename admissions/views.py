@@ -47,6 +47,7 @@ from .services import (
     hold_slot,
     mark_application_paid,
     release_slot_hold,
+    selected_slot_is_full,
 )
 from .utils import client_ip, lookup_rate_limited
 
@@ -124,6 +125,20 @@ def _sync_wizard_after_save(application, current_step):
     return nxt
 
 
+def _redirect_if_slot_filled(request, application):
+    """Send the applicant back to choose again when paid applicants have filled their chosen slot."""
+    if not selected_slot_is_full(application):
+        return None
+    release_slot_hold(application)
+    messages.error(
+        request,
+        'The viva slot you chose has been filled by applicants who already paid. '
+        'Please choose another slot before paying.',
+    )
+    response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
+    return _set_resume_cookie(response, application)
+
+
 def _class_code_map():
     return {str(klass.pk): klass.code for klass in AdmissionClass.objects.all()}
 
@@ -170,12 +185,14 @@ def _address_state(application):
 def landing(request):
     session = AdmissionSession.objects.filter(is_open=True).first()
     open_now = bool(session and session.is_currently_open())
+    not_started = bool(session and not open_now and session.opens_at and timezone.now() < session.opens_at)
     documents = {category: [] for category in AdmissionDocument.Category.values}
     for doc in AdmissionDocument.objects.filter(is_active=True):
         documents[doc.category].append(doc)
     return render(request, 'admissions/landing.html', {
         'session': session,
         'open_now': open_now,
+        'not_started': not_started,
         'prospectus_docs': documents[AdmissionDocument.Category.PROSPECTUS],
         'guideline_docs': documents[AdmissionDocument.Category.GUIDELINE],
         'notice_docs': documents[AdmissionDocument.Category.NOTICE],
@@ -285,6 +302,9 @@ def apply(request):
             messages.error(request, 'Your viva slot hold expired. Please choose a slot again.')
             response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
             return _set_resume_cookie(response, application)
+        filled = _redirect_if_slot_filled(request, application)
+        if filled:
+            return filled
         if not session.is_currently_open():
             messages.error(request, 'Admission is now closed.')
             return redirect('admissions:landing')
@@ -345,6 +365,8 @@ def apply(request):
             next_step = _sync_wizard_after_save(application, step)
             response = redirect(f"{reverse('admissions:apply')}?step={next_step}")
             return _set_resume_cookie(response, application)
+        if step == STEP_STUDENT:
+            _keep_uploaded_photo(request, application, form)
 
     context = {
         'session': session,
@@ -367,6 +389,19 @@ def apply(request):
     }
     response = render(request, 'admissions/apply.html', context)
     return _set_resume_cookie(response, application)
+
+
+def _keep_uploaded_photo(request, application, form):
+    """Persist a valid new photo even when other fields fail, since file inputs cannot be re-filled."""
+    if 'photo' not in request.FILES or 'photo' in form.errors:
+        return
+    photo = form.cleaned_data.get('photo')
+    if not photo:
+        return
+    fresh = Application.objects.get(pk=application.pk)
+    fresh.photo = photo
+    fresh.save(update_fields=['photo', 'updated_at'])
+    application.photo = fresh.photo
 
 
 def _calendar_context(session, year=None, month=None, selected_date=None):
@@ -548,6 +583,9 @@ def payment_page(request, token):
         messages.error(request, 'Your viva slot reservation expired. Please choose a slot again before paying.')
         response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
         return _set_resume_cookie(response, application)
+    filled = _redirect_if_slot_filled(request, application)
+    if filled:
+        return filled
     return render(request, 'admissions/payment.html', {
         'application': application,
         'debug': settings.DEBUG,
@@ -572,6 +610,9 @@ def start_payment(request, token):
         messages.error(request, 'Your viva slot reservation expired. Please choose a slot again before paying.')
         response = redirect(f"{reverse('admissions:apply')}?step={STEP_SLOT}")
         return _set_resume_cookie(response, application)
+    filled = _redirect_if_slot_filled(request, application)
+    if filled:
+        return filled
     if application.status not in (Application.Status.AWAITING_PAYMENT, Application.Status.PAYMENT_FAILED):
         messages.error(request, 'This application is not ready for payment. Please review and submit it first.')
         return redirect(f"{reverse('admissions:apply')}?step={STEP_REVIEW}")
