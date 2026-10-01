@@ -89,7 +89,7 @@ class PaymentAttemptAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return request.user.is_superuser
 
     @admin.action(description='Re-verify with gateway')
     def reverify_with_gateway(self, request, queryset):
