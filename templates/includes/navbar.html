@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-20">
             <!-- Logo & Branding -->
-            <div class="flex items-center mr-8 xl:mr-16">
+            <div class="nav-brand flex items-center mr-8 xl:mr-16">
                 <a href="{% url 'home' %}" class="flex items-center space-x-4 group">
                     {% if school_info.logo %}
                     <div class="logo-container w-14 h-14 md:w-16 md:h-16 flex items-center justify-center bg-white rounded-full p-1 shadow-lg transition-all duration-500">
@@ -316,6 +316,9 @@
     /* Desktop Navigation Links */
     .nav-link {
         position: relative;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
         color: rgba(255, 255, 255, 0.95);
         padding: 0.75rem 0.875rem;
         border-radius: 0.625rem;
@@ -353,6 +356,16 @@
 
     .nav-link:active {
         transform: translateY(0);
+    }
+
+    @media (min-width: 1280px) {
+        .nav-brand { margin-right: 1.5rem; }
+    }
+
+    /* Below 1536px the one-line menu only fits next to the logo without icons */
+    @media (min-width: 1280px) and (max-width: 1535px) {
+        .nav-link { padding: 0.625rem 0.7rem; }
+        .nav-link > i:not(.fa-chevron-down) { display: none; }
     }
 
     /* Admission - highlighted red call to action */
